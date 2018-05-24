@@ -38,6 +38,7 @@
     "chai": "^4.1.2",
     "eslint": "^4.13.1",
     "eslint-loader": "^1.9.0",
+    "express": "^4.16.3",
     "mocha": "^4.0.1",
     "webpack": "^3.10.0",
     "yargs": "^10.0.3"
