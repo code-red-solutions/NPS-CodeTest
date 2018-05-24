@@ -29,29 +29,43 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="lib\webpack-library-starter.js" />
-    <Compile Include="lib\webpack-library-starter.min.js" />
+    <Content Include="lib\webpack-library-starter.js">
+      <Publish>True</Publish>
+    </Content>
+    <Content Include="lib\webpack-library-starter.min.js">
+      <Publish>True</Publish>
+    </Content>
     <Compile Include="server.js" />
-    <Compile Include="src\cat.js" />
-    <Compile Include="src\dog.js" />
-    <Compile Include="src\index.js" />
-    <Compile Include="test\index.spec.js" />
+    <Compile Include="src\cat.js">
+      <Publish>False</Publish>
+    </Compile>
+    <Compile Include="src\dog.js">
+      <Publish>False</Publish>
+    </Compile>
+    <Compile Include="src\index.js">
+      <Publish>False</Publish>
+    </Compile>
+    <Compile Include="test\index.spec.js">
+      <Publish>False</Publish>
+    </Compile>
     <Compile Include="webpack.config.js" />
-    <Content Include=".babelrc" />
-    <Content Include=".editorconfig" />
-    <Content Include=".eslintrc" />
-    <Content Include=".gitignore" />
-    <Content Include=".nvmrc" />
-    <Content Include=".travis.yml" />
-    <Content Include="lib\webpack-library-starter.js.map" />
+    <None Include=".babelrc" />
+    <None Include=".editorconfig" />
+    <None Include=".eslintrc" />
+    <None Include=".gitignore" />
+    <None Include=".nvmrc" />
+    <None Include=".travis.yml" />
     <None Include="index.html">
       <SubType>Code</SubType>
     </None>
-    <Content Include="LICENSE" />
-    <Content Include="package-lock.json" />
-    <Content Include="package.json" />
-    <Content Include="README.md" />
-    <Content Include="README_orig.md" />
+    <Content Include="lib\webpack-library-starter.js.map">
+      <Publish>True</Publish>
+    </Content>
+    <None Include="LICENSE" />
+    <None Include="package-lock.json" />
+    <None Include="package.json" />
+    <None Include="README.md" />
+    <None Include="README_orig.md" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="lib\" />
