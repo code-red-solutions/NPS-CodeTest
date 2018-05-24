@@ -2,11 +2,11 @@
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
 	else if(typeof define === 'function' && define.amd)
-		define("webpack-library-starter", [], factory);
+		define("codered-nps-widget", [], factory);
 	else if(typeof exports === 'object')
-		exports["webpack-library-starter"] = factory();
+		exports["codered-nps-widget"] = factory();
 	else
-		root["webpack-library-starter"] = factory();
+		root["codered-nps-widget"] = factory();
 })(typeof self !== 'undefined' ? self : this, function() {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
@@ -171,4 +171,4 @@ module.exports = exports['default'];
 /***/ })
 /******/ ]);
 });
-//# sourceMappingURL=webpack-library-starter.js.map
+//# sourceMappingURL=codered-nps-widget.js.map

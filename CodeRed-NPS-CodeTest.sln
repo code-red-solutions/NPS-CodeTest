@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27703.2018
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "webpack-library-starter", "webpack-library-starter\webpack-library-starter.njsproj", "{23DD5A4C-5CE2-411C-AFE8-641B7D7271FA}"
+Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "CodeRed-NPS-Widget", "CodeRed-NPS-CodeTest\CodeRed-NPS-Widget.njsproj", "{23DD5A4C-5CE2-411C-AFE8-641B7D7271FA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

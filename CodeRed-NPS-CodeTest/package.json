@@ -1,8 +1,8 @@
 {
-  "name": "webpack-library-starter",
+  "name": "codered-nps-widget",
   "version": "1.0.2",
   "description": "Produce universal library with webpack and es6",
-  "main": "lib/library.js",
+  "main": "lib/CodeRed-NPS-Widget.js",
   "scripts": {
     "build": "webpack --env dev && webpack --env build && npm run test",
     "dev": "webpack --progress --colors --watch --env dev",
