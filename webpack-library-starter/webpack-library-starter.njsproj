@@ -44,6 +44,9 @@
     <Content Include=".nvmrc" />
     <Content Include=".travis.yml" />
     <Content Include="lib\webpack-library-starter.js.map" />
+    <None Include="index.html">
+      <SubType>Code</SubType>
+    </None>
     <Content Include="LICENSE" />
     <Content Include="package-lock.json" />
     <Content Include="package.json" />
