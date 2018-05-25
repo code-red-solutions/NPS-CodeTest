@@ -44,5 +44,9 @@
     "webpack": "^3.10.0",
     "yargs": "^10.0.3"
   },
-  "-vs-binding": { "BeforeBuild": [ "prod" ] }
+  "-vs-binding": {
+    "BeforeBuild": [
+      "dev"
+    ]
+  }
 }
