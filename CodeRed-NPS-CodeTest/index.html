@@ -2,10 +2,45 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-    <meta charset="utf-8" />
-    <title></title>
+  <meta charset="utf-8" />
+  <title></title>
+
 </head>
 <body>
-  
+  <script type="text/javascript">
+
+    //(function (d, s, id) {
+    //  var js, fjs = d.getElementsByTagName(s)[0];
+    //  if (d.getElementById(id)) { return; }
+    //  js = d.createElement(s); js.id = id;
+    //  js.onload = function () {
+    //    // remote script has loaded
+    //    alert('about to call');
+    //  };
+    //  js.src = "./lib/codered-nps-widget.js";
+    //  fjs.parentNode.insertBefore(js, fjs);
+    //}(document, 'script', 'codered-nps-widget'));
+
+    function injectScript(src) {
+      return new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.async = true;
+        script.src = src;
+        script.addEventListener('load', resolve);
+        script.addEventListener('error', () => reject('Error loading script.'));
+        script.addEventListener('abort', () => reject('Script loading aborted.'));
+        document.head.appendChild(script);
+      });
+    }
+
+    injectScript('./lib/codered-nps-widget.js')
+      .then(() => {
+        console.log('Script loaded!');
+        alert('about to call');
+      }).catch(error => {
+        console.log(error);
+      });
+
+  </script>
 </body>
 </html>
