@@ -4,8 +4,9 @@
   "description": "Produce universal library with webpack and es6",
   "main": "lib/CodeRed-NPS-Widget.js",
   "scripts": {
-    "build": "webpack --env dev && webpack --env build && npm run test",
-    "dev": "webpack --progress --colors --watch --env dev",
+    "prod": "webpack --env dev && webpack --env build && npm run test",
+    "dev": "webpack --colors --env dev && npm run test",
+    "dev:watch": "webpack --progress --colors --watch --env dev",
     "test": "mocha --require babel-core/register --colors ./test/*.spec.js",
     "test:watch": "mocha --require babel-core/register --colors -w ./test/*.spec.js"
   },
@@ -42,5 +43,6 @@
     "mocha": "^4.0.1",
     "webpack": "^3.10.0",
     "yargs": "^10.0.3"
-  }
+  },
+  "-vs-binding": { "BeforeBuild": [ "prod" ] }
 }
