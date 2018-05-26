@@ -69,14 +69,15 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="index.html" />
-    <Content Include="lib\codered-nps-widget.js" />
-    <Content Include="lib\codered-nps-widget.min.js" />
+    <Content Include="lib\codered_nps_widget.js" />
+    <Content Include="lib\codered_nps_widget.min.js" />
     <Content Include="src\cat.js" />
     <Content Include="src\dog.js" />
     <Content Include="src\index.js" />
     <Content Include="test\index.spec.js" />
     <Content Include="favicon.ico" />
     <Content Include=".gitignore" />
+    <Content Include="transpiledTypescript\welcome.js" />
     <Content Include="Web.config" />
     <Content Include="webpack.config.js" />
   </ItemGroup>
@@ -84,7 +85,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="lib\codered-nps-widget.js.map" />
     <Content Include=".babelrc" />
     <Content Include=".editorconfig" />
     <Content Include=".eslintrc" />
@@ -93,6 +93,7 @@
     <Content Include="LICENSE" />
     <Content Include="package-lock.json" />
     <Content Include="package.json" />
+    <Content Include="lib\codered_nps_widget.js.map" />
     <None Include="packages.config" />
     <Content Include="project.lock.json" />
     <Content Include="README.md" />

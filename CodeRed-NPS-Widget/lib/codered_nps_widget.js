@@ -2,11 +2,11 @@
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
 	else if(typeof define === 'function' && define.amd)
-		define("codered-nps-widget", [], factory);
+		define("codered_nps_widget", [], factory);
 	else if(typeof exports === 'object')
-		exports["codered-nps-widget"] = factory();
+		exports["codered_nps_widget"] = factory();
 	else
-		root["codered-nps-widget"] = factory();
+		root["codered_nps_widget"] = factory();
 })(typeof self !== 'undefined' ? self : this, function() {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
@@ -83,7 +83,7 @@ return /******/ (function(modules) { // webpackBootstrap
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.Cat = exports.Dog = undefined;
+exports.Welcome = exports.Dog = exports.Cat = undefined;
 
 var _cat = __webpack_require__(1);
 
@@ -93,10 +93,15 @@ var _dog = __webpack_require__(2);
 
 var _dog2 = _interopRequireDefault(_dog);
 
+var _app = __webpack_require__(3);
+
+var _app2 = _interopRequireDefault(_app);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-exports.Dog = _dog2.default;
 exports.Cat = _cat2.default;
+exports.Dog = _dog2.default;
+exports.Welcome = _app2.default;
 
 /***/ }),
 /* 1 */
@@ -168,7 +173,40 @@ var Dog = function () {
 exports.default = Dog;
 module.exports = exports['default'];
 
+/***/ }),
+/* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var Welcome = /** @class */ (function () {
+    function Welcome(usersName) {
+        this._name = usersName;
+    }
+    ;
+    Object.defineProperty(Welcome.prototype, "usersName", {
+        get: function () {
+            return this._name;
+        },
+        set: function (value) {
+            this._name = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Welcome.prototype.GetWelcomeMessage = function () {
+        return "<h2>Hello there " + this._name + ", Let's learn TypeScript</h2>";
+    };
+    Welcome.prototype.ClickMeButton = function () {
+        document.getElementById("divMsg").innerHTML = this.GetWelcomeMessage();
+    };
+    return Welcome;
+}());
+exports.default = Welcome;
+
+
 /***/ })
 /******/ ]);
 });
-//# sourceMappingURL=codered-nps-widget.js.map
+//# sourceMappingURL=codered_nps_widget.js.map
