@@ -8,7 +8,8 @@
     "dev": "webpack --colors --env dev && npm run test",
     "dev:watch": "webpack --progress --colors --watch --env dev",
     "test": "mocha --require babel-core/register --colors ./test/*.spec.js",
-    "test:watch": "mocha --require babel-core/register --colors -w ./test/*.spec.js"
+    "test:watch": "mocha --require babel-core/register --colors -w ./test/*.spec.js",
+    "linkTypescript": "npm link typescript"
   },
   "repository": {
     "type": "git",
