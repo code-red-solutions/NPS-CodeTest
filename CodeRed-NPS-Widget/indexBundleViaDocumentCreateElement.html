@@ -20,13 +20,10 @@
       });
     }
 
-    injectScript('https://cdnjs.cloudflare.com/ajax/libs/systemjs/0.21.3/system-production.js')
+    injectScript('./lib/codered_nps_widget.js')
       .then(() => {
-        console.log('SystemJS loaded!');
-        SystemJS.import('./lib/codered_nps_widget.js').then(function (modules) {
-          console.log(modules);
-          welcome = new (modules.Welcome)('Paul');
-        });;
+        console.log('Script loaded!');
+        welcome = new (codered_nps_widget.Welcome)('Paul');
       }).catch(error => {
         console.log(error);
       });

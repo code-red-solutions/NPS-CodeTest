@@ -70,6 +70,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="indexBundleViaDocumentCreateElement.html" />
+    <Content Include="indexBundleViaScriptTag.html" />
+    <Content Include="indexDirectTSDebugging.html" />
     <Content Include="index.html" />
     <Content Include="lib\codered_nps_widget.js" />
     <Content Include="lib\codered_nps_widget.min.js" />

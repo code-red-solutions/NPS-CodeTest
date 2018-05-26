@@ -20,13 +20,11 @@
       });
     }
 
-    injectScript('https://cdnjs.cloudflare.com/ajax/libs/systemjs/0.21.3/system-production.js')
+    injectScript('./transpiledTypescript/welcome.js')
       .then(() => {
-        console.log('SystemJS loaded!');
-        SystemJS.import('./lib/codered_nps_widget.js').then(function (modules) {
-          console.log(modules);
-          welcome = new (modules.Welcome)('Paul');
-        });;
+        console.log('welcome.js Script loaded!');
+        welcome = new Welcome('Paul');
+       
       }).catch(error => {
         console.log(error);
       });
@@ -38,6 +36,9 @@
   </script>
 </head>
 <body>
+  <div><h1>To run and debug the TS files directly you need to comment out the 'export default' keywords in the TS source.</h1></div>
+  <br />
+  <br />
   <div id="divMsg"></div>
   <br />
   <button type="button" class="btn btn-primary btn-md" onclick="clickAndChangeName()">
