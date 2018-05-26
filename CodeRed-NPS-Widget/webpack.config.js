@@ -38,12 +38,18 @@ const config = {
         test: /(\.jsx|\.js)$/,
         loader: 'eslint-loader',
         exclude: /node_modules/
+      },
+      // all files with a `.ts` or `.tsx` extension will be handled by `ts-loader`
+      {
+        test: /(\.tsx|\.ts)$/,
+        loader: 'ts-loader',
+        exclude: /node_modules/
       }
     ]
   },
   resolve: {
     modules: [path.resolve('./node_modules'), path.resolve('./src')],
-    extensions: ['.json', '.js']
+    extensions: ['.ts', '.tsx', '.json', '.js']
   },
   plugins: plugins
 };

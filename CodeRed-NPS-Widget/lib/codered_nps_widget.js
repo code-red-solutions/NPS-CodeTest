@@ -93,15 +93,15 @@ var _dog = __webpack_require__(2);
 
 var _dog2 = _interopRequireDefault(_dog);
 
-var _app = __webpack_require__(3);
+var _welcome = __webpack_require__(3);
 
-var _app2 = _interopRequireDefault(_app);
+var _welcome2 = _interopRequireDefault(_welcome);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 exports.Cat = _cat2.default;
 exports.Dog = _dog2.default;
-exports.Welcome = _app2.default;
+exports.Welcome = _welcome2.default;
 
 /***/ }),
 /* 1 */

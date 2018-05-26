@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "removeComments": false,
+    "sourceMap": true,
+    "target": "es5",
+    "outDir": "transpiledTypescript"
+  },
+  "exclude": [
+    "node_modules",
+    "wwwroot"
+  ]
+}
