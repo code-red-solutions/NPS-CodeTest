@@ -70,39 +70,46 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="indexBundleViaDocumentCreateElement.html" />
-    <Content Include="indexBundleViaScriptTag.html" />
-    <Content Include="indexDirectTSDebugging.html" />
+    <None Include="indexBundleViaDocumentCreateElement.html" />
+    <None Include="indexBundleViaScriptTag.html" />
+    <None Include="indexDirectTSDebugging.html" />
     <Content Include="index.html" />
-    <Content Include="lib\codered_nps_widget.js" />
-    <Content Include="lib\codered_nps_widget.min.js" />
-    <Content Include="src\cat.js" />
-    <Content Include="src\dog.js" />
-    <Content Include="src\index.js" />
-    <Content Include="test\index.spec.js" />
+    <None Include="lib\codered_nps_widget.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="lib\codered_nps_widget.min.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
+    <None Include="src\cat.js" />
+    <None Include="src\dog.js" />
+    <None Include="src\index.js" />
+    <None Include="test\index.spec.js" />
     <Content Include="favicon.ico" />
-    <Content Include=".gitignore" />
+    <None Include=".gitignore" />
     <Content Include="transpiledTypescript\welcome.js" />
     <Content Include="Web.config" />
-    <Content Include="webpack.config.js" />
+    <None Include="webpack.config.js" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include=".babelrc" />
-    <Content Include=".editorconfig" />
-    <Content Include=".eslintrc" />
-    <Content Include=".nvmrc" />
-    <Content Include=".travis.yml" />
-    <Content Include="LICENSE" />
-    <Content Include="package-lock.json" />
-    <Content Include="package.json" />
-    <Content Include="lib\codered_nps_widget.js.map" />
+    <None Include=".babelrc" />
+    <None Include=".editorconfig" />
+    <None Include=".eslintrc" />
+    <None Include=".nvmrc" />
+    <None Include=".travis.yml" />
+    <None Include="LICENSE" />
+    <None Include="package-lock.json" />
+    <None Include="package.json" />
+    <None Include="lib\codered_nps_widget.js.map">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="packages.config" />
-    <Content Include="project.lock.json" />
-    <Content Include="README.md" />
-    <Content Include="tsconfig.json" />
+    <None Include="project.lock.json" />
+    <None Include="README-webpack-library-starter.md" />
+    <None Include="tsconfig.json" />
     <Content Include="transpiledTypescript\welcome.js.map" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
