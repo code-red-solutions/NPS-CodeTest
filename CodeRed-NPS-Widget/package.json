@@ -47,7 +47,7 @@
     "yargs": "^10.0.3"
   },
   "-vs-binding": {
-    "AfterBuild": [
+    "BeforeBuild": [
       "dev"
     ]
   }

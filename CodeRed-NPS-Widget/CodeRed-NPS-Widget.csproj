@@ -84,6 +84,7 @@
     <None Include="src\cat.js" />
     <None Include="src\dog.js" />
     <None Include="src\index.js" />
+    <Content Include="src\tsconfig.json" />
     <None Include="test\index.spec.js" />
     <Content Include="favicon.ico" />
     <None Include=".gitignore" />
