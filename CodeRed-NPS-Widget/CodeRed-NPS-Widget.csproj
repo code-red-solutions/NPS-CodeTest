@@ -73,11 +73,14 @@
     <None Include="indexBundleViaDocumentCreateElement.html" />
     <None Include="indexBundleViaScriptTag.html" />
     <None Include="indexDirectTSDebugging.html" />
+    <Content Include="conf\webpack.config.dev.js" />
+    <Content Include="conf\webpack.config.prod.js" />
     <Content Include="index.html" />
-    <Content Include="lib\build\codered_nps_widget.min.js" />
+    <Content Include="lib\prod\codered_nps_widget.min.js" />
     <Content Include="lib\dev\codered_nps_widget.js.map" />
-    <Content Include="mochaConfig.dev.json" />
-    <Content Include="mochaConfig.build.json" />
+    <Content Include="conf\mocha.config.dev.json" />
+    <Content Include="conf\mocha.config.prod.json" />
+    <Content Include="package-lock.json" />
     <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
     <None Include="src\cat.js" />
     <None Include="src\dog.js" />
@@ -90,7 +93,6 @@
     <Content Include="test\context.js" />
     <Content Include="transpiledTypescript\welcome.js" />
     <Content Include="Web.config" />
-    <None Include="webpack.config.js" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -102,7 +104,6 @@
     <None Include=".nvmrc" />
     <None Include=".travis.yml" />
     <None Include="LICENSE" />
-    <None Include="package-lock.json" />
     <None Include="package.json" />
     <None Include="packages.config" />
     <None Include="project.lock.json" />

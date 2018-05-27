@@ -10,8 +10,8 @@ var context = config.get('context')
 var testEnv = context.env
 
 import * as dev from '../lib/dev/codered_nps_widget.js';
-import * as prod from '../lib/build/codered_nps_widget.min.js';
+import * as prod from '../lib/prod/codered_nps_widget.min.js';
 
-let testObjects = testEnv === "build" ? prod : dev;
+let testObjects = testEnv === "prod" ? prod : dev;
 
 export default testObjects;

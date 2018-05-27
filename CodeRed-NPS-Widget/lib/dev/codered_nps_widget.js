@@ -54,6 +54,11 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 		}
 /******/ 	};
 /******/
+/******/ 	// define __esModule on exports
+/******/ 	__webpack_require__.r = function(exports) {
+/******/ 		Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 	};
+/******/
 /******/ 	// getDefaultExport function for compatibility with non-harmony modules
 /******/ 	__webpack_require__.n = function(module) {
 /******/ 		var getter = module && module.__esModule ?
@@ -69,42 +74,18 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// __webpack_public_path__
 /******/ 	__webpack_require__.p = "";
 /******/
+/******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 0);
+/******/ 	return __webpack_require__(__webpack_require__.s = "./src/index.js");
 /******/ })
 /************************************************************************/
-/******/ ([
-/* 0 */
-/***/ (function(module, exports, __webpack_require__) {
+/******/ ({
 
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.Welcome = exports.Dog = exports.Cat = undefined;
-
-var _cat = __webpack_require__(1);
-
-var _cat2 = _interopRequireDefault(_cat);
-
-var _dog = __webpack_require__(2);
-
-var _dog2 = _interopRequireDefault(_dog);
-
-var _welcome = __webpack_require__(3);
-
-var _welcome2 = _interopRequireDefault(_welcome);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-exports.Cat = _cat2.default;
-exports.Dog = _dog2.default;
-exports.Welcome = _welcome2.default;
-
-/***/ }),
-/* 1 */
+/***/ "./src/cat.js":
+/*!********************!*\
+  !*** ./src/cat.js ***!
+  \********************/
+/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -139,7 +120,12 @@ exports.default = Cat;
 module.exports = exports['default'];
 
 /***/ }),
-/* 2 */
+
+/***/ "./src/dog.js":
+/*!********************!*\
+  !*** ./src/dog.js ***!
+  \********************/
+/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -174,7 +160,47 @@ exports.default = Dog;
 module.exports = exports['default'];
 
 /***/ }),
-/* 3 */
+
+/***/ "./src/index.js":
+/*!**********************!*\
+  !*** ./src/index.js ***!
+  \**********************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Welcome = exports.Dog = exports.Cat = undefined;
+
+var _cat = __webpack_require__(/*! ./cat.js */ "./src/cat.js");
+
+var _cat2 = _interopRequireDefault(_cat);
+
+var _dog = __webpack_require__(/*! ./dog.js */ "./src/dog.js");
+
+var _dog2 = _interopRequireDefault(_dog);
+
+var _welcome = __webpack_require__(/*! ./welcome.ts */ "./src/welcome.ts");
+
+var _welcome2 = _interopRequireDefault(_welcome);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+exports.Cat = _cat2.default;
+exports.Dog = _dog2.default;
+exports.Welcome = _welcome2.default;
+
+/***/ }),
+
+/***/ "./src/welcome.ts":
+/*!************************!*\
+  !*** ./src/welcome.ts ***!
+  \************************/
+/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -207,6 +233,7 @@ exports.default = Welcome;
 
 
 /***/ })
-/******/ ]);
+
+/******/ });
 });
 //# sourceMappingURL=codered_nps_widget.js.map
