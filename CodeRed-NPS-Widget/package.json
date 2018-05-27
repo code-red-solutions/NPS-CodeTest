@@ -4,11 +4,12 @@
   "description": "Produce universal library with webpack and es6",
   "main": "lib/CodeRed-NPS-Widget.js",
   "scripts": {
-    "prod": "webpack --env dev && webpack --env build && npm run test",
-    "dev": "webpack --colors --env dev && npm run test",
+    "prod": "npm run  && webpack --env build && npm run test:build",
+    "dev": "webpack --colors --env dev && npm run test:dev",
     "dev:watch": "webpack --progress --colors --watch --env dev",
-    "test": "mocha --require babel-core/register --colors ./test/*.spec.js",
-    "test:watch": "mocha --require babel-core/register --colors -w ./test/*.spec.js",
+    "test:dev": "mocha --require babel-core/register --colors --config=./mochaConfig.dev.json ./test/*.spec.js",
+    "test:dev:watch": "mocha --require babel-core/register --colors -w --config=./mochaConfig.dev.json ./test/*.spec.js",
+    "test:build": "mocha --require babel-core/register --colors --config=./mochaConfig.build.json ./test/*.spec.js",
     "linkTypescript": "npm link typescript"
   },
   "repository": {
@@ -38,10 +39,14 @@
     "babel-plugin-add-module-exports": "^0.2.1",
     "babel-preset-env": "^1.6.1",
     "chai": "^4.1.2",
+    "clean-webpack-plugin": "^0.1.19",
     "eslint": "^4.13.1",
     "eslint-loader": "^1.9.0",
     "express": "^4.16.3",
+    "html-webpack-plugin": "^3.2.0",
     "mocha": "^4.0.1",
+    "nconf": "^0.10.0",
+    "optimist": "^0.6.1",
     "ts-loader": "^3.5.0",
     "webpack": "^3.10.0",
     "yargs": "^10.0.3"

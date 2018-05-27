@@ -74,20 +74,20 @@
     <None Include="indexBundleViaScriptTag.html" />
     <None Include="indexDirectTSDebugging.html" />
     <Content Include="index.html" />
-    <None Include="lib\codered_nps_widget.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="lib\codered_nps_widget.min.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <Content Include="lib\dev\codered_nps_widget.js.map" />
+    <Content Include="mochaConfig.dev.json" />
+    <Content Include="mochaConfig.build.json" />
     <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
     <None Include="src\cat.js" />
     <None Include="src\dog.js" />
     <None Include="src\index.js" />
+    <Content Include="lib\dev\codered_nps_widget.js" />
+    <Content Include="lib\prod\codered_nps_widget.min.js" />
     <Content Include="src\tsconfig.json" />
     <None Include="test\index.spec.js" />
     <Content Include="favicon.ico" />
     <None Include=".gitignore" />
+    <Content Include="test\context.js" />
     <Content Include="transpiledTypescript\welcome.js" />
     <Content Include="Web.config" />
     <None Include="webpack.config.js" />
@@ -104,9 +104,6 @@
     <None Include="LICENSE" />
     <None Include="package-lock.json" />
     <None Include="package.json" />
-    <None Include="lib\codered_nps_widget.js.map">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Include="packages.config" />
     <None Include="project.lock.json" />
     <None Include="README-webpack-library-starter.md" />
