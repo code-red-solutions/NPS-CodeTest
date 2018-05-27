@@ -1,5 +1,5 @@
 {
   "context": {
-    "env": "build"
+    "env": "prod"
   }
 }
