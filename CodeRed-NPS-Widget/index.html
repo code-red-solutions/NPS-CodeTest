@@ -23,7 +23,7 @@
     injectScript('https://cdnjs.cloudflare.com/ajax/libs/systemjs/0.21.3/system-production.js')
       .then(() => {
         console.log('SystemJS loaded!');
-        SystemJS.import('./lib/codered_nps_widget.js').then(function (modules) {
+        SystemJS.import('./lib/dev/codered_nps_widget.js').then(function (modules) {
           console.log(modules);
           welcome = new (modules.Welcome)('Paul');
         });;

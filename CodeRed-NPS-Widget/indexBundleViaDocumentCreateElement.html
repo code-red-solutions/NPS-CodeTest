@@ -20,7 +20,7 @@
       });
     }
 
-    injectScript('./lib/codered_nps_widget.js')
+    injectScript('./lib/dev/codered_nps_widget.js')
       .then(() => {
         console.log('Script loaded!');
         welcome = new (codered_nps_widget.Welcome)('Paul');

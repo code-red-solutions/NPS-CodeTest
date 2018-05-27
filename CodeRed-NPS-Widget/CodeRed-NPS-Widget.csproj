@@ -74,6 +74,7 @@
     <None Include="indexBundleViaScriptTag.html" />
     <None Include="indexDirectTSDebugging.html" />
     <Content Include="index.html" />
+    <Content Include="lib\build\codered_nps_widget.min.js" />
     <Content Include="lib\dev\codered_nps_widget.js.map" />
     <Content Include="mochaConfig.dev.json" />
     <Content Include="mochaConfig.build.json" />
@@ -82,7 +83,6 @@
     <None Include="src\dog.js" />
     <None Include="src\index.js" />
     <Content Include="lib\dev\codered_nps_widget.js" />
-    <Content Include="lib\prod\codered_nps_widget.min.js" />
     <Content Include="src\tsconfig.json" />
     <None Include="test\index.spec.js" />
     <Content Include="favicon.ico" />
