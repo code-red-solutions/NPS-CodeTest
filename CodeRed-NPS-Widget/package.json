@@ -48,6 +48,7 @@
     "nconf": "^0.10.0",
     "optimist": "^0.6.1",
     "ts-loader": "^3.5.0",
+    "typescript": "^2.8.3",
     "webpack": "^3.10.0",
     "yargs": "^10.0.3"
   },
