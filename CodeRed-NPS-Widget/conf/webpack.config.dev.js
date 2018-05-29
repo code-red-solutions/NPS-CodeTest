@@ -2,7 +2,6 @@
 
 const path = require('path');
 const webpack = require('webpack');
-const CleanWebpackPlugin = require('clean-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 // const UglifyJsPlugin = webpack.optimize.UglifyJsPlugin;
@@ -64,7 +63,6 @@ const config = {
     extensions: ['.ts', '.tsx', '.json', '.js']
   },
   plugins: [
-    new CleanWebpackPlugin(['lib/dev'], { verbose: true, root: path.resolve(__dirname, '..') }),
     // copy custom static assets
     new CopyWebpackPlugin([
       {

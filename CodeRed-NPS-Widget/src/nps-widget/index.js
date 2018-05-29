@@ -6,14 +6,6 @@ export default class NpsWidget extends PolymerElement {
     return {
       name: {
         type: String
-      },
-      appVersion: {
-        type: String,
-        value: process.env.appVersion
-      },
-      ENV: {
-        type: String,
-        value: process.env.NODE_ENV
       }
     };
   }
