@@ -1,4 +1,6 @@
-/*export default*/ var Welcome = /** @class */ (function () {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var Welcome = /** @class */ (function () {
     function Welcome(usersName) {
         this._name = usersName;
     }
@@ -21,4 +23,5 @@
     };
     return Welcome;
 }());
+exports.default = Welcome;
 //# sourceMappingURL=welcome.js.map

@@ -4,6 +4,9 @@
 <head>
   <meta charset="utf-8" />
   <title></title>
+
+
+
   <script type="text/javascript">
 
     let welcome;
@@ -23,10 +26,22 @@
     injectScript('https://cdnjs.cloudflare.com/ajax/libs/systemjs/0.21.3/system-production.js')
       .then(() => {
         console.log('SystemJS loaded!');
-        SystemJS.import('./lib/dev/codered_nps_widget.js').then(function (modules) {
-          console.log(modules);
-          welcome = new (modules.Welcome)('Paul');
-        });;
+        injectScript('./lib/dev/custom-elements-es5-adapter.js')
+          .then(() => {
+            console.log('custom-elements-es5-adapter loaded!');
+            injectScript('./lib/dev/webcomponents-loader.js')
+              .then(() => {
+                console.log('Webcomponents loaded!');
+                SystemJS.import('./lib/dev/codered_nps_widget.js').then(function (modules) {
+                  console.log(modules);
+                  welcome = new (modules.Welcome)('Paul');
+                }).catch(error => {
+                  console.log(error);
+                });
+          }).catch(error => {
+            console.log(error);
+          });
+        });
       }).catch(error => {
         console.log(error);
       });
@@ -43,6 +58,6 @@
   <button type="button" class="btn btn-primary btn-md" onclick="clickAndChangeName()">
     Show Message
   </button>
-
+  <NpsWidget></NpsWidget>
 </body>
 </html>
