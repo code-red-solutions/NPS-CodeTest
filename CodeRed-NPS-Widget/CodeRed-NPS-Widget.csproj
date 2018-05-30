@@ -101,6 +101,7 @@
     <Content Include="src\nps-widget\index.js" />
     <Content Include="src\nps-widget\template.html" />
     <Content Include="src\tsconfig.json" />
+    <TypeScriptCompile Include="src\nps-widget\stylingProps.ts" />
     <None Include="test\index.spec.js" />
     <Content Include="favicon.ico" />
     <None Include=".gitignore" />

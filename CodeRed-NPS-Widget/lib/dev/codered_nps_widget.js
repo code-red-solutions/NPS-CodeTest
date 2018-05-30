@@ -81,10 +81,10 @@ return /******/ (function(modules) { // webpackBootstrap
 /************************************************************************/
 /******/ ({
 
-/***/ "./node_modules/@polymer/iron-fit-behavior/iron-fit-behavior.js":
-/*!**********************************************************************!*\
-  !*** ./node_modules/@polymer/iron-fit-behavior/iron-fit-behavior.js ***!
-  \**********************************************************************/
+/***/ "./node_modules/@polymer/iron-a11y-keys-behavior/iron-a11y-keys-behavior.js":
+/*!**********************************************************************************!*\
+  !*** ./node_modules/@polymer/iron-a11y-keys-behavior/iron-a11y-keys-behavior.js ***!
+  \**********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -94,60 +94,32 @@ return /******/ (function(modules) { // webpackBootstrap
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.IronFitBehavior = undefined;
+exports.IronA11yKeysBehavior = undefined;
 
 __webpack_require__(/*! @polymer/polymer/polymer-legacy.js */ "./node_modules/@polymer/polymer/polymer-legacy.js");
 
-var _polymerDom = __webpack_require__(/*! @polymer/polymer/lib/legacy/polymer.dom.js */ "./node_modules/@polymer/polymer/lib/legacy/polymer.dom.js");
+/**
+ * Chrome uses an older version of DOM Level 3 Keyboard Events
+ *
+ * Most keys are labeled as text, but some are Unicode codepoints.
+ * Values taken from:
+ * http://www.w3.org/TR/2007/WD-DOM-Level-3-Events-20071221/keyset.html#KeySet-Set
+ */
+var KEY_IDENTIFIER = {
+  'U+0008': 'backspace',
+  'U+0009': 'tab',
+  'U+001B': 'esc',
+  'U+0020': 'space',
+  'U+007F': 'del'
+};
 
 /**
-  `Polymer.IronFitBehavior` fits an element in another element using `max-height`
-  and `max-width`, and optionally centers it in the window or another element.
-
-  The element will only be sized and/or positioned if it has not already been
-  sized and/or positioned by CSS.
-
-  CSS properties               | Action
-  -----------------------------|-------------------------------------------
-  `position` set               | Element is not centered horizontally or
-  vertically `top` or `bottom` set        | Element is not vertically centered
-  `left` or `right` set        | Element is not horizontally centered
-  `max-height` set             | Element respects `max-height`
-  `max-width` set              | Element respects `max-width`
-
-  `Polymer.IronFitBehavior` can position an element into another element using
-  `verticalAlign` and `horizontalAlign`. This will override the element's css
-  position.
-
-        <div class="container">
-          <iron-fit-impl vertical-align="top" horizontal-align="auto">
-            Positioned into the container
-          </iron-fit-impl>
-        </div>
-
-  Use `noOverlap` to position the element around another element without
-  overlapping it.
-
-        <div class="container">
-          <iron-fit-impl no-overlap vertical-align="auto" horizontal-align="auto">
-            Positioned around the container
-          </iron-fit-impl>
-        </div>
-
-  Use `horizontalOffset, verticalOffset` to offset the element from its
-  `positionTarget`; `Polymer.IronFitBehavior` will collapse these in order to keep
-  the element within `fitInto` boundaries, while preserving the element's CSS
-  margin values.
-
-        <div class="container">
-          <iron-fit-impl vertical-align="top" vertical-offset="20">
-            With vertical offset
-          </iron-fit-impl>
-        </div>
-
-
-  @demo demo/index.html
-  @polymerBehavior
+ * Special table for KeyboardEvent.keyCode.
+ * KeyboardEvent.keyIdentifier is better, and KeyBoardEvent.key is even better
+ * than that.
+ *
+ * Values from:
+ * https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent.keyCode#Value_of_keyCode
  */
 /**
 @license
@@ -158,17 +130,238 @@ The complete set of contributors may be found at http://polymer.github.io/CONTRI
 Code distributed by Google as part of the polymer project is also
 subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
 */
-var IronFitBehavior = exports.IronFitBehavior = {
+var KEY_CODE = {
+  8: 'backspace',
+  9: 'tab',
+  13: 'enter',
+  27: 'esc',
+  33: 'pageup',
+  34: 'pagedown',
+  35: 'end',
+  36: 'home',
+  32: 'space',
+  37: 'left',
+  38: 'up',
+  39: 'right',
+  40: 'down',
+  46: 'del',
+  106: '*'
+};
 
+/**
+ * MODIFIER_KEYS maps the short name for modifier keys used in a key
+ * combo string to the property name that references those same keys
+ * in a KeyboardEvent instance.
+ */
+var MODIFIER_KEYS = {
+  'shift': 'shiftKey',
+  'ctrl': 'ctrlKey',
+  'alt': 'altKey',
+  'meta': 'metaKey'
+};
+
+/**
+ * KeyboardEvent.key is mostly represented by printable character made by
+ * the keyboard, with unprintable keys labeled nicely.
+ *
+ * However, on OS X, Alt+char can make a Unicode character that follows an
+ * Apple-specific mapping. In this case, we fall back to .keyCode.
+ */
+var KEY_CHAR = /[a-z0-9*]/;
+
+/**
+ * Matches a keyIdentifier string.
+ */
+var IDENT_CHAR = /U\+/;
+
+/**
+ * Matches arrow keys in Gecko 27.0+
+ */
+var ARROW_KEY = /^arrow/;
+
+/**
+ * Matches space keys everywhere (notably including IE10's exceptional name
+ * `spacebar`).
+ */
+var SPACE_KEY = /^space(bar)?/;
+
+/**
+ * Matches ESC key.
+ *
+ * Value from: http://w3c.github.io/uievents-key/#key-Escape
+ */
+var ESC_KEY = /^escape$/;
+
+/**
+ * Transforms the key.
+ * @param {string} key The KeyBoardEvent.key
+ * @param {Boolean} [noSpecialChars] Limits the transformation to
+ * alpha-numeric characters.
+ */
+function transformKey(key, noSpecialChars) {
+  var validKey = '';
+  if (key) {
+    var lKey = key.toLowerCase();
+    if (lKey === ' ' || SPACE_KEY.test(lKey)) {
+      validKey = 'space';
+    } else if (ESC_KEY.test(lKey)) {
+      validKey = 'esc';
+    } else if (lKey.length == 1) {
+      if (!noSpecialChars || KEY_CHAR.test(lKey)) {
+        validKey = lKey;
+      }
+    } else if (ARROW_KEY.test(lKey)) {
+      validKey = lKey.replace('arrow', '');
+    } else if (lKey == 'multiply') {
+      // numpad '*' can map to Multiply on IE/Windows
+      validKey = '*';
+    } else {
+      validKey = lKey;
+    }
+  }
+  return validKey;
+}
+
+function transformKeyIdentifier(keyIdent) {
+  var validKey = '';
+  if (keyIdent) {
+    if (keyIdent in KEY_IDENTIFIER) {
+      validKey = KEY_IDENTIFIER[keyIdent];
+    } else if (IDENT_CHAR.test(keyIdent)) {
+      keyIdent = parseInt(keyIdent.replace('U+', '0x'), 16);
+      validKey = String.fromCharCode(keyIdent).toLowerCase();
+    } else {
+      validKey = keyIdent.toLowerCase();
+    }
+  }
+  return validKey;
+}
+
+function transformKeyCode(keyCode) {
+  var validKey = '';
+  if (Number(keyCode)) {
+    if (keyCode >= 65 && keyCode <= 90) {
+      // ascii a-z
+      // lowercase is 32 offset from uppercase
+      validKey = String.fromCharCode(32 + keyCode);
+    } else if (keyCode >= 112 && keyCode <= 123) {
+      // function keys f1-f12
+      validKey = 'f' + (keyCode - 112 + 1);
+    } else if (keyCode >= 48 && keyCode <= 57) {
+      // top 0-9 keys
+      validKey = String(keyCode - 48);
+    } else if (keyCode >= 96 && keyCode <= 105) {
+      // num pad 0-9
+      validKey = String(keyCode - 96);
+    } else {
+      validKey = KEY_CODE[keyCode];
+    }
+  }
+  return validKey;
+}
+
+/**
+ * Calculates the normalized key for a KeyboardEvent.
+ * @param {KeyboardEvent} keyEvent
+ * @param {Boolean} [noSpecialChars] Set to true to limit keyEvent.key
+ * transformation to alpha-numeric chars. This is useful with key
+ * combinations like shift + 2, which on FF for MacOS produces
+ * keyEvent.key = @
+ * To get 2 returned, set noSpecialChars = true
+ * To get @ returned, set noSpecialChars = false
+ */
+function normalizedKeyForEvent(keyEvent, noSpecialChars) {
+  // Fall back from .key, to .detail.key for artifical keyboard events,
+  // and then to deprecated .keyIdentifier and .keyCode.
+  if (keyEvent.key) {
+    return transformKey(keyEvent.key, noSpecialChars);
+  }
+  if (keyEvent.detail && keyEvent.detail.key) {
+    return transformKey(keyEvent.detail.key, noSpecialChars);
+  }
+  return transformKeyIdentifier(keyEvent.keyIdentifier) || transformKeyCode(keyEvent.keyCode) || '';
+}
+
+function keyComboMatchesEvent(keyCombo, event) {
+  // For combos with modifiers we support only alpha-numeric keys
+  var keyEvent = normalizedKeyForEvent(event, keyCombo.hasModifiers);
+  return keyEvent === keyCombo.key && (!keyCombo.hasModifiers || !!event.shiftKey === !!keyCombo.shiftKey && !!event.ctrlKey === !!keyCombo.ctrlKey && !!event.altKey === !!keyCombo.altKey && !!event.metaKey === !!keyCombo.metaKey);
+}
+
+function parseKeyComboString(keyComboString) {
+  if (keyComboString.length === 1) {
+    return { combo: keyComboString, key: keyComboString, event: 'keydown' };
+  }
+  return keyComboString.split('+').reduce(function (parsedKeyCombo, keyComboPart) {
+    var eventParts = keyComboPart.split(':');
+    var keyName = eventParts[0];
+    var event = eventParts[1];
+
+    if (keyName in MODIFIER_KEYS) {
+      parsedKeyCombo[MODIFIER_KEYS[keyName]] = true;
+      parsedKeyCombo.hasModifiers = true;
+    } else {
+      parsedKeyCombo.key = keyName;
+      parsedKeyCombo.event = event || 'keydown';
+    }
+
+    return parsedKeyCombo;
+  }, { combo: keyComboString.split(':').shift() });
+}
+
+function parseEventString(eventString) {
+  return eventString.trim().split(' ').map(function (keyComboString) {
+    return parseKeyComboString(keyComboString);
+  });
+}
+
+/**
+ * `Polymer.IronA11yKeysBehavior` provides a normalized interface for processing
+ * keyboard commands that pertain to [WAI-ARIA best
+ * practices](http://www.w3.org/TR/wai-aria-practices/#kbd_general_binding). The
+ * element takes care of browser differences with respect to Keyboard events and
+ * uses an expressive syntax to filter key presses.
+ *
+ * Use the `keyBindings` prototype property to express what combination of keys
+ * will trigger the callback. A key binding has the format
+ * `"KEY+MODIFIER:EVENT": "callback"` (`"KEY": "callback"` or
+ * `"KEY:EVENT": "callback"` are valid as well). Some examples:
+ *
+ *      keyBindings: {
+ *        'space': '_onKeydown', // same as 'space:keydown'
+ *        'shift+tab': '_onKeydown',
+ *        'enter:keypress': '_onKeypress',
+ *        'esc:keyup': '_onKeyup'
+ *      }
+ *
+ * The callback will receive with an event containing the following information
+ * in `event.detail`:
+ *
+ *      _onKeydown: function(event) {
+ *        console.log(event.detail.combo); // KEY+MODIFIER, e.g. "shift+tab"
+ *        console.log(event.detail.key); // KEY only, e.g. "tab"
+ *        console.log(event.detail.event); // EVENT, e.g. "keydown"
+ *        console.log(event.detail.keyboardEvent); // the original KeyboardEvent
+ *      }
+ *
+ * Use the `keyEventTarget` attribute to set up event handlers on a specific
+ * node.
+ *
+ * See the [demo source
+ * code](https://github.com/PolymerElements/iron-a11y-keys-behavior/blob/master/demo/x-key-aware.html)
+ * for an example.
+ *
+ * @demo demo/index.html
+ * @polymerBehavior
+ */
+var IronA11yKeysBehavior = exports.IronA11yKeysBehavior = {
   properties: {
-
     /**
-     * The element that will receive a `max-height`/`width`. By default it is
-     * the same as `this`, but it can be set to a child element. This is useful,
-     * for example, for implementing a scrolling region inside the element.
-     * @type {!Element}
+     * The EventTarget that will be firing relevant KeyboardEvents. Set it to
+     * `null` to disable the listeners.
+     * @type {?EventTarget}
      */
-    sizingTarget: {
+    keyEventTarget: {
       type: Object,
       value: function value() {
         return this;
@@ -176,565 +369,2612 @@ var IronFitBehavior = exports.IronFitBehavior = {
     },
 
     /**
-     * The element to fit `this` into.
+     * If true, this property will cause the implementing element to
+     * automatically stop propagation on any handled KeyboardEvents.
      */
-    fitInto: { type: Object, value: window },
+    stopKeyboardEventPropagation: { type: Boolean, value: false },
 
-    /**
-     * Will position the element around the positionTarget without overlapping
-     * it.
-     */
-    noOverlap: { type: Boolean },
-
-    /**
-     * The element that should be used to position the element. If not set, it
-     * will default to the parent node.
-     * @type {!Element}
-     */
-    positionTarget: { type: Element },
-
-    /**
-     * The orientation against which to align the element horizontally
-     * relative to the `positionTarget`. Possible values are "left", "right",
-     * "center", "auto".
-     */
-    horizontalAlign: { type: String },
-
-    /**
-     * The orientation against which to align the element vertically
-     * relative to the `positionTarget`. Possible values are "top", "bottom",
-     * "middle", "auto".
-     */
-    verticalAlign: { type: String },
-
-    /**
-     * If true, it will use `horizontalAlign` and `verticalAlign` values as
-     * preferred alignment and if there's not enough space, it will pick the
-     * values which minimize the cropping.
-     */
-    dynamicAlign: { type: Boolean },
-
-    /**
-     * A pixel value that will be added to the position calculated for the
-     * given `horizontalAlign`, in the direction of alignment. You can think
-     * of it as increasing or decreasing the distance to the side of the
-     * screen given by `horizontalAlign`.
-     *
-     * If `horizontalAlign` is "left" or "center", this offset will increase or
-     * decrease the distance to the left side of the screen: a negative offset
-     * will move the dropdown to the left; a positive one, to the right.
-     *
-     * Conversely if `horizontalAlign` is "right", this offset will increase
-     * or decrease the distance to the right side of the screen: a negative
-     * offset will move the dropdown to the right; a positive one, to the left.
-     */
-    horizontalOffset: { type: Number, value: 0, notify: true },
-
-    /**
-     * A pixel value that will be added to the position calculated for the
-     * given `verticalAlign`, in the direction of alignment. You can think
-     * of it as increasing or decreasing the distance to the side of the
-     * screen given by `verticalAlign`.
-     *
-     * If `verticalAlign` is "top" or "middle", this offset will increase or
-     * decrease the distance to the top side of the screen: a negative offset
-     * will move the dropdown upwards; a positive one, downwards.
-     *
-     * Conversely if `verticalAlign` is "bottom", this offset will increase
-     * or decrease the distance to the bottom side of the screen: a negative
-     * offset will move the dropdown downwards; a positive one, upwards.
-     */
-    verticalOffset: { type: Number, value: 0, notify: true },
-
-    /**
-     * Set to true to auto-fit on attach.
-     */
-    autoFitOnAttach: { type: Boolean, value: false },
-
-    /** @type {?Object} */
-    _fitInfo: { type: Object }
-  },
-
-  get _fitWidth() {
-    var fitWidth;
-    if (this.fitInto === window) {
-      fitWidth = this.fitInto.innerWidth;
-    } else {
-      fitWidth = this.fitInto.getBoundingClientRect().width;
-    }
-    return fitWidth;
-  },
-
-  get _fitHeight() {
-    var fitHeight;
-    if (this.fitInto === window) {
-      fitHeight = this.fitInto.innerHeight;
-    } else {
-      fitHeight = this.fitInto.getBoundingClientRect().height;
-    }
-    return fitHeight;
-  },
-
-  get _fitLeft() {
-    var fitLeft;
-    if (this.fitInto === window) {
-      fitLeft = 0;
-    } else {
-      fitLeft = this.fitInto.getBoundingClientRect().left;
-    }
-    return fitLeft;
-  },
-
-  get _fitTop() {
-    var fitTop;
-    if (this.fitInto === window) {
-      fitTop = 0;
-    } else {
-      fitTop = this.fitInto.getBoundingClientRect().top;
-    }
-    return fitTop;
-  },
-
-  /**
-   * The element that should be used to position the element,
-   * if no position target is configured.
-   */
-  get _defaultPositionTarget() {
-    var parent = (0, _polymerDom.dom)(this).parentNode;
-
-    if (parent && parent.nodeType === Node.DOCUMENT_FRAGMENT_NODE) {
-      parent = parent.host;
-    }
-
-    return parent;
-  },
-
-  /**
-   * The horizontal align value, accounting for the RTL/LTR text direction.
-   */
-  get _localeHorizontalAlign() {
-    if (this._isRTL) {
-      // In RTL, "left" becomes "right".
-      if (this.horizontalAlign === 'right') {
-        return 'left';
+    _boundKeyHandlers: {
+      type: Array,
+      value: function value() {
+        return [];
       }
-      if (this.horizontalAlign === 'left') {
-        return 'right';
+    },
+
+    // We use this due to a limitation in IE10 where instances will have
+    // own properties of everything on the "prototype".
+    _imperativeKeyBindings: {
+      type: Object,
+      value: function value() {
+        return {};
       }
     }
-    return this.horizontalAlign;
   },
 
+  observers: ['_resetKeyEventListeners(keyEventTarget, _boundKeyHandlers)'],
+
   /**
-   * True if the element should be positioned instead of centered.
-   * @private
+   * To be used to express what combination of keys  will trigger the relative
+   * callback. e.g. `keyBindings: { 'esc': '_onEscPressed'}`
+   * @type {!Object}
    */
-  get __shouldPosition() {
-    return (this.horizontalAlign || this.verticalAlign) && (this.horizontalAlign !== 'center' || this.verticalAlign !== 'middle');
+  keyBindings: {},
+
+  registered: function registered() {
+    this._prepKeyBindings();
   },
 
   attached: function attached() {
-    // Memoize this to avoid expensive calculations & relayouts.
-    // Make sure we do it only once
-    if (typeof this._isRTL === 'undefined') {
-      this._isRTL = window.getComputedStyle(this).direction == 'rtl';
-    }
-    this.positionTarget = this.positionTarget || this._defaultPositionTarget;
-    if (this.autoFitOnAttach) {
-      if (window.getComputedStyle(this).display === 'none') {
-        setTimeout(function () {
-          this.fit();
-        }.bind(this));
-      } else {
-        // NOTE: shadydom applies distribution asynchronously
-        // for performance reasons webcomponents/shadydom#120
-        // Flush to get correct layout info.
-        window.ShadyDOM && ShadyDOM.flush();
-        this.fit();
-      }
-    }
+    this._listenKeyEventListeners();
   },
 
   detached: function detached() {
-    if (this.__deferredFit) {
-      clearTimeout(this.__deferredFit);
-      this.__deferredFit = null;
-    }
+    this._unlistenKeyEventListeners();
   },
 
   /**
-   * Positions and fits the element into the `fitInto` element.
+   * Can be used to imperatively add a key binding to the implementing
+   * element. This is the imperative equivalent of declaring a keybinding
+   * in the `keyBindings` prototype property.
+   *
+   * @param {string} eventString
+   * @param {string} handlerName
    */
-  fit: function fit() {
-    this.position();
-    this.constrain();
-    this.center();
+  addOwnKeyBinding: function addOwnKeyBinding(eventString, handlerName) {
+    this._imperativeKeyBindings[eventString] = handlerName;
+    this._prepKeyBindings();
+    this._resetKeyEventListeners();
   },
 
   /**
-   * Memoize information needed to position and size the target element.
-   * @suppress {deprecated}
+   * When called, will remove all imperatively-added key bindings.
    */
-  _discoverInfo: function _discoverInfo() {
-    if (this._fitInfo) {
-      return;
-    }
-    var target = window.getComputedStyle(this);
-    var sizer = window.getComputedStyle(this.sizingTarget);
+  removeOwnKeyBindings: function removeOwnKeyBindings() {
+    this._imperativeKeyBindings = {};
+    this._prepKeyBindings();
+    this._resetKeyEventListeners();
+  },
 
-    this._fitInfo = {
-      inlineStyle: {
-        top: this.style.top || '',
-        left: this.style.left || '',
-        position: this.style.position || ''
-      },
-      sizerInlineStyle: {
-        maxWidth: this.sizingTarget.style.maxWidth || '',
-        maxHeight: this.sizingTarget.style.maxHeight || '',
-        boxSizing: this.sizingTarget.style.boxSizing || ''
-      },
-      positionedBy: {
-        vertically: target.top !== 'auto' ? 'top' : target.bottom !== 'auto' ? 'bottom' : null,
-        horizontally: target.left !== 'auto' ? 'left' : target.right !== 'auto' ? 'right' : null
-      },
-      sizedBy: {
-        height: sizer.maxHeight !== 'none',
-        width: sizer.maxWidth !== 'none',
-        minWidth: parseInt(sizer.minWidth, 10) || 0,
-        minHeight: parseInt(sizer.minHeight, 10) || 0
-      },
-      margin: {
-        top: parseInt(target.marginTop, 10) || 0,
-        right: parseInt(target.marginRight, 10) || 0,
-        bottom: parseInt(target.marginBottom, 10) || 0,
-        left: parseInt(target.marginLeft, 10) || 0
+  /**
+   * Returns true if a keyboard event matches `eventString`.
+   *
+   * @param {KeyboardEvent} event
+   * @param {string} eventString
+   * @return {boolean}
+   */
+  keyboardEventMatchesKeys: function keyboardEventMatchesKeys(event, eventString) {
+    var keyCombos = parseEventString(eventString);
+    for (var i = 0; i < keyCombos.length; ++i) {
+      if (keyComboMatchesEvent(keyCombos[i], event)) {
+        return true;
       }
-    };
+    }
+    return false;
   },
 
-  /**
-   * Resets the target element's position and size constraints, and clear
-   * the memoized data.
-   */
-  resetFit: function resetFit() {
-    var info = this._fitInfo || {};
-    for (var property in info.sizerInlineStyle) {
-      this.sizingTarget.style[property] = info.sizerInlineStyle[property];
-    }
-    for (var property in info.inlineStyle) {
-      this.style[property] = info.inlineStyle[property];
+  _collectKeyBindings: function _collectKeyBindings() {
+    var keyBindings = this.behaviors.map(function (behavior) {
+      return behavior.keyBindings;
+    });
+
+    if (keyBindings.indexOf(this.keyBindings) === -1) {
+      keyBindings.push(this.keyBindings);
     }
 
-    this._fitInfo = null;
+    return keyBindings;
   },
 
-  /**
-   * Equivalent to calling `resetFit()` and `fit()`. Useful to call this after
-   * the element or the `fitInto` element has been resized, or if any of the
-   * positioning properties (e.g. `horizontalAlign, verticalAlign`) is updated.
-   * It preserves the scroll position of the sizingTarget.
-   */
-  refit: function refit() {
-    var scrollLeft = this.sizingTarget.scrollLeft;
-    var scrollTop = this.sizingTarget.scrollTop;
-    this.resetFit();
-    this.fit();
-    this.sizingTarget.scrollLeft = scrollLeft;
-    this.sizingTarget.scrollTop = scrollTop;
+  _prepKeyBindings: function _prepKeyBindings() {
+    this._keyBindings = {};
+
+    this._collectKeyBindings().forEach(function (keyBindings) {
+      for (var eventString in keyBindings) {
+        this._addKeyBinding(eventString, keyBindings[eventString]);
+      }
+    }, this);
+
+    for (var eventString in this._imperativeKeyBindings) {
+      this._addKeyBinding(eventString, this._imperativeKeyBindings[eventString]);
+    }
+
+    // Give precedence to combos with modifiers to be checked first.
+    for (var eventName in this._keyBindings) {
+      this._keyBindings[eventName].sort(function (kb1, kb2) {
+        var b1 = kb1[0].hasModifiers;
+        var b2 = kb2[0].hasModifiers;
+        return b1 === b2 ? 0 : b1 ? -1 : 1;
+      });
+    }
   },
 
-  /**
-   * Positions the element according to `horizontalAlign, verticalAlign`.
-   */
-  position: function position() {
-    if (!this.__shouldPosition) {
-      // needs to be centered, and it is done after constrain.
+  _addKeyBinding: function _addKeyBinding(eventString, handlerName) {
+    parseEventString(eventString).forEach(function (keyCombo) {
+      this._keyBindings[keyCombo.event] = this._keyBindings[keyCombo.event] || [];
+
+      this._keyBindings[keyCombo.event].push([keyCombo, handlerName]);
+    }, this);
+  },
+
+  _resetKeyEventListeners: function _resetKeyEventListeners() {
+    this._unlistenKeyEventListeners();
+
+    if (this.isAttached) {
+      this._listenKeyEventListeners();
+    }
+  },
+
+  _listenKeyEventListeners: function _listenKeyEventListeners() {
+    if (!this.keyEventTarget) {
       return;
     }
-    this._discoverInfo();
+    Object.keys(this._keyBindings).forEach(function (eventName) {
+      var keyBindings = this._keyBindings[eventName];
+      var boundKeyHandler = this._onKeyBindingEvent.bind(this, keyBindings);
 
-    this.style.position = 'fixed';
-    // Need border-box for margin/padding.
-    this.sizingTarget.style.boxSizing = 'border-box';
-    // Set to 0, 0 in order to discover any offset caused by parent stacking
-    // contexts.
-    this.style.left = '0px';
-    this.style.top = '0px';
+      this._boundKeyHandlers.push([this.keyEventTarget, eventName, boundKeyHandler]);
 
-    var rect = this.getBoundingClientRect();
-    var positionRect = this.__getNormalizedRect(this.positionTarget);
-    var fitRect = this.__getNormalizedRect(this.fitInto);
-
-    var margin = this._fitInfo.margin;
-
-    // Consider the margin as part of the size for position calculations.
-    var size = {
-      width: rect.width + margin.left + margin.right,
-      height: rect.height + margin.top + margin.bottom
-    };
-
-    var position = this.__getPosition(this._localeHorizontalAlign, this.verticalAlign, size, rect, positionRect, fitRect);
-
-    var left = position.left + margin.left;
-    var top = position.top + margin.top;
-
-    // We first limit right/bottom within fitInto respecting the margin,
-    // then use those values to limit top/left.
-    var right = Math.min(fitRect.right - margin.right, left + rect.width);
-    var bottom = Math.min(fitRect.bottom - margin.bottom, top + rect.height);
-
-    // Keep left/top within fitInto respecting the margin.
-    left = Math.max(fitRect.left + margin.left, Math.min(left, right - this._fitInfo.sizedBy.minWidth));
-    top = Math.max(fitRect.top + margin.top, Math.min(top, bottom - this._fitInfo.sizedBy.minHeight));
-
-    // Use right/bottom to set maxWidth/maxHeight, and respect
-    // minWidth/minHeight.
-    this.sizingTarget.style.maxWidth = Math.max(right - left, this._fitInfo.sizedBy.minWidth) + 'px';
-    this.sizingTarget.style.maxHeight = Math.max(bottom - top, this._fitInfo.sizedBy.minHeight) + 'px';
-
-    // Remove the offset caused by any stacking context.
-    this.style.left = left - rect.left + 'px';
-    this.style.top = top - rect.top + 'px';
+      this.keyEventTarget.addEventListener(eventName, boundKeyHandler);
+    }, this);
   },
 
-  /**
-   * Constrains the size of the element to `fitInto` by setting `max-height`
-   * and/or `max-width`.
-   */
-  constrain: function constrain() {
-    if (this.__shouldPosition) {
+  _unlistenKeyEventListeners: function _unlistenKeyEventListeners() {
+    var keyHandlerTuple;
+    var keyEventTarget;
+    var eventName;
+    var boundKeyHandler;
+
+    while (this._boundKeyHandlers.length) {
+      // My kingdom for block-scope binding and destructuring assignment..
+      keyHandlerTuple = this._boundKeyHandlers.pop();
+      keyEventTarget = keyHandlerTuple[0];
+      eventName = keyHandlerTuple[1];
+      boundKeyHandler = keyHandlerTuple[2];
+
+      keyEventTarget.removeEventListener(eventName, boundKeyHandler);
+    }
+  },
+
+  _onKeyBindingEvent: function _onKeyBindingEvent(keyBindings, event) {
+    if (this.stopKeyboardEventPropagation) {
+      event.stopPropagation();
+    }
+
+    // if event has been already prevented, don't do anything
+    if (event.defaultPrevented) {
       return;
     }
-    this._discoverInfo();
 
-    var info = this._fitInfo;
-    // position at (0px, 0px) if not already positioned, so we can measure the
-    // natural size.
-    if (!info.positionedBy.vertically) {
-      this.style.position = 'fixed';
-      this.style.top = '0px';
-    }
-    if (!info.positionedBy.horizontally) {
-      this.style.position = 'fixed';
-      this.style.left = '0px';
-    }
-
-    // need border-box for margin/padding
-    this.sizingTarget.style.boxSizing = 'border-box';
-    // constrain the width and height if not already set
-    var rect = this.getBoundingClientRect();
-    if (!info.sizedBy.height) {
-      this.__sizeDimension(rect, info.positionedBy.vertically, 'top', 'bottom', 'Height');
-    }
-    if (!info.sizedBy.width) {
-      this.__sizeDimension(rect, info.positionedBy.horizontally, 'left', 'right', 'Width');
-    }
-  },
-
-  /**
-   * @protected
-   * @deprecated
-   */
-  _sizeDimension: function _sizeDimension(rect, positionedBy, start, end, extent) {
-    this.__sizeDimension(rect, positionedBy, start, end, extent);
-  },
-
-  /**
-   * @private
-   */
-  __sizeDimension: function __sizeDimension(rect, positionedBy, start, end, extent) {
-    var info = this._fitInfo;
-    var fitRect = this.__getNormalizedRect(this.fitInto);
-    var max = extent === 'Width' ? fitRect.width : fitRect.height;
-    var flip = positionedBy === end;
-    var offset = flip ? max - rect[end] : rect[start];
-    var margin = info.margin[flip ? start : end];
-    var offsetExtent = 'offset' + extent;
-    var sizingOffset = this[offsetExtent] - this.sizingTarget[offsetExtent];
-    this.sizingTarget.style['max' + extent] = max - margin - offset - sizingOffset + 'px';
-  },
-
-  /**
-   * Centers horizontally and vertically if not already positioned. This also
-   * sets `position:fixed`.
-   */
-  center: function center() {
-    if (this.__shouldPosition) {
-      return;
-    }
-    this._discoverInfo();
-
-    var positionedBy = this._fitInfo.positionedBy;
-    if (positionedBy.vertically && positionedBy.horizontally) {
-      // Already positioned.
-      return;
-    }
-    // Need position:fixed to center
-    this.style.position = 'fixed';
-    // Take into account the offset caused by parents that create stacking
-    // contexts (e.g. with transform: translate3d). Translate to 0,0 and
-    // measure the bounding rect.
-    if (!positionedBy.vertically) {
-      this.style.top = '0px';
-    }
-    if (!positionedBy.horizontally) {
-      this.style.left = '0px';
-    }
-    // It will take in consideration margins and transforms
-    var rect = this.getBoundingClientRect();
-    var fitRect = this.__getNormalizedRect(this.fitInto);
-    if (!positionedBy.vertically) {
-      var top = fitRect.top - rect.top + (fitRect.height - rect.height) / 2;
-      this.style.top = top + 'px';
-    }
-    if (!positionedBy.horizontally) {
-      var left = fitRect.left - rect.left + (fitRect.width - rect.width) / 2;
-      this.style.left = left + 'px';
-    }
-  },
-
-  __getNormalizedRect: function __getNormalizedRect(target) {
-    if (target === document.documentElement || target === window) {
-      return {
-        top: 0,
-        left: 0,
-        width: window.innerWidth,
-        height: window.innerHeight,
-        right: window.innerWidth,
-        bottom: window.innerHeight
-      };
-    }
-    return target.getBoundingClientRect();
-  },
-
-  __getOffscreenArea: function __getOffscreenArea(position, size, fitRect) {
-    var verticalCrop = Math.min(0, position.top) + Math.min(0, fitRect.bottom - (position.top + size.height));
-    var horizontalCrop = Math.min(0, position.left) + Math.min(0, fitRect.right - (position.left + size.width));
-    return Math.abs(verticalCrop) * size.width + Math.abs(horizontalCrop) * size.height;
-  },
-
-  __getPosition: function __getPosition(hAlign, vAlign, size, sizeNoMargins, positionRect, fitRect) {
-    // All the possible configurations.
-    // Ordered as top-left, top-right, bottom-left, bottom-right.
-    var positions = [{
-      verticalAlign: 'top',
-      horizontalAlign: 'left',
-      top: positionRect.top + this.verticalOffset,
-      left: positionRect.left + this.horizontalOffset
-    }, {
-      verticalAlign: 'top',
-      horizontalAlign: 'right',
-      top: positionRect.top + this.verticalOffset,
-      left: positionRect.right - size.width - this.horizontalOffset
-    }, {
-      verticalAlign: 'bottom',
-      horizontalAlign: 'left',
-      top: positionRect.bottom - size.height - this.verticalOffset,
-      left: positionRect.left + this.horizontalOffset
-    }, {
-      verticalAlign: 'bottom',
-      horizontalAlign: 'right',
-      top: positionRect.bottom - size.height - this.verticalOffset,
-      left: positionRect.right - size.width - this.horizontalOffset
-    }];
-
-    if (this.noOverlap) {
-      // Duplicate.
-      for (var i = 0, l = positions.length; i < l; i++) {
-        var copy = {};
-        for (var key in positions[i]) {
-          copy[key] = positions[i][key];
+    for (var i = 0; i < keyBindings.length; i++) {
+      var keyCombo = keyBindings[i][0];
+      var handlerName = keyBindings[i][1];
+      if (keyComboMatchesEvent(keyCombo, event)) {
+        this._triggerKeyHandler(keyCombo, handlerName, event);
+        // exit the loop if eventDefault was prevented
+        if (event.defaultPrevented) {
+          return;
         }
-        positions.push(copy);
-      }
-      // Horizontal overlap only.
-      positions[0].top = positions[1].top += positionRect.height;
-      positions[2].top = positions[3].top -= positionRect.height;
-      // Vertical overlap only.
-      positions[4].left = positions[6].left += positionRect.width;
-      positions[5].left = positions[7].left -= positionRect.width;
-    }
-
-    // Consider auto as null for coding convenience.
-    vAlign = vAlign === 'auto' ? null : vAlign;
-    hAlign = hAlign === 'auto' ? null : hAlign;
-
-    if (!hAlign || hAlign === 'center') {
-      positions.push({
-        verticalAlign: 'top',
-        horizontalAlign: 'center',
-        top: positionRect.top + this.verticalOffset + (this.noOverlap ? positionRect.height : 0),
-        left: positionRect.left - sizeNoMargins.width / 2 + positionRect.width / 2 + this.horizontalOffset
-      });
-      positions.push({
-        verticalAlign: 'bottom',
-        horizontalAlign: 'center',
-        top: positionRect.bottom - size.height - this.verticalOffset - (this.noOverlap ? positionRect.height : 0),
-        left: positionRect.left - sizeNoMargins.width / 2 + positionRect.width / 2 + this.horizontalOffset
-      });
-    }
-
-    if (!vAlign || vAlign === 'middle') {
-      positions.push({
-        verticalAlign: 'middle',
-        horizontalAlign: 'left',
-        top: positionRect.top - sizeNoMargins.height / 2 + positionRect.height / 2 + this.verticalOffset,
-        left: positionRect.left + this.horizontalOffset + (this.noOverlap ? positionRect.width : 0)
-      });
-      positions.push({
-        verticalAlign: 'middle',
-        horizontalAlign: 'right',
-        top: positionRect.top - sizeNoMargins.height / 2 + positionRect.height / 2 + this.verticalOffset,
-        left: positionRect.right - size.width - this.horizontalOffset - (this.noOverlap ? positionRect.width : 0)
-      });
-    }
-
-    var position;
-    for (var i = 0; i < positions.length; i++) {
-      var candidate = positions[i];
-      var vAlignOk = candidate.verticalAlign === vAlign;
-      var hAlignOk = candidate.horizontalAlign === hAlign;
-
-      // If both vAlign and hAlign are defined, return exact match.
-      // For dynamicAlign and noOverlap we'll have more than one candidate, so
-      // we'll have to check the offscreenArea to make the best choice.
-      if (!this.dynamicAlign && !this.noOverlap && vAlignOk && hAlignOk) {
-        position = candidate;
-        break;
-      }
-
-      // Align is ok if alignment preferences are respected. If no preferences,
-      // it is considered ok.
-      var alignOk = (!vAlign || vAlignOk) && (!hAlign || hAlignOk);
-
-      // Filter out elements that don't match the alignment (if defined).
-      // With dynamicAlign, we need to consider all the positions to find the
-      // one that minimizes the cropped area.
-      if (!this.dynamicAlign && !alignOk) {
-        continue;
-      }
-
-      candidate.offscreenArea = this.__getOffscreenArea(candidate, size, fitRect);
-      // If not cropped and respects the align requirements, keep it.
-      // This allows to prefer positions overlapping horizontally over the
-      // ones overlapping vertically.
-      if (candidate.offscreenArea === 0 && alignOk) {
-        position = candidate;
-        break;
-      }
-      position = position || candidate;
-      var diff = candidate.offscreenArea - position.offscreenArea;
-      // Check which crops less. If it crops equally, check if at least one
-      // align setting is ok.
-      if (diff < 0 || diff === 0 && (vAlignOk || hAlignOk)) {
-        position = candidate;
       }
     }
+  },
 
-    return position;
+  _triggerKeyHandler: function _triggerKeyHandler(keyCombo, handlerName, keyboardEvent) {
+    var detail = Object.create(keyCombo);
+    detail.keyboardEvent = keyboardEvent;
+    var event = new CustomEvent(keyCombo.event, { detail: detail, cancelable: true });
+    this[handlerName].call(this, event);
+    if (event.defaultPrevented) {
+      keyboardEvent.preventDefault();
+    }
+  }
+};
+
+/***/ }),
+
+/***/ "./node_modules/@polymer/iron-behaviors/iron-button-state.js":
+/*!*******************************************************************!*\
+  !*** ./node_modules/@polymer/iron-behaviors/iron-button-state.js ***!
+  \*******************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.IronButtonState = exports.IronButtonStateImpl = undefined;
+
+__webpack_require__(/*! @polymer/polymer/polymer-legacy.js */ "./node_modules/@polymer/polymer/polymer-legacy.js");
+
+var _ironA11yKeysBehavior = __webpack_require__(/*! @polymer/iron-a11y-keys-behavior/iron-a11y-keys-behavior.js */ "./node_modules/@polymer/iron-a11y-keys-behavior/iron-a11y-keys-behavior.js");
+
+__webpack_require__(/*! ./iron-control-state.js */ "./node_modules/@polymer/iron-behaviors/iron-control-state.js");
+
+var _polymerDom = __webpack_require__(/*! @polymer/polymer/lib/legacy/polymer.dom.js */ "./node_modules/@polymer/polymer/lib/legacy/polymer.dom.js");
+
+/**
+ * @demo demo/index.html
+ * @polymerBehavior Polymer.IronButtonState
+ */
+/**
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+*/
+var IronButtonStateImpl = exports.IronButtonStateImpl = {
+
+  properties: {
+
+    /**
+     * If true, the user is currently holding down the button.
+     */
+    pressed: {
+      type: Boolean,
+      readOnly: true,
+      value: false,
+      reflectToAttribute: true,
+      observer: '_pressedChanged'
+    },
+
+    /**
+     * If true, the button toggles the active state with each tap or press
+     * of the spacebar.
+     */
+    toggles: { type: Boolean, value: false, reflectToAttribute: true },
+
+    /**
+     * If true, the button is a toggle and is currently in the active state.
+     */
+    active: { type: Boolean, value: false, notify: true, reflectToAttribute: true },
+
+    /**
+     * True if the element is currently being pressed by a "pointer," which
+     * is loosely defined as mouse or touch input (but specifically excluding
+     * keyboard input).
+     */
+    pointerDown: { type: Boolean, readOnly: true, value: false },
+
+    /**
+     * True if the input device that caused the element to receive focus
+     * was a keyboard.
+     */
+    receivedFocusFromKeyboard: { type: Boolean, readOnly: true },
+
+    /**
+     * The aria attribute to be set if the button is a toggle and in the
+     * active state.
+     */
+    ariaActiveAttribute: {
+      type: String,
+      value: 'aria-pressed',
+      observer: '_ariaActiveAttributeChanged'
+    }
+  },
+
+  listeners: { down: '_downHandler', up: '_upHandler', tap: '_tapHandler' },
+
+  observers: ['_focusChanged(focused)', '_activeChanged(active, ariaActiveAttribute)'],
+
+  /**
+   * @type {!Object}
+   */
+  keyBindings: {
+    'enter:keydown': '_asyncClick',
+    'space:keydown': '_spaceKeyDownHandler',
+    'space:keyup': '_spaceKeyUpHandler'
+  },
+
+  _mouseEventRe: /^mouse/,
+
+  _tapHandler: function _tapHandler() {
+    if (this.toggles) {
+      // a tap is needed to toggle the active state
+      this._userActivate(!this.active);
+    } else {
+      this.active = false;
+    }
+  },
+
+  _focusChanged: function _focusChanged(focused) {
+    this._detectKeyboardFocus(focused);
+
+    if (!focused) {
+      this._setPressed(false);
+    }
+  },
+
+  _detectKeyboardFocus: function _detectKeyboardFocus(focused) {
+    this._setReceivedFocusFromKeyboard(!this.pointerDown && focused);
+  },
+
+  // to emulate native checkbox, (de-)activations from a user interaction fire
+  // 'change' events
+  _userActivate: function _userActivate(active) {
+    if (this.active !== active) {
+      this.active = active;
+      this.fire('change');
+    }
+  },
+
+  _downHandler: function _downHandler(event) {
+    this._setPointerDown(true);
+    this._setPressed(true);
+    this._setReceivedFocusFromKeyboard(false);
+  },
+
+  _upHandler: function _upHandler() {
+    this._setPointerDown(false);
+    this._setPressed(false);
+  },
+
+  /**
+   * @param {!KeyboardEvent} event .
+   */
+  _spaceKeyDownHandler: function _spaceKeyDownHandler(event) {
+    var keyboardEvent = event.detail.keyboardEvent;
+    var target = (0, _polymerDom.dom)(keyboardEvent).localTarget;
+
+    // Ignore the event if this is coming from a focused light child, since that
+    // element will deal with it.
+    if (this.isLightDescendant( /** @type {Node} */target)) return;
+
+    keyboardEvent.preventDefault();
+    keyboardEvent.stopImmediatePropagation();
+    this._setPressed(true);
+  },
+
+  /**
+   * @param {!KeyboardEvent} event .
+   */
+  _spaceKeyUpHandler: function _spaceKeyUpHandler(event) {
+    var keyboardEvent = event.detail.keyboardEvent;
+    var target = (0, _polymerDom.dom)(keyboardEvent).localTarget;
+
+    // Ignore the event if this is coming from a focused light child, since that
+    // element will deal with it.
+    if (this.isLightDescendant( /** @type {Node} */target)) return;
+
+    if (this.pressed) {
+      this._asyncClick();
+    }
+    this._setPressed(false);
+  },
+
+  // trigger click asynchronously, the asynchrony is useful to allow one
+  // event handler to unwind before triggering another event
+  _asyncClick: function _asyncClick() {
+    this.async(function () {
+      this.click();
+    }, 1);
+  },
+
+  // any of these changes are considered a change to button state
+
+  _pressedChanged: function _pressedChanged(pressed) {
+    this._changedButtonState();
+  },
+
+  _ariaActiveAttributeChanged: function _ariaActiveAttributeChanged(value, oldValue) {
+    if (oldValue && oldValue != value && this.hasAttribute(oldValue)) {
+      this.removeAttribute(oldValue);
+    }
+  },
+
+  _activeChanged: function _activeChanged(active, ariaActiveAttribute) {
+    if (this.toggles) {
+      this.setAttribute(this.ariaActiveAttribute, active ? 'true' : 'false');
+    } else {
+      this.removeAttribute(this.ariaActiveAttribute);
+    }
+    this._changedButtonState();
+  },
+
+  _controlStateChanged: function _controlStateChanged() {
+    if (this.disabled) {
+      this._setPressed(false);
+    } else {
+      this._changedButtonState();
+    }
+  },
+
+  // provide hook for follow-on behaviors to react to button-state
+
+  _changedButtonState: function _changedButtonState() {
+    if (this._buttonStateChanged) {
+      this._buttonStateChanged(); // abstract
+    }
   }
 
 };
+
+/** @polymerBehavior */
+var IronButtonState = exports.IronButtonState = [_ironA11yKeysBehavior.IronA11yKeysBehavior, IronButtonStateImpl];
+
+/***/ }),
+
+/***/ "./node_modules/@polymer/iron-behaviors/iron-control-state.js":
+/*!********************************************************************!*\
+  !*** ./node_modules/@polymer/iron-behaviors/iron-control-state.js ***!
+  \********************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.IronControlState = undefined;
+
+__webpack_require__(/*! @polymer/polymer/polymer-legacy.js */ "./node_modules/@polymer/polymer/polymer-legacy.js");
+
+var _polymerElement = __webpack_require__(/*! @polymer/polymer/polymer-element.js */ "./node_modules/@polymer/polymer/polymer-element.js");
+
+var _polymerDom = __webpack_require__(/*! @polymer/polymer/lib/legacy/polymer.dom.js */ "./node_modules/@polymer/polymer/lib/legacy/polymer.dom.js");
+
+/**
+ * @demo demo/index.html
+ * @polymerBehavior
+ */
+var IronControlState = exports.IronControlState = {
+
+  properties: {
+
+    /**
+     * If true, the element currently has focus.
+     */
+    focused: {
+      type: Boolean,
+      value: false,
+      notify: true,
+      readOnly: true,
+      reflectToAttribute: true
+    },
+
+    /**
+     * If true, the user cannot interact with this element.
+     */
+    disabled: {
+      type: Boolean,
+      value: false,
+      notify: true,
+      observer: '_disabledChanged',
+      reflectToAttribute: true
+    },
+
+    /**
+     * Value of the `tabindex` attribute before `disabled` was activated.
+     * `null` means the attribute was not present.
+     * @type {?string|undefined}
+     */
+    _oldTabIndex: { type: String },
+
+    _boundFocusBlurHandler: {
+      type: Function,
+      value: function value() {
+        return this._focusBlurHandler.bind(this);
+      }
+    },
+
+    __handleEventRetargeting: {
+      type: Boolean,
+      value: function value() {
+        return !this.shadowRoot && !_polymerElement.PolymerElement;
+      }
+    }
+  },
+
+  observers: ['_changedControlState(focused, disabled)'],
+
+  /**
+   * @return {void}
+   */
+  ready: function ready() {
+    this.addEventListener('focus', this._boundFocusBlurHandler, true);
+    this.addEventListener('blur', this._boundFocusBlurHandler, true);
+  },
+
+  _focusBlurHandler: function _focusBlurHandler(event) {
+    // In Polymer 2.0, the library takes care of retargeting events.
+    if (_polymerElement.PolymerElement) {
+      this._setFocused(event.type === 'focus');
+      return;
+    }
+
+    // NOTE(cdata):  if we are in ShadowDOM land, `event.target` will
+    // eventually become `this` due to retargeting; if we are not in
+    // ShadowDOM land, `event.target` will eventually become `this` due
+    // to the second conditional which fires a synthetic event (that is also
+    // handled). In either case, we can disregard `event.path`.
+    if (event.target === this) {
+      this._setFocused(event.type === 'focus');
+    } else if (this.__handleEventRetargeting) {
+      var target = /** @type {Node} */(0, _polymerDom.dom)(event).localTarget;
+      if (!this.isLightDescendant(target)) {
+        this.fire(event.type, { sourceEvent: event }, { node: this, bubbles: event.bubbles, cancelable: event.cancelable });
+      }
+    }
+  },
+
+  _disabledChanged: function _disabledChanged(disabled, old) {
+    this.setAttribute('aria-disabled', disabled ? 'true' : 'false');
+    this.style.pointerEvents = disabled ? 'none' : '';
+    if (disabled) {
+      // Read the `tabindex` attribute instead of the `tabIndex` property.
+      // The property returns `-1` if there is no `tabindex` attribute.
+      // This distinction is important when restoring the value because
+      // leaving `-1` hides shadow root children from the tab order.
+      this._oldTabIndex = this.getAttribute('tabindex');
+      this._setFocused(false);
+      this.tabIndex = -1;
+      this.blur();
+    } else if (this._oldTabIndex !== undefined) {
+      if (this._oldTabIndex === null) {
+        this.removeAttribute('tabindex');
+      } else {
+        this.setAttribute('tabindex', this._oldTabIndex);
+      }
+    }
+  },
+
+  _changedControlState: function _changedControlState() {
+    // _controlStateChanged is abstract, follow-on behaviors may implement it
+    if (this._controlStateChanged) {
+      this._controlStateChanged();
+    }
+  }
+
+}; /**
+   @license
+   Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+   This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+   The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+   The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+   Code distributed by Google as part of the polymer project is also
+   subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+   */
+
+/***/ }),
+
+/***/ "./node_modules/@polymer/iron-flex-layout/iron-flex-layout.js":
+/*!********************************************************************!*\
+  !*** ./node_modules/@polymer/iron-flex-layout/iron-flex-layout.js ***!
+  \********************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+__webpack_require__(/*! @polymer/polymer/polymer-legacy.js */ "./node_modules/@polymer/polymer/polymer-legacy.js");
+
+var $_documentContainer = document.createElement('template'); /**
+                                                              @license
+                                                              Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+                                                              This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+                                                              The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+                                                              The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+                                                              Code distributed by Google as part of the polymer project is also
+                                                              subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+                                                              */
+/**
+The `<iron-flex-layout>` component provides simple ways to use
+[CSS flexible box layout](https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Flexible_boxes),
+also known as flexbox. This component provides two different ways to use flexbox:
+
+1. [Layout classes](https://github.com/PolymerElements/iron-flex-layout/tree/master/iron-flex-layout-classes.html).
+The layout class stylesheet provides a simple set of class-based flexbox rules, that
+let you specify layout properties directly in markup. You must include this file
+in every element that needs to use them.
+
+    Sample use:
+
+    ```
+    <custom-element-demo>
+      <template>
+        <script src="../webcomponentsjs/webcomponents-lite.js"></script>
+        <next-code-block></next-code-block>
+      </template>
+    </custom-element-demo>
+    ```
+
+    ```html
+    <link rel="import" href="iron-flex-layout-classes.html">
+    <style is="custom-style" include="iron-flex iron-flex-alignment"></style>
+    <style>
+      .test { width: 100px; }
+    </style>
+    <div class="layout horizontal center-center">
+      <div class="test">horizontal layout center alignment</div>
+    </div>
+    ```
+
+2. [Custom CSS mixins](https://github.com/PolymerElements/iron-flex-layout/blob/master/iron-flex-layout.html).
+The mixin stylesheet includes custom CSS mixins that can be applied inside a CSS rule using the `@apply` function.
+
+Please note that the old [/deep/ layout classes](https://github.com/PolymerElements/iron-flex-layout/tree/master/classes)
+are deprecated, and should not be used. To continue using layout properties
+directly in markup, please switch to using the new `dom-module`-based
+[layout classes](https://github.com/PolymerElements/iron-flex-layout/tree/master/iron-flex-layout-classes.html).
+Please note that the new version does not use `/deep/`, and therefore requires you
+to import the `dom-modules` in every element that needs to use them.
+
+A complete [guide](https://elements.polymer-project.org/guides/flex-layout) to `<iron-flex-layout>` is available.
+
+@group Iron Elements
+@pseudoElement iron-flex-layout
+@demo demo/index.html
+*/
+/*
+  FIXME(polymer-modulizer): the above comments were extracted
+  from HTML and may be out of place here. Review them and
+  then delete this comment!
+*/
+
+$_documentContainer.setAttribute('style', 'display: none;');
+
+$_documentContainer.innerHTML = '<custom-style>\n  <style is="custom-style">\n    [hidden] {\n      display: none !important;\n    }\n  </style>\n</custom-style><custom-style>\n  <style is="custom-style">\n    html {\n\n      --layout: {\n        display: -ms-flexbox;\n        display: -webkit-flex;\n        display: flex;\n      };\n\n      --layout-inline: {\n        display: -ms-inline-flexbox;\n        display: -webkit-inline-flex;\n        display: inline-flex;\n      };\n\n      --layout-horizontal: {\n        @apply --layout;\n\n        -ms-flex-direction: row;\n        -webkit-flex-direction: row;\n        flex-direction: row;\n      };\n\n      --layout-horizontal-reverse: {\n        @apply --layout;\n\n        -ms-flex-direction: row-reverse;\n        -webkit-flex-direction: row-reverse;\n        flex-direction: row-reverse;\n      };\n\n      --layout-vertical: {\n        @apply --layout;\n\n        -ms-flex-direction: column;\n        -webkit-flex-direction: column;\n        flex-direction: column;\n      };\n\n      --layout-vertical-reverse: {\n        @apply --layout;\n\n        -ms-flex-direction: column-reverse;\n        -webkit-flex-direction: column-reverse;\n        flex-direction: column-reverse;\n      };\n\n      --layout-wrap: {\n        -ms-flex-wrap: wrap;\n        -webkit-flex-wrap: wrap;\n        flex-wrap: wrap;\n      };\n\n      --layout-wrap-reverse: {\n        -ms-flex-wrap: wrap-reverse;\n        -webkit-flex-wrap: wrap-reverse;\n        flex-wrap: wrap-reverse;\n      };\n\n      --layout-flex-auto: {\n        -ms-flex: 1 1 auto;\n        -webkit-flex: 1 1 auto;\n        flex: 1 1 auto;\n      };\n\n      --layout-flex-none: {\n        -ms-flex: none;\n        -webkit-flex: none;\n        flex: none;\n      };\n\n      --layout-flex: {\n        -ms-flex: 1 1 0.000000001px;\n        -webkit-flex: 1;\n        flex: 1;\n        -webkit-flex-basis: 0.000000001px;\n        flex-basis: 0.000000001px;\n      };\n\n      --layout-flex-2: {\n        -ms-flex: 2;\n        -webkit-flex: 2;\n        flex: 2;\n      };\n\n      --layout-flex-3: {\n        -ms-flex: 3;\n        -webkit-flex: 3;\n        flex: 3;\n      };\n\n      --layout-flex-4: {\n        -ms-flex: 4;\n        -webkit-flex: 4;\n        flex: 4;\n      };\n\n      --layout-flex-5: {\n        -ms-flex: 5;\n        -webkit-flex: 5;\n        flex: 5;\n      };\n\n      --layout-flex-6: {\n        -ms-flex: 6;\n        -webkit-flex: 6;\n        flex: 6;\n      };\n\n      --layout-flex-7: {\n        -ms-flex: 7;\n        -webkit-flex: 7;\n        flex: 7;\n      };\n\n      --layout-flex-8: {\n        -ms-flex: 8;\n        -webkit-flex: 8;\n        flex: 8;\n      };\n\n      --layout-flex-9: {\n        -ms-flex: 9;\n        -webkit-flex: 9;\n        flex: 9;\n      };\n\n      --layout-flex-10: {\n        -ms-flex: 10;\n        -webkit-flex: 10;\n        flex: 10;\n      };\n\n      --layout-flex-11: {\n        -ms-flex: 11;\n        -webkit-flex: 11;\n        flex: 11;\n      };\n\n      --layout-flex-12: {\n        -ms-flex: 12;\n        -webkit-flex: 12;\n        flex: 12;\n      };\n\n      /* alignment in cross axis */\n\n      --layout-start: {\n        -ms-flex-align: start;\n        -webkit-align-items: flex-start;\n        align-items: flex-start;\n      };\n\n      --layout-center: {\n        -ms-flex-align: center;\n        -webkit-align-items: center;\n        align-items: center;\n      };\n\n      --layout-end: {\n        -ms-flex-align: end;\n        -webkit-align-items: flex-end;\n        align-items: flex-end;\n      };\n\n      --layout-baseline: {\n        -ms-flex-align: baseline;\n        -webkit-align-items: baseline;\n        align-items: baseline;\n      };\n\n      /* alignment in main axis */\n\n      --layout-start-justified: {\n        -ms-flex-pack: start;\n        -webkit-justify-content: flex-start;\n        justify-content: flex-start;\n      };\n\n      --layout-center-justified: {\n        -ms-flex-pack: center;\n        -webkit-justify-content: center;\n        justify-content: center;\n      };\n\n      --layout-end-justified: {\n        -ms-flex-pack: end;\n        -webkit-justify-content: flex-end;\n        justify-content: flex-end;\n      };\n\n      --layout-around-justified: {\n        -ms-flex-pack: distribute;\n        -webkit-justify-content: space-around;\n        justify-content: space-around;\n      };\n\n      --layout-justified: {\n        -ms-flex-pack: justify;\n        -webkit-justify-content: space-between;\n        justify-content: space-between;\n      };\n\n      --layout-center-center: {\n        @apply --layout-center;\n        @apply --layout-center-justified;\n      };\n\n      /* self alignment */\n\n      --layout-self-start: {\n        -ms-align-self: flex-start;\n        -webkit-align-self: flex-start;\n        align-self: flex-start;\n      };\n\n      --layout-self-center: {\n        -ms-align-self: center;\n        -webkit-align-self: center;\n        align-self: center;\n      };\n\n      --layout-self-end: {\n        -ms-align-self: flex-end;\n        -webkit-align-self: flex-end;\n        align-self: flex-end;\n      };\n\n      --layout-self-stretch: {\n        -ms-align-self: stretch;\n        -webkit-align-self: stretch;\n        align-self: stretch;\n      };\n\n      --layout-self-baseline: {\n        -ms-align-self: baseline;\n        -webkit-align-self: baseline;\n        align-self: baseline;\n      };\n\n      /* multi-line alignment in main axis */\n\n      --layout-start-aligned: {\n        -ms-flex-line-pack: start;  /* IE10 */\n        -ms-align-content: flex-start;\n        -webkit-align-content: flex-start;\n        align-content: flex-start;\n      };\n\n      --layout-end-aligned: {\n        -ms-flex-line-pack: end;  /* IE10 */\n        -ms-align-content: flex-end;\n        -webkit-align-content: flex-end;\n        align-content: flex-end;\n      };\n\n      --layout-center-aligned: {\n        -ms-flex-line-pack: center;  /* IE10 */\n        -ms-align-content: center;\n        -webkit-align-content: center;\n        align-content: center;\n      };\n\n      --layout-between-aligned: {\n        -ms-flex-line-pack: justify;  /* IE10 */\n        -ms-align-content: space-between;\n        -webkit-align-content: space-between;\n        align-content: space-between;\n      };\n\n      --layout-around-aligned: {\n        -ms-flex-line-pack: distribute;  /* IE10 */\n        -ms-align-content: space-around;\n        -webkit-align-content: space-around;\n        align-content: space-around;\n      };\n\n      /*******************************\n                Other Layout\n      *******************************/\n\n      --layout-block: {\n        display: block;\n      };\n\n      --layout-invisible: {\n        visibility: hidden !important;\n      };\n\n      --layout-relative: {\n        position: relative;\n      };\n\n      --layout-fit: {\n        position: absolute;\n        top: 0;\n        right: 0;\n        bottom: 0;\n        left: 0;\n      };\n\n      --layout-scroll: {\n        -webkit-overflow-scrolling: touch;\n        overflow: auto;\n      };\n\n      --layout-fullbleed: {\n        margin: 0;\n        height: 100vh;\n      };\n\n      /* fixed position */\n\n      --layout-fixed-top: {\n        position: fixed;\n        top: 0;\n        left: 0;\n        right: 0;\n      };\n\n      --layout-fixed-right: {\n        position: fixed;\n        top: 0;\n        right: 0;\n        bottom: 0;\n      };\n\n      --layout-fixed-bottom: {\n        position: fixed;\n        right: 0;\n        bottom: 0;\n        left: 0;\n      };\n\n      --layout-fixed-left: {\n        position: fixed;\n        top: 0;\n        bottom: 0;\n        left: 0;\n      };\n\n    }\n  </style>\n</custom-style>';
+
+document.head.appendChild($_documentContainer.content);
+var style = document.createElement('style');
+style.textContent = '[hidden] { display: none !important; }';
+document.head.appendChild(style);
+
+/***/ }),
+
+/***/ "./node_modules/@polymer/iron-icon/iron-icon.js":
+/*!******************************************************!*\
+  !*** ./node_modules/@polymer/iron-icon/iron-icon.js ***!
+  \******************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _templateObject = _taggedTemplateLiteral(['\n    <style>\n      :host {\n        @apply --layout-inline;\n        @apply --layout-center-center;\n        position: relative;\n\n        vertical-align: middle;\n\n        fill: var(--iron-icon-fill-color, currentcolor);\n        stroke: var(--iron-icon-stroke-color, none);\n\n        width: var(--iron-icon-width, 24px);\n        height: var(--iron-icon-height, 24px);\n        @apply --iron-icon;\n      }\n\n      :host([hidden]) {\n        display: none;\n      }\n    </style>\n'], ['\n    <style>\n      :host {\n        @apply --layout-inline;\n        @apply --layout-center-center;\n        position: relative;\n\n        vertical-align: middle;\n\n        fill: var(--iron-icon-fill-color, currentcolor);\n        stroke: var(--iron-icon-stroke-color, none);\n\n        width: var(--iron-icon-width, 24px);\n        height: var(--iron-icon-height, 24px);\n        @apply --iron-icon;\n      }\n\n      :host([hidden]) {\n        display: none;\n      }\n    </style>\n']);
+
+var _polymerLegacy = __webpack_require__(/*! @polymer/polymer/polymer-legacy.js */ "./node_modules/@polymer/polymer/polymer-legacy.js");
+
+__webpack_require__(/*! @polymer/iron-meta/iron-meta.js */ "./node_modules/@polymer/iron-meta/iron-meta.js");
+
+__webpack_require__(/*! @polymer/iron-flex-layout/iron-flex-layout.js */ "./node_modules/@polymer/iron-flex-layout/iron-flex-layout.js");
+
+var _polymerFn = __webpack_require__(/*! @polymer/polymer/lib/legacy/polymer-fn.js */ "./node_modules/@polymer/polymer/lib/legacy/polymer-fn.js");
+
+var _htmlTag = __webpack_require__(/*! @polymer/polymer/lib/utils/html-tag.js */ "./node_modules/@polymer/polymer/lib/utils/html-tag.js");
+
+var _polymerDom = __webpack_require__(/*! @polymer/polymer/lib/legacy/polymer.dom.js */ "./node_modules/@polymer/polymer/lib/legacy/polymer.dom.js");
+
+function _taggedTemplateLiteral(strings, raw) { return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); } /**
+                                                                                                                                                  @license
+                                                                                                                                                  Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+                                                                                                                                                  This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+                                                                                                                                                  The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+                                                                                                                                                  The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+                                                                                                                                                  Code distributed by Google as part of the polymer project is also
+                                                                                                                                                  subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+                                                                                                                                                  */
+/**
+
+The `iron-icon` element displays an icon. By default an icon renders as a 24px square.
+
+Example using src:
+
+    <iron-icon src="star.png"></iron-icon>
+
+Example setting size to 32px x 32px:
+
+    <iron-icon class="big" src="big_star.png"></iron-icon>
+
+    <style is="custom-style">
+      .big {
+        --iron-icon-height: 32px;
+        --iron-icon-width: 32px;
+      }
+    </style>
+
+The iron elements include several sets of icons.
+To use the default set of icons, import `iron-icons.html` and use the `icon` attribute to specify an icon:
+
+    <link rel="import" href="/components/iron-icons/iron-icons.html">
+
+    <iron-icon icon="menu"></iron-icon>
+
+To use a different built-in set of icons, import the specific `iron-icons/<iconset>-icons.html`, and
+specify the icon as `<iconset>:<icon>`. For example, to use a communication icon, you would
+use:
+
+    <link rel="import" href="/components/iron-icons/communication-icons.html">
+
+    <iron-icon icon="communication:email"></iron-icon>
+
+You can also create custom icon sets of bitmap or SVG icons.
+
+Example of using an icon named `cherry` from a custom iconset with the ID `fruit`:
+
+    <iron-icon icon="fruit:cherry"></iron-icon>
+
+See [iron-iconset](iron-iconset) and [iron-iconset-svg](iron-iconset-svg) for more information about
+how to create a custom iconset.
+
+See the [iron-icons demo](iron-icons?view=demo:demo/index.html) to see the icons available
+in the various iconsets.
+
+To load a subset of icons from one of the default `iron-icons` sets, you can
+use the [poly-icon](https://poly-icon.appspot.com/) tool. It allows you
+to select individual icons, and creates an iconset from them that you can
+use directly in your elements.
+
+### Styling
+
+The following custom properties are available for styling:
+
+Custom property | Description | Default
+----------------|-------------|----------
+`--iron-icon` | Mixin applied to the icon | {}
+`--iron-icon-width` | Width of the icon | `24px`
+`--iron-icon-height` | Height of the icon | `24px`
+`--iron-icon-fill-color` | Fill color of the svg icon | `currentcolor`
+`--iron-icon-stroke-color` | Stroke color of the svg icon | none
+
+@group Iron Elements
+@element iron-icon
+@demo demo/index.html
+@hero hero.svg
+@homepage polymer.github.io
+*/
+/*
+  FIXME(polymer-modulizer): the above comments were extracted
+  from HTML and may be out of place here. Review them and
+  then delete this comment!
+*/
+
+
+(0, _polymerFn.Polymer)({
+  _template: (0, _htmlTag.html)(_templateObject),
+
+  is: 'iron-icon',
+
+  properties: {
+
+    /**
+     * The name of the icon to use. The name should be of the form:
+     * `iconset_name:icon_name`.
+     */
+    icon: { type: String },
+
+    /**
+     * The name of the theme to used, if one is specified by the
+     * iconset.
+     */
+    theme: { type: String },
+
+    /**
+     * If using iron-icon without an iconset, you can set the src to be
+     * the URL of an individual icon image file. Note that this will take
+     * precedence over a given icon attribute.
+     */
+    src: { type: String },
+
+    /**
+     * @type {!Polymer.IronMeta}
+     */
+    _meta: { value: _polymerLegacy.Base.create('iron-meta', { type: 'iconset' }) }
+
+  },
+
+  observers: ['_updateIcon(_meta, isAttached)', '_updateIcon(theme, isAttached)', '_srcChanged(src, isAttached)', '_iconChanged(icon, isAttached)'],
+
+  _DEFAULT_ICONSET: 'icons',
+
+  _iconChanged: function _iconChanged(icon) {
+    var parts = (icon || '').split(':');
+    this._iconName = parts.pop();
+    this._iconsetName = parts.pop() || this._DEFAULT_ICONSET;
+    this._updateIcon();
+  },
+
+  _srcChanged: function _srcChanged(src) {
+    this._updateIcon();
+  },
+
+  _usesIconset: function _usesIconset() {
+    return this.icon || !this.src;
+  },
+
+  /** @suppress {visibility} */
+  _updateIcon: function _updateIcon() {
+    if (this._usesIconset()) {
+      if (this._img && this._img.parentNode) {
+        (0, _polymerDom.dom)(this.root).removeChild(this._img);
+      }
+      if (this._iconName === '') {
+        if (this._iconset) {
+          this._iconset.removeIcon(this);
+        }
+      } else if (this._iconsetName && this._meta) {
+        this._iconset = /** @type {?Polymer.Iconset} */this._meta.byKey(this._iconsetName);
+        if (this._iconset) {
+          this._iconset.applyIcon(this, this._iconName, this.theme);
+          this.unlisten(window, 'iron-iconset-added', '_updateIcon');
+        } else {
+          this.listen(window, 'iron-iconset-added', '_updateIcon');
+        }
+      }
+    } else {
+      if (this._iconset) {
+        this._iconset.removeIcon(this);
+      }
+      if (!this._img) {
+        this._img = document.createElement('img');
+        this._img.style.width = '100%';
+        this._img.style.height = '100%';
+        this._img.draggable = false;
+      }
+      this._img.src = this.src;
+      (0, _polymerDom.dom)(this.root).appendChild(this._img);
+    }
+  }
+});
+
+/***/ }),
+
+/***/ "./node_modules/@polymer/iron-icons/iron-icons.js":
+/*!********************************************************!*\
+  !*** ./node_modules/@polymer/iron-icons/iron-icons.js ***!
+  \********************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+__webpack_require__(/*! @polymer/iron-icon/iron-icon.js */ "./node_modules/@polymer/iron-icon/iron-icon.js");
+
+__webpack_require__(/*! @polymer/iron-iconset-svg/iron-iconset-svg.js */ "./node_modules/@polymer/iron-iconset-svg/iron-iconset-svg.js");
+
+var $_documentContainer = document.createElement('template');
+$_documentContainer.setAttribute('style', 'display: none;');
+
+$_documentContainer.innerHTML = '<iron-iconset-svg name="icons" size="24">\n<svg><defs>\n<g id="3d-rotation"><path d="M7.52 21.48C4.25 19.94 1.91 16.76 1.55 13H.05C.56 19.16 5.71 24 12 24l.66-.03-3.81-3.81-1.33 1.32zm.89-6.52c-.19 0-.37-.03-.52-.08-.16-.06-.29-.13-.4-.24-.11-.1-.2-.22-.26-.37-.06-.14-.09-.3-.09-.47h-1.3c0 .36.07.68.21.95.14.27.33.5.56.69.24.18.51.32.82.41.3.1.62.15.96.15.37 0 .72-.05 1.03-.15.32-.1.6-.25.83-.44s.42-.43.55-.72c.13-.29.2-.61.2-.97 0-.19-.02-.38-.07-.56-.05-.18-.12-.35-.23-.51-.1-.16-.24-.3-.4-.43-.17-.13-.37-.23-.61-.31.2-.09.37-.2.52-.33.15-.13.27-.27.37-.42.1-.15.17-.3.22-.46.05-.16.07-.32.07-.48 0-.36-.06-.68-.18-.96-.12-.28-.29-.51-.51-.69-.2-.19-.47-.33-.77-.43C9.1 8.05 8.76 8 8.39 8c-.36 0-.69.05-1 .16-.3.11-.57.26-.79.45-.21.19-.38.41-.51.67-.12.26-.18.54-.18.85h1.3c0-.17.03-.32.09-.45s.14-.25.25-.34c.11-.09.23-.17.38-.22.15-.05.3-.08.48-.08.4 0 .7.1.89.31.19.2.29.49.29.86 0 .18-.03.34-.08.49-.05.15-.14.27-.25.37-.11.1-.25.18-.41.24-.16.06-.36.09-.58.09H7.5v1.03h.77c.22 0 .42.02.6.07s.33.13.45.23c.12.11.22.24.29.4.07.16.1.35.1.57 0 .41-.12.72-.35.93-.23.23-.55.33-.95.33zm8.55-5.92c-.32-.33-.7-.59-1.14-.77-.43-.18-.92-.27-1.46-.27H12v8h2.3c.55 0 1.06-.09 1.51-.27.45-.18.84-.43 1.16-.76.32-.33.57-.73.74-1.19.17-.47.26-.99.26-1.57v-.4c0-.58-.09-1.1-.26-1.57-.18-.47-.43-.87-.75-1.2zm-.39 3.16c0 .42-.05.79-.14 1.13-.1.33-.24.62-.43.85-.19.23-.43.41-.71.53-.29.12-.62.18-.99.18h-.91V9.12h.97c.72 0 1.27.23 1.64.69.38.46.57 1.12.57 1.99v.4zM12 0l-.66.03 3.81 3.81 1.33-1.33c3.27 1.55 5.61 4.72 5.96 8.48h1.5C23.44 4.84 18.29 0 12 0z"></path></g>\n<g id="accessibility"><path d="M12 2c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zm9 7h-6v13h-2v-6h-2v6H9V9H3V7h18v2z"></path></g>\n<g id="accessible"><circle cx="12" cy="4" r="2"></circle><path d="M19 13v-2c-1.54.02-3.09-.75-4.07-1.83l-1.29-1.43c-.17-.19-.38-.34-.61-.45-.01 0-.01-.01-.02-.01H13c-.35-.2-.75-.3-1.19-.26C10.76 7.11 10 8.04 10 9.09V15c0 1.1.9 2 2 2h5v5h2v-5.5c0-1.1-.9-2-2-2h-3v-3.45c1.29 1.07 3.25 1.94 5 1.95zm-6.17 5c-.41 1.16-1.52 2-2.83 2-1.66 0-3-1.34-3-3 0-1.31.84-2.41 2-2.83V12.1c-2.28.46-4 2.48-4 4.9 0 2.76 2.24 5 5 5 2.42 0 4.44-1.72 4.9-4h-2.07z"></path></g>\n<g id="account-balance"><path d="M4 10v7h3v-7H4zm6 0v7h3v-7h-3zM2 22h19v-3H2v3zm14-12v7h3v-7h-3zm-4.5-9L2 6v2h19V6l-9.5-5z"></path></g>\n<g id="account-balance-wallet"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"></path></g>\n<g id="account-box"><path d="M3 5v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2H5c-1.11 0-2 .9-2 2zm12 4c0 1.66-1.34 3-3 3s-3-1.34-3-3 1.34-3 3-3 3 1.34 3 3zm-9 8c0-2 4-3.1 6-3.1s6 1.1 6 3.1v1H6v-1z"></path></g>\n<g id="account-circle"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"></path></g>\n<g id="add"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"></path></g>\n<g id="add-alert"><path d="M10.01 21.01c0 1.1.89 1.99 1.99 1.99s1.99-.89 1.99-1.99h-3.98zm8.87-4.19V11c0-3.25-2.25-5.97-5.29-6.69v-.72C13.59 2.71 12.88 2 12 2s-1.59.71-1.59 1.59v.72C7.37 5.03 5.12 7.75 5.12 11v5.82L3 18.94V20h18v-1.06l-2.12-2.12zM16 13.01h-3v3h-2v-3H8V11h3V8h2v3h3v2.01z"></path></g>\n<g id="add-box"><path d="M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"></path></g>\n<g id="add-circle"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"></path></g>\n<g id="add-circle-outline"><path d="M13 7h-2v4H7v2h4v4h2v-4h4v-2h-4V7zm-1-5C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"></path></g>\n<g id="add-shopping-cart"><path d="M11 9h2V6h3V4h-3V1h-2v3H8v2h3v3zm-4 9c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2zm-9.83-3.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.86-7.01L19.42 4h-.01l-1.1 2-2.76 5H8.53l-.13-.27L6.16 6l-.95-2-.94-2H1v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.13 0-.25-.11-.25-.25z"></path></g>\n<g id="alarm"><path d="M22 5.72l-4.6-3.86-1.29 1.53 4.6 3.86L22 5.72zM7.88 3.39L6.6 1.86 2 5.71l1.29 1.53 4.59-3.85zM12.5 8H11v6l4.75 2.85.75-1.23-4-2.37V8zM12 4c-4.97 0-9 4.03-9 9s4.02 9 9 9c4.97 0 9-4.03 9-9s-4.03-9-9-9zm0 16c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"></path></g>\n<g id="alarm-add"><path d="M7.88 3.39L6.6 1.86 2 5.71l1.29 1.53 4.59-3.85zM22 5.72l-4.6-3.86-1.29 1.53 4.6 3.86L22 5.72zM12 4c-4.97 0-9 4.03-9 9s4.02 9 9 9c4.97 0 9-4.03 9-9s-4.03-9-9-9zm0 16c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7zm1-11h-2v3H8v2h3v3h2v-3h3v-2h-3V9z"></path></g>\n<g id="alarm-off"><path d="M12 6c3.87 0 7 3.13 7 7 0 .84-.16 1.65-.43 2.4l1.52 1.52c.58-1.19.91-2.51.91-3.92 0-4.97-4.03-9-9-9-1.41 0-2.73.33-3.92.91L9.6 6.43C10.35 6.16 11.16 6 12 6zm10-.28l-4.6-3.86-1.29 1.53 4.6 3.86L22 5.72zM2.92 2.29L1.65 3.57 2.98 4.9l-1.11.93 1.42 1.42 1.11-.94.8.8C3.83 8.69 3 10.75 3 13c0 4.97 4.02 9 9 9 2.25 0 4.31-.83 5.89-2.2l2.2 2.2 1.27-1.27L3.89 3.27l-.97-.98zm13.55 16.1C15.26 19.39 13.7 20 12 20c-3.87 0-7-3.13-7-7 0-1.7.61-3.26 1.61-4.47l9.86 9.86zM8.02 3.28L6.6 1.86l-.86.71 1.42 1.42.86-.71z"></path></g>\n<g id="alarm-on"><path d="M22 5.72l-4.6-3.86-1.29 1.53 4.6 3.86L22 5.72zM7.88 3.39L6.6 1.86 2 5.71l1.29 1.53 4.59-3.85zM12 4c-4.97 0-9 4.03-9 9s4.02 9 9 9c4.97 0 9-4.03 9-9s-4.03-9-9-9zm0 16c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7zm-1.46-5.47L8.41 12.4l-1.06 1.06 3.18 3.18 6-6-1.06-1.06-4.93 4.95z"></path></g>\n<g id="all-out"><path d="M16.21 4.16l4 4v-4zm4 12l-4 4h4zm-12 4l-4-4v4zm-4-12l4-4h-4zm12.95-.95c-2.73-2.73-7.17-2.73-9.9 0s-2.73 7.17 0 9.9 7.17 2.73 9.9 0 2.73-7.16 0-9.9zm-1.1 8.8c-2.13 2.13-5.57 2.13-7.7 0s-2.13-5.57 0-7.7 5.57-2.13 7.7 0 2.13 5.57 0 7.7z"></path></g>\n<g id="android"><path d="M6 18c0 .55.45 1 1 1h1v3.5c0 .83.67 1.5 1.5 1.5s1.5-.67 1.5-1.5V19h2v3.5c0 .83.67 1.5 1.5 1.5s1.5-.67 1.5-1.5V19h1c.55 0 1-.45 1-1V8H6v10zM3.5 8C2.67 8 2 8.67 2 9.5v7c0 .83.67 1.5 1.5 1.5S5 17.33 5 16.5v-7C5 8.67 4.33 8 3.5 8zm17 0c-.83 0-1.5.67-1.5 1.5v7c0 .83.67 1.5 1.5 1.5s1.5-.67 1.5-1.5v-7c0-.83-.67-1.5-1.5-1.5zm-4.97-5.84l1.3-1.3c.2-.2.2-.51 0-.71-.2-.2-.51-.2-.71 0l-1.48 1.48C13.85 1.23 12.95 1 12 1c-.96 0-1.86.23-2.66.63L7.85.15c-.2-.2-.51-.2-.71 0-.2.2-.2.51 0 .71l1.31 1.31C6.97 3.26 6 5.01 6 7h12c0-1.99-.97-3.75-2.47-4.84zM10 5H9V4h1v1zm5 0h-1V4h1v1z"></path></g>\n<g id="announcement"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7 9h-2V5h2v6zm0 4h-2v-2h2v2z"></path></g>\n<g id="apps"><path d="M4 8h4V4H4v4zm6 12h4v-4h-4v4zm-6 0h4v-4H4v4zm0-6h4v-4H4v4zm6 0h4v-4h-4v4zm6-10v4h4V4h-4zm-6 4h4V4h-4v4zm6 6h4v-4h-4v4zm0 6h4v-4h-4v4z"></path></g>\n<g id="archive"><path d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.02 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.48-.17-.93-.46-1.27zM12 17.5L6.5 12H10v-2h4v2h3.5L12 17.5zM5.12 5l.81-1h12l.94 1H5.12z"></path></g>\n<g id="arrow-back"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"></path></g>\n<g id="arrow-downward"><path d="M20 12l-1.41-1.41L13 16.17V4h-2v12.17l-5.58-5.59L4 12l8 8 8-8z"></path></g>\n<g id="arrow-drop-down"><path d="M7 10l5 5 5-5z"></path></g>\n<g id="arrow-drop-down-circle"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 12l-4-4h8l-4 4z"></path></g>\n<g id="arrow-drop-up"><path d="M7 14l5-5 5 5z"></path></g>\n<g id="arrow-forward"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"></path></g>\n<g id="arrow-upward"><path d="M4 12l1.41 1.41L11 7.83V20h2V7.83l5.58 5.59L20 12l-8-8-8 8z"></path></g>\n<g id="aspect-ratio"><path d="M19 12h-2v3h-3v2h5v-5zM7 9h3V7H5v5h2V9zm14-6H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16.01H3V4.99h18v14.02z"></path></g>\n<g id="assessment"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"></path></g>\n<g id="assignment"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"></path></g>\n<g id="assignment-ind"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm0 4c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm6 12H6v-1.4c0-2 4-3.1 6-3.1s6 1.1 6 3.1V19z"></path></g>\n<g id="assignment-late"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-6 15h-2v-2h2v2zm0-4h-2V8h2v6zm-1-9c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1z"></path></g>\n<g id="assignment-return"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm4 12h-4v3l-5-5 5-5v3h4v4z"></path></g>\n<g id="assignment-returned"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm0 15l-5-5h3V9h4v4h3l-5 5z"></path></g>\n<g id="assignment-turned-in"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm-2 14l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"></path></g>\n<g id="attachment"><path d="M2 12.5C2 9.46 4.46 7 7.5 7H18c2.21 0 4 1.79 4 4s-1.79 4-4 4H9.5C8.12 15 7 13.88 7 12.5S8.12 10 9.5 10H17v2H9.41c-.55 0-.55 1 0 1H18c1.1 0 2-.9 2-2s-.9-2-2-2H7.5C5.57 9 4 10.57 4 12.5S5.57 16 7.5 16H17v2H7.5C4.46 18 2 15.54 2 12.5z"></path></g>\n<g id="autorenew"><path d="M12 6v3l4-4-4-4v3c-4.42 0-8 3.58-8 8 0 1.57.46 3.03 1.24 4.26L6.7 14.8c-.45-.83-.7-1.79-.7-2.8 0-3.31 2.69-6 6-6zm6.76 1.74L17.3 9.2c.44.84.7 1.79.7 2.8 0 3.31-2.69 6-6 6v-3l-4 4 4 4v-3c4.42 0 8-3.58 8-8 0-1.57-.46-3.03-1.24-4.26z"></path></g>\n<g id="backspace"><path d="M22 3H7c-.69 0-1.23.35-1.59.88L0 12l5.41 8.11c.36.53.9.89 1.59.89h15c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-3 12.59L17.59 17 14 13.41 10.41 17 9 15.59 12.59 12 9 8.41 10.41 7 14 10.59 17.59 7 19 8.41 15.41 12 19 15.59z"></path></g>\n<g id="backup"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"></path></g>\n<g id="block"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zM4 12c0-4.42 3.58-8 8-8 1.85 0 3.55.63 4.9 1.69L5.69 16.9C4.63 15.55 4 13.85 4 12zm8 8c-1.85 0-3.55-.63-4.9-1.69L18.31 7.1C19.37 8.45 20 10.15 20 12c0 4.42-3.58 8-8 8z"></path></g>\n<g id="book"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"></path></g>\n<g id="bookmark"><path d="M17 3H7c-1.1 0-1.99.9-1.99 2L5 21l7-3 7 3V5c0-1.1-.9-2-2-2z"></path></g>\n<g id="bookmark-border"><path d="M17 3H7c-1.1 0-1.99.9-1.99 2L5 21l7-3 7 3V5c0-1.1-.9-2-2-2zm0 15l-5-2.18L7 18V5h10v13z"></path></g>\n<g id="bug-report"><path d="M20 8h-2.81c-.45-.78-1.07-1.45-1.82-1.96L17 4.41 15.59 3l-2.17 2.17C12.96 5.06 12.49 5 12 5c-.49 0-.96.06-1.41.17L8.41 3 7 4.41l1.62 1.63C7.88 6.55 7.26 7.22 6.81 8H4v2h2.09c-.05.33-.09.66-.09 1v1H4v2h2v1c0 .34.04.67.09 1H4v2h2.81c1.04 1.79 2.97 3 5.19 3s4.15-1.21 5.19-3H20v-2h-2.09c.05-.33.09-.66.09-1v-1h2v-2h-2v-1c0-.34-.04-.67-.09-1H20V8zm-6 8h-4v-2h4v2zm0-4h-4v-2h4v2z"></path></g>\n<g id="build"><path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z"></path></g>\n<g id="cached"><path d="M19 8l-4 4h3c0 3.31-2.69 6-6 6-1.01 0-1.97-.25-2.8-.7l-1.46 1.46C8.97 19.54 10.43 20 12 20c4.42 0 8-3.58 8-8h3l-4-4zM6 12c0-3.31 2.69-6 6-6 1.01 0 1.97.25 2.8.7l1.46-1.46C15.03 4.46 13.57 4 12 4c-4.42 0-8 3.58-8 8H1l4 4 4-4H6z"></path></g>\n<g id="camera-enhance"><path d="M9 3L7.17 5H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2h-3.17L15 3H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-1l1.25-2.75L16 13l-2.75-1.25L12 9l-1.25 2.75L8 13l2.75 1.25z"></path></g>\n<g id="cancel"><path d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z"></path></g>\n<g id="card-giftcard"><path d="M20 6h-2.18c.11-.31.18-.65.18-1 0-1.66-1.34-3-3-3-1.05 0-1.96.54-2.5 1.35l-.5.67-.5-.68C10.96 2.54 10.05 2 9 2 7.34 2 6 3.34 6 5c0 .35.07.69.18 1H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-5-2c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zM9 4c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm11 15H4v-2h16v2zm0-5H4V8h5.08L7 10.83 8.62 12 11 8.76l1-1.36 1 1.36L15.38 12 17 10.83 14.92 8H20v6z"></path></g>\n<g id="card-membership"><path d="M20 2H4c-1.11 0-2 .89-2 2v11c0 1.11.89 2 2 2h4v5l4-2 4 2v-5h4c1.11 0 2-.89 2-2V4c0-1.11-.89-2-2-2zm0 13H4v-2h16v2zm0-5H4V4h16v6z"></path></g>\n<g id="card-travel"><path d="M20 6h-3V4c0-1.11-.89-2-2-2H9c-1.11 0-2 .89-2 2v2H4c-1.11 0-2 .89-2 2v11c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zM9 4h6v2H9V4zm11 15H4v-2h16v2zm0-5H4V8h3v2h2V8h6v2h2V8h3v6z"></path></g>\n<g id="change-history"><path d="M12 7.77L18.39 18H5.61L12 7.77M12 4L2 20h20L12 4z"></path></g>\n<g id="check"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"></path></g>\n<g id="check-box"><path d="M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.11 0 2-.9 2-2V5c0-1.1-.89-2-2-2zm-9 14l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"></path></g>\n<g id="check-box-outline-blank"><path d="M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"></path></g>\n<g id="check-circle"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"></path></g>\n<g id="chevron-left"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"></path></g>\n<g id="chevron-right"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></g>\n<g id="chrome-reader-mode"><path d="M13 12h7v1.5h-7zm0-2.5h7V11h-7zm0 5h7V16h-7zM21 4H3c-1.1 0-2 .9-2 2v13c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 15h-9V6h9v13z"></path></g>\n<g id="class"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"></path></g>\n<g id="clear"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path></g>\n<g id="close"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path></g>\n<g id="cloud"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"></path></g>\n<g id="cloud-circle"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.5 14H8c-1.66 0-3-1.34-3-3s1.34-3 3-3l.14.01C8.58 8.28 10.13 7 12 7c2.21 0 4 1.79 4 4h.5c1.38 0 2.5 1.12 2.5 2.5S17.88 16 16.5 16z"></path></g>\n<g id="cloud-done"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM10 17l-3.5-3.5 1.41-1.41L10 14.17 15.18 9l1.41 1.41L10 17z"></path></g>\n<g id="cloud-download"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"></path></g>\n<g id="cloud-off"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4c-1.48 0-2.85.43-4.01 1.17l1.46 1.46C10.21 6.23 11.08 6 12 6c3.04 0 5.5 2.46 5.5 5.5v.5H19c1.66 0 3 1.34 3 3 0 1.13-.64 2.11-1.56 2.62l1.45 1.45C23.16 18.16 24 16.68 24 15c0-2.64-2.05-4.78-4.65-4.96zM3 5.27l2.75 2.74C2.56 8.15 0 10.77 0 14c0 3.31 2.69 6 6 6h11.73l2 2L21 20.73 4.27 4 3 5.27zM7.73 10l8 8H6c-2.21 0-4-1.79-4-4s1.79-4 4-4h1.73z"></path></g>\n<g id="cloud-queue"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM19 18H6c-2.21 0-4-1.79-4-4s1.79-4 4-4h.71C7.37 7.69 9.48 6 12 6c3.04 0 5.5 2.46 5.5 5.5v.5H19c1.66 0 3 1.34 3 3s-1.34 3-3 3z"></path></g>\n<g id="cloud-upload"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"></path></g>\n<g id="code"><path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"></path></g>\n<g id="compare-arrows"><path d="M9.01 14H2v2h7.01v3L13 15l-3.99-4v3zm5.98-1v-3H22V8h-7.01V5L11 9l3.99 4z"></path></g>\n<g id="content-copy"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></g>\n<g id="content-cut"><path d="M9.64 7.64c.23-.5.36-1.05.36-1.64 0-2.21-1.79-4-4-4S2 3.79 2 6s1.79 4 4 4c.59 0 1.14-.13 1.64-.36L10 12l-2.36 2.36C7.14 14.13 6.59 14 6 14c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4c0-.59-.13-1.14-.36-1.64L12 14l7 7h3v-1L9.64 7.64zM6 8c-1.1 0-2-.89-2-2s.9-2 2-2 2 .89 2 2-.9 2-2 2zm0 12c-1.1 0-2-.89-2-2s.9-2 2-2 2 .89 2 2-.9 2-2 2zm6-7.5c-.28 0-.5-.22-.5-.5s.22-.5.5-.5.5.22.5.5-.22.5-.5.5zM19 3l-6 6 2 2 7-7V3z"></path></g>\n<g id="content-paste"><path d="M19 2h-4.18C14.4.84 13.3 0 12 0c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm7 18H5V4h2v3h10V4h2v16z"></path></g>\n<g id="copyright"><path d="M10.08 10.86c.05-.33.16-.62.3-.87s.34-.46.59-.62c.24-.15.54-.22.91-.23.23.01.44.05.63.13.2.09.38.21.52.36s.25.33.34.53.13.42.14.64h1.79c-.02-.47-.11-.9-.28-1.29s-.4-.73-.7-1.01-.66-.5-1.08-.66-.88-.23-1.39-.23c-.65 0-1.22.11-1.7.34s-.88.53-1.2.92-.56.84-.71 1.36S8 11.29 8 11.87v.27c0 .58.08 1.12.23 1.64s.39.97.71 1.35.72.69 1.2.91 1.05.34 1.7.34c.47 0 .91-.08 1.32-.23s.77-.36 1.08-.63.56-.58.74-.94.29-.74.3-1.15h-1.79c-.01.21-.06.4-.15.58s-.21.33-.36.46-.32.23-.52.3c-.19.07-.39.09-.6.1-.36-.01-.66-.08-.89-.23-.25-.16-.45-.37-.59-.62s-.25-.55-.3-.88-.08-.67-.08-1v-.27c0-.35.03-.68.08-1.01zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"></path></g>\n<g id="create"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"></path></g>\n<g id="create-new-folder"><path d="M20 6h-8l-2-2H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-1 8h-3v3h-2v-3h-3v-2h3V9h2v3h3v2z"></path></g>\n<g id="credit-card"><path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"></path></g>\n<g id="dashboard"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"></path></g>\n<g id="date-range"><path d="M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm2-7h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z"></path></g>\n<g id="delete"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"></path></g>\n<g id="delete-forever"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zm2.46-7.12l1.41-1.41L12 12.59l2.12-2.12 1.41 1.41L13.41 14l2.12 2.12-1.41 1.41L12 15.41l-2.12 2.12-1.41-1.41L10.59 14l-2.13-2.12zM15.5 4l-1-1h-5l-1 1H5v2h14V4z"></path></g>\n<g id="delete-sweep"><path d="M15 16h4v2h-4zm0-8h7v2h-7zm0 4h6v2h-6zM3 18c0 1.1.9 2 2 2h6c1.1 0 2-.9 2-2V8H3v10zM14 5h-3l-1-1H6L5 5H2v2h12z"></path></g>\n<g id="description"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"></path></g>\n<g id="dns"><path d="M20 13H4c-.55 0-1 .45-1 1v6c0 .55.45 1 1 1h16c.55 0 1-.45 1-1v-6c0-.55-.45-1-1-1zM7 19c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zM20 3H4c-.55 0-1 .45-1 1v6c0 .55.45 1 1 1h16c.55 0 1-.45 1-1V4c0-.55-.45-1-1-1zM7 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"></path></g>\n<g id="done"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"></path></g>\n<g id="done-all"><path d="M18 7l-1.41-1.41-6.34 6.34 1.41 1.41L18 7zm4.24-1.41L11.66 16.17 7.48 12l-1.41 1.41L11.66 19l12-12-1.42-1.41zM.41 13.41L6 19l1.41-1.41L1.83 12 .41 13.41z"></path></g>\n<g id="donut-large"><path d="M11 5.08V2c-5 .5-9 4.81-9 10s4 9.5 9 10v-3.08c-3-.48-6-3.4-6-6.92s3-6.44 6-6.92zM18.97 11H22c-.47-5-4-8.53-9-9v3.08C16 5.51 18.54 8 18.97 11zM13 18.92V22c5-.47 8.53-4 9-9h-3.03c-.43 3-2.97 5.49-5.97 5.92z"></path></g>\n<g id="donut-small"><path d="M11 9.16V2c-5 .5-9 4.79-9 10s4 9.5 9 10v-7.16c-1-.41-2-1.52-2-2.84s1-2.43 2-2.84zM14.86 11H22c-.48-4.75-4-8.53-9-9v7.16c1 .3 1.52.98 1.86 1.84zM13 14.84V22c5-.47 8.52-4.25 9-9h-7.14c-.34.86-.86 1.54-1.86 1.84z"></path></g>\n<g id="drafts"><path d="M21.99 8c0-.72-.37-1.35-.94-1.7L12 1 2.95 6.3C2.38 6.65 2 7.28 2 8v10c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2l-.01-10zM12 13L3.74 7.84 12 3l8.26 4.84L12 13z"></path></g>\n<g id="eject"><path d="M5 17h14v2H5zm7-12L5.33 15h13.34z"></path></g>\n<g id="error"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"></path></g>\n<g id="error-outline"><path d="M11 15h2v2h-2zm0-8h2v6h-2zm.99-5C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"></path></g>\n<g id="euro-symbol"><path d="M15 18.5c-2.51 0-4.68-1.42-5.76-3.5H15v-2H8.58c-.05-.33-.08-.66-.08-1s.03-.67.08-1H15V9H9.24C10.32 6.92 12.5 5.5 15 5.5c1.61 0 3.09.59 4.23 1.57L21 5.3C19.41 3.87 17.3 3 15 3c-3.92 0-7.24 2.51-8.48 6H3v2h3.06c-.04.33-.06.66-.06 1 0 .34.02.67.06 1H3v2h3.52c1.24 3.49 4.56 6 8.48 6 2.31 0 4.41-.87 6-2.3l-1.78-1.77c-1.13.98-2.6 1.57-4.22 1.57z"></path></g>\n<g id="event"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"></path></g>\n<g id="event-seat"><path d="M4 18v3h3v-3h10v3h3v-6H4zm15-8h3v3h-3zM2 10h3v3H2zm15 3H7V5c0-1.1.9-2 2-2h6c1.1 0 2 .9 2 2v8z"></path></g>\n<g id="exit-to-app"><path d="M10.09 15.59L11.5 17l5-5-5-5-1.41 1.41L12.67 11H3v2h9.67l-2.58 2.59zM19 3H5c-1.11 0-2 .9-2 2v4h2V5h14v14H5v-4H3v4c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"></path></g>\n<g id="expand-less"><path d="M12 8l-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z"></path></g>\n<g id="expand-more"><path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"></path></g>\n<g id="explore"><path d="M12 10.9c-.61 0-1.1.49-1.1 1.1s.49 1.1 1.1 1.1c.61 0 1.1-.49 1.1-1.1s-.49-1.1-1.1-1.1zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm2.19 12.19L6 18l3.81-8.19L18 6l-3.81 8.19z"></path></g>\n<g id="extension"><path d="M20.5 11H19V7c0-1.1-.9-2-2-2h-4V3.5C13 2.12 11.88 1 10.5 1S8 2.12 8 3.5V5H4c-1.1 0-1.99.9-1.99 2v3.8H3.5c1.49 0 2.7 1.21 2.7 2.7s-1.21 2.7-2.7 2.7H2V20c0 1.1.9 2 2 2h3.8v-1.5c0-1.49 1.21-2.7 2.7-2.7 1.49 0 2.7 1.21 2.7 2.7V22H17c1.1 0 2-.9 2-2v-4h1.5c1.38 0 2.5-1.12 2.5-2.5S21.88 11 20.5 11z"></path></g>\n<g id="face"><path d="M9 11.75c-.69 0-1.25.56-1.25 1.25s.56 1.25 1.25 1.25 1.25-.56 1.25-1.25-.56-1.25-1.25-1.25zm6 0c-.69 0-1.25.56-1.25 1.25s.56 1.25 1.25 1.25 1.25-.56 1.25-1.25-.56-1.25-1.25-1.25zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8 0-.29.02-.58.05-.86 2.36-1.05 4.23-2.98 5.21-5.37C11.07 8.33 14.05 10 17.42 10c.78 0 1.53-.09 2.25-.26.21.71.33 1.47.33 2.26 0 4.41-3.59 8-8 8z"></path></g>\n<g id="favorite"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path></g>\n<g id="favorite-border"><path d="M16.5 3c-1.74 0-3.41.81-4.5 2.09C10.91 3.81 9.24 3 7.5 3 4.42 3 2 5.42 2 8.5c0 3.78 3.4 6.86 8.55 11.54L12 21.35l1.45-1.32C18.6 15.36 22 12.28 22 8.5 22 5.42 19.58 3 16.5 3zm-4.4 15.55l-.1.1-.1-.1C7.14 14.24 4 11.39 4 8.5 4 6.5 5.5 5 7.5 5c1.54 0 3.04.99 3.57 2.36h1.87C13.46 5.99 14.96 5 16.5 5c2 0 3.5 1.5 3.5 3.5 0 2.89-3.14 5.74-7.9 10.05z"></path></g>\n<g id="feedback"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7 12h-2v-2h2v2zm0-4h-2V6h2v4z"></path></g>\n<g id="file-download"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"></path></g>\n<g id="file-upload"><path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"></path></g>\n<g id="filter-list"><path d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z"></path></g>\n<g id="find-in-page"><path d="M20 19.59V8l-6-6H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c.45 0 .85-.15 1.19-.4l-4.43-4.43c-.8.52-1.74.83-2.76.83-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5c0 1.02-.31 1.96-.83 2.75L20 19.59zM9 13c0 1.66 1.34 3 3 3s3-1.34 3-3-1.34-3-3-3-3 1.34-3 3z"></path></g>\n<g id="find-replace"><path d="M11 6c1.38 0 2.63.56 3.54 1.46L12 10h6V4l-2.05 2.05C14.68 4.78 12.93 4 11 4c-3.53 0-6.43 2.61-6.92 6H6.1c.46-2.28 2.48-4 4.9-4zm5.64 9.14c.66-.9 1.12-1.97 1.28-3.14H15.9c-.46 2.28-2.48 4-4.9 4-1.38 0-2.63-.56-3.54-1.46L10 12H4v6l2.05-2.05C7.32 17.22 9.07 18 11 18c1.55 0 2.98-.51 4.14-1.36L20 21.49 21.49 20l-4.85-4.86z"></path></g>\n<g id="fingerprint"><path d="M17.81 4.47c-.08 0-.16-.02-.23-.06C15.66 3.42 14 3 12.01 3c-1.98 0-3.86.47-5.57 1.41-.24.13-.54.04-.68-.2-.13-.24-.04-.55.2-.68C7.82 2.52 9.86 2 12.01 2c2.13 0 3.99.47 6.03 1.52.25.13.34.43.21.67-.09.18-.26.28-.44.28zM3.5 9.72c-.1 0-.2-.03-.29-.09-.23-.16-.28-.47-.12-.7.99-1.4 2.25-2.5 3.75-3.27C9.98 4.04 14 4.03 17.15 5.65c1.5.77 2.76 1.86 3.75 3.25.16.22.11.54-.12.7-.23.16-.54.11-.7-.12-.9-1.26-2.04-2.25-3.39-2.94-2.87-1.47-6.54-1.47-9.4.01-1.36.7-2.5 1.7-3.4 2.96-.08.14-.23.21-.39.21zm6.25 12.07c-.13 0-.26-.05-.35-.15-.87-.87-1.34-1.43-2.01-2.64-.69-1.23-1.05-2.73-1.05-4.34 0-2.97 2.54-5.39 5.66-5.39s5.66 2.42 5.66 5.39c0 .28-.22.5-.5.5s-.5-.22-.5-.5c0-2.42-2.09-4.39-4.66-4.39-2.57 0-4.66 1.97-4.66 4.39 0 1.44.32 2.77.93 3.85.64 1.15 1.08 1.64 1.85 2.42.19.2.19.51 0 .71-.11.1-.24.15-.37.15zm7.17-1.85c-1.19 0-2.24-.3-3.1-.89-1.49-1.01-2.38-2.65-2.38-4.39 0-.28.22-.5.5-.5s.5.22.5.5c0 1.41.72 2.74 1.94 3.56.71.48 1.54.71 2.54.71.24 0 .64-.03 1.04-.1.27-.05.53.13.58.41.05.27-.13.53-.41.58-.57.11-1.07.12-1.21.12zM14.91 22c-.04 0-.09-.01-.13-.02-1.59-.44-2.63-1.03-3.72-2.1-1.4-1.39-2.17-3.24-2.17-5.22 0-1.62 1.38-2.94 3.08-2.94 1.7 0 3.08 1.32 3.08 2.94 0 1.07.93 1.94 2.08 1.94s2.08-.87 2.08-1.94c0-3.77-3.25-6.83-7.25-6.83-2.84 0-5.44 1.58-6.61 4.03-.39.81-.59 1.76-.59 2.8 0 .78.07 2.01.67 3.61.1.26-.03.55-.29.64-.26.1-.55-.04-.64-.29-.49-1.31-.73-2.61-.73-3.96 0-1.2.23-2.29.68-3.24 1.33-2.79 4.28-4.6 7.51-4.6 4.55 0 8.25 3.51 8.25 7.83 0 1.62-1.38 2.94-3.08 2.94s-3.08-1.32-3.08-2.94c0-1.07-.93-1.94-2.08-1.94s-2.08.87-2.08 1.94c0 1.71.66 3.31 1.87 4.51.95.94 1.86 1.46 3.27 1.85.27.07.42.35.35.61-.05.23-.26.38-.47.38z"></path></g>\n<g id="first-page"><path d="M18.41 16.59L13.82 12l4.59-4.59L17 6l-6 6 6 6zM6 6h2v12H6z"></path></g>\n<g id="flag"><path d="M14.4 6L14 4H5v17h2v-7h5.6l.4 2h7V6z"></path></g>\n<g id="flight-land"><path d="M2.5 19h19v2h-19zm7.18-5.73l4.35 1.16 5.31 1.42c.8.21 1.62-.26 1.84-1.06.21-.8-.26-1.62-1.06-1.84l-5.31-1.42-2.76-9.02L10.12 2v8.28L5.15 8.95l-.93-2.32-1.45-.39v5.17l1.6.43 5.31 1.43z"></path></g>\n<g id="flight-takeoff"><path d="M2.5 19h19v2h-19zm19.57-9.36c-.21-.8-1.04-1.28-1.84-1.06L14.92 10l-6.9-6.43-1.93.51 4.14 7.17-4.97 1.33-1.97-1.54-1.45.39 1.82 3.16.77 1.33 1.6-.43 5.31-1.42 4.35-1.16L21 11.49c.81-.23 1.28-1.05 1.07-1.85z"></path></g>\n<g id="flip-to-back"><path d="M9 7H7v2h2V7zm0 4H7v2h2v-2zm0-8c-1.11 0-2 .9-2 2h2V3zm4 12h-2v2h2v-2zm6-12v2h2c0-1.1-.9-2-2-2zm-6 0h-2v2h2V3zM9 17v-2H7c0 1.1.89 2 2 2zm10-4h2v-2h-2v2zm0-4h2V7h-2v2zm0 8c1.1 0 2-.9 2-2h-2v2zM5 7H3v12c0 1.1.89 2 2 2h12v-2H5V7zm10-2h2V3h-2v2zm0 12h2v-2h-2v2z"></path></g>\n<g id="flip-to-front"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm2 4v-2H3c0 1.1.89 2 2 2zM3 9h2V7H3v2zm12 12h2v-2h-2v2zm4-18H9c-1.11 0-2 .9-2 2v10c0 1.1.89 2 2 2h10c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 12H9V5h10v10zm-8 6h2v-2h-2v2zm-4 0h2v-2H7v2z"></path></g>\n<g id="folder"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"></path></g>\n<g id="folder-open"><path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"></path></g>\n<g id="folder-shared"><path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-5 3c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zm4 8h-8v-1c0-1.33 2.67-2 4-2s4 .67 4 2v1z"></path></g>\n<g id="font-download"><path d="M9.93 13.5h4.14L12 7.98zM20 2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-4.05 16.5l-1.14-3H9.17l-1.12 3H5.96l5.11-13h1.86l5.11 13h-2.09z"></path></g>\n<g id="forward"><path d="M12 8V4l8 8-8 8v-4H4V8z"></path></g>\n<g id="fullscreen"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"></path></g>\n<g id="fullscreen-exit"><path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"></path></g>\n<g id="g-translate"><path d="M20 5h-9.12L10 2H4c-1.1 0-2 .9-2 2v13c0 1.1.9 2 2 2h7l1 3h8c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zM7.17 14.59c-2.25 0-4.09-1.83-4.09-4.09s1.83-4.09 4.09-4.09c1.04 0 1.99.37 2.74 1.07l.07.06-1.23 1.18-.06-.05c-.29-.27-.78-.59-1.52-.59-1.31 0-2.38 1.09-2.38 2.42s1.07 2.42 2.38 2.42c1.37 0 1.96-.87 2.12-1.46H7.08V9.91h3.95l.01.07c.04.21.05.4.05.61 0 2.35-1.61 4-3.92 4zm6.03-1.71c.33.6.74 1.18 1.19 1.7l-.54.53-.65-2.23zm.77-.76h-.99l-.31-1.04h3.99s-.34 1.31-1.56 2.74c-.52-.62-.89-1.23-1.13-1.7zM21 20c0 .55-.45 1-1 1h-7l2-2-.81-2.77.92-.92L17.79 18l.73-.73-2.71-2.68c.9-1.03 1.6-2.25 1.92-3.51H19v-1.04h-3.64V9h-1.04v1.04h-1.96L11.18 6H20c.55 0 1 .45 1 1v13z"></path></g>\n<g id="gavel"><path d="M1 21h12v2H1zM5.245 8.07l2.83-2.827 14.14 14.142-2.828 2.828zM12.317 1l5.657 5.656-2.83 2.83-5.654-5.66zM3.825 9.485l5.657 5.657-2.828 2.828-5.657-5.657z"></path></g>\n<g id="gesture"><path d="M4.59 6.89c.7-.71 1.4-1.35 1.71-1.22.5.2 0 1.03-.3 1.52-.25.42-2.86 3.89-2.86 6.31 0 1.28.48 2.34 1.34 2.98.75.56 1.74.73 2.64.46 1.07-.31 1.95-1.4 3.06-2.77 1.21-1.49 2.83-3.44 4.08-3.44 1.63 0 1.65 1.01 1.76 1.79-3.78.64-5.38 3.67-5.38 5.37 0 1.7 1.44 3.09 3.21 3.09 1.63 0 4.29-1.33 4.69-6.1H21v-2.5h-2.47c-.15-1.65-1.09-4.2-4.03-4.2-2.25 0-4.18 1.91-4.94 2.84-.58.73-2.06 2.48-2.29 2.72-.25.3-.68.84-1.11.84-.45 0-.72-.83-.36-1.92.35-1.09 1.4-2.86 1.85-3.52.78-1.14 1.3-1.92 1.3-3.28C8.95 3.69 7.31 3 6.44 3 5.12 3 3.97 4 3.72 4.25c-.36.36-.66.66-.88.93l1.75 1.71zm9.29 11.66c-.31 0-.74-.26-.74-.72 0-.6.73-2.2 2.87-2.76-.3 2.69-1.43 3.48-2.13 3.48z"></path></g>\n<g id="get-app"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"></path></g>\n<g id="gif"><path d="M11.5 9H13v6h-1.5zM9 9H6c-.6 0-1 .5-1 1v4c0 .5.4 1 1 1h3c.6 0 1-.5 1-1v-2H8.5v1.5h-2v-3H10V10c0-.5-.4-1-1-1zm10 1.5V9h-4.5v6H16v-2h2v-1.5h-2v-1z"></path></g>\n<g id="grade"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path></g>\n<g id="group-work"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zM8 17.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5zM9.5 8c0-1.38 1.12-2.5 2.5-2.5s2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5S9.5 9.38 9.5 8zm6.5 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"></path></g>\n<g id="help"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"></path></g>\n<g id="help-outline"><path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"></path></g>\n<g id="highlight-off"><path d="M14.59 8L12 10.59 9.41 8 8 9.41 10.59 12 8 14.59 9.41 16 12 13.41 14.59 16 16 14.59 13.41 12 16 9.41 14.59 8zM12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"></path></g>\n<g id="history"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"></path></g>\n<g id="home"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"></path></g>\n<g id="hourglass-empty"><path d="M6 2v6h.01L6 8.01 10 12l-4 4 .01.01H6V22h12v-5.99h-.01L18 16l-4-4 4-3.99-.01-.01H18V2H6zm10 14.5V20H8v-3.5l4-4 4 4zm-4-5l-4-4V4h8v3.5l-4 4z"></path></g>\n<g id="hourglass-full"><path d="M6 2v6h.01L6 8.01 10 12l-4 4 .01.01H6V22h12v-5.99h-.01L18 16l-4-4 4-3.99-.01-.01H18V2H6z"></path></g>\n<g id="http"><path d="M4.5 11h-2V9H1v6h1.5v-2.5h2V15H6V9H4.5v2zm2.5-.5h1.5V15H10v-4.5h1.5V9H7v1.5zm5.5 0H14V15h1.5v-4.5H17V9h-4.5v1.5zm9-1.5H18v6h1.5v-2h2c.8 0 1.5-.7 1.5-1.5v-1c0-.8-.7-1.5-1.5-1.5zm0 2.5h-2v-1h2v1z"></path></g>\n<g id="https"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"></path></g>\n<g id="important-devices"><path d="M23 11.01L18 11c-.55 0-1 .45-1 1v9c0 .55.45 1 1 1h5c.55 0 1-.45 1-1v-9c0-.55-.45-.99-1-.99zM23 20h-5v-7h5v7zM20 2H2C.89 2 0 2.89 0 4v12c0 1.1.89 2 2 2h7v2H7v2h8v-2h-2v-2h2v-2H2V4h18v5h2V4c0-1.11-.9-2-2-2zm-8.03 7L11 6l-.97 3H7l2.47 1.76-.94 2.91 2.47-1.8 2.47 1.8-.94-2.91L15 9h-3.03z"></path></g>\n<g id="inbox"><path d="M19 3H4.99c-1.11 0-1.98.89-1.98 2L3 19c0 1.1.88 2 1.99 2H19c1.1 0 2-.9 2-2V5c0-1.11-.9-2-2-2zm0 12h-4c0 1.66-1.35 3-3 3s-3-1.34-3-3H4.99V5H19v10z"></path></g>\n<g id="indeterminate-check-box"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10H7v-2h10v2z"></path></g>\n<g id="info"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"></path></g>\n<g id="info-outline"><path d="M11 17h2v-6h-2v6zm1-15C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zM11 9h2V7h-2v2z"></path></g>\n<g id="input"><path d="M21 3.01H3c-1.1 0-2 .9-2 2V9h2V4.99h18v14.03H3V15H1v4.01c0 1.1.9 1.98 2 1.98h18c1.1 0 2-.88 2-1.98v-14c0-1.11-.9-2-2-2zM11 16l4-4-4-4v3H1v2h10v3z"></path></g>\n<g id="invert-colors"><path d="M17.66 7.93L12 2.27 6.34 7.93c-3.12 3.12-3.12 8.19 0 11.31C7.9 20.8 9.95 21.58 12 21.58c2.05 0 4.1-.78 5.66-2.34 3.12-3.12 3.12-8.19 0-11.31zM12 19.59c-1.6 0-3.11-.62-4.24-1.76C6.62 16.69 6 15.19 6 13.59s.62-3.11 1.76-4.24L12 5.1v14.49z"></path></g>\n<g id="label"><path d="M17.63 5.84C17.27 5.33 16.67 5 16 5L5 5.01C3.9 5.01 3 5.9 3 7v10c0 1.1.9 1.99 2 1.99L16 19c.67 0 1.27-.33 1.63-.84L22 12l-4.37-6.16z"></path></g>\n<g id="label-outline"><path d="M17.63 5.84C17.27 5.33 16.67 5 16 5L5 5.01C3.9 5.01 3 5.9 3 7v10c0 1.1.9 1.99 2 1.99L16 19c.67 0 1.27-.33 1.63-.84L22 12l-4.37-6.16zM16 17H5V7h11l3.55 5L16 17z"></path></g>\n<g id="language"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zm6.93 6h-2.95c-.32-1.25-.78-2.45-1.38-3.56 1.84.63 3.37 1.91 4.33 3.56zM12 4.04c.83 1.2 1.48 2.53 1.91 3.96h-3.82c.43-1.43 1.08-2.76 1.91-3.96zM4.26 14C4.1 13.36 4 12.69 4 12s.1-1.36.26-2h3.38c-.08.66-.14 1.32-.14 2 0 .68.06 1.34.14 2H4.26zm.82 2h2.95c.32 1.25.78 2.45 1.38 3.56-1.84-.63-3.37-1.9-4.33-3.56zm2.95-8H5.08c.96-1.66 2.49-2.93 4.33-3.56C8.81 5.55 8.35 6.75 8.03 8zM12 19.96c-.83-1.2-1.48-2.53-1.91-3.96h3.82c-.43 1.43-1.08 2.76-1.91 3.96zM14.34 14H9.66c-.09-.66-.16-1.32-.16-2 0-.68.07-1.35.16-2h4.68c.09.65.16 1.32.16 2 0 .68-.07 1.34-.16 2zm.25 5.56c.6-1.11 1.06-2.31 1.38-3.56h2.95c-.96 1.65-2.49 2.93-4.33 3.56zM16.36 14c.08-.66.14-1.32.14-2 0-.68-.06-1.34-.14-2h3.38c.16.64.26 1.31.26 2s-.1 1.36-.26 2h-3.38z"></path></g>\n<g id="last-page"><path d="M5.59 7.41L10.18 12l-4.59 4.59L7 18l6-6-6-6zM16 6h2v12h-2z"></path></g>\n<g id="launch"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"></path></g>\n<g id="lightbulb-outline"><path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7zm2.85 11.1l-.85.6V16h-4v-2.3l-.85-.6C7.8 12.16 7 10.63 7 9c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.63-.8 3.16-2.15 4.1z"></path></g>\n<g id="line-style"><path d="M3 16h5v-2H3v2zm6.5 0h5v-2h-5v2zm6.5 0h5v-2h-5v2zM3 20h2v-2H3v2zm4 0h2v-2H7v2zm4 0h2v-2h-2v2zm4 0h2v-2h-2v2zm4 0h2v-2h-2v2zM3 12h8v-2H3v2zm10 0h8v-2h-8v2zM3 4v4h18V4H3z"></path></g>\n<g id="line-weight"><path d="M3 17h18v-2H3v2zm0 3h18v-1H3v1zm0-7h18v-3H3v3zm0-9v4h18V4H3z"></path></g>\n<g id="link"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"></path></g>\n<g id="list"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"></path></g>\n<g id="lock"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"></path></g>\n<g id="lock-open"><path d="M12 17c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6-9h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6h1.9c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm0 12H6V10h12v10z"></path></g>\n<g id="lock-outline"><path d="M12 17c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6-9h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM8.9 6c0-1.71 1.39-3.1 3.1-3.1s3.1 1.39 3.1 3.1v2H8.9V6zM18 20H6V10h12v10z"></path></g>\n<g id="low-priority"><path d="M14 5h8v2h-8zm0 5.5h8v2h-8zm0 5.5h8v2h-8zM2 11.5C2 15.08 4.92 18 8.5 18H9v2l3-3-3-3v2h-.5C6.02 16 4 13.98 4 11.5S6.02 7 8.5 7H12V5H8.5C4.92 5 2 7.92 2 11.5z"></path></g>\n<g id="loyalty"><path d="M21.41 11.58l-9-9C12.05 2.22 11.55 2 11 2H4c-1.1 0-2 .9-2 2v7c0 .55.22 1.05.59 1.42l9 9c.36.36.86.58 1.41.58.55 0 1.05-.22 1.41-.59l7-7c.37-.36.59-.86.59-1.41 0-.55-.23-1.06-.59-1.42zM5.5 7C4.67 7 4 6.33 4 5.5S4.67 4 5.5 4 7 4.67 7 5.5 6.33 7 5.5 7zm11.77 8.27L13 19.54l-4.27-4.27C8.28 14.81 8 14.19 8 13.5c0-1.38 1.12-2.5 2.5-2.5.69 0 1.32.28 1.77.74l.73.72.73-.73c.45-.45 1.08-.73 1.77-.73 1.38 0 2.5 1.12 2.5 2.5 0 .69-.28 1.32-.73 1.77z"></path></g>\n<g id="mail"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"></path></g>\n<g id="markunread"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"></path></g>\n<g id="markunread-mailbox"><path d="M20 6H10v6H8V4h6V0H6v6H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2z"></path></g>\n<g id="menu"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"></path></g>\n<g id="more-horiz"><path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"></path></g>\n<g id="more-vert"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"></path></g>\n<g id="motorcycle"><path d="M19.44 9.03L15.41 5H11v2h3.59l2 2H5c-2.8 0-5 2.2-5 5s2.2 5 5 5c2.46 0 4.45-1.69 4.9-4h1.65l2.77-2.77c-.21.54-.32 1.14-.32 1.77 0 2.8 2.2 5 5 5s5-2.2 5-5c0-2.65-1.97-4.77-4.56-4.97zM7.82 15C7.4 16.15 6.28 17 5 17c-1.63 0-3-1.37-3-3s1.37-3 3-3c1.28 0 2.4.85 2.82 2H5v2h2.82zM19 17c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3z"></path></g>\n<g id="move-to-inbox"><path d="M19 3H4.99c-1.11 0-1.98.9-1.98 2L3 19c0 1.1.88 2 1.99 2H19c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 12h-4c0 1.66-1.35 3-3 3s-3-1.34-3-3H4.99V5H19v10zm-3-5h-2V7h-4v3H8l4 4 4-4z"></path></g>\n<g id="next-week"><path d="M20 7h-4V5c0-.55-.22-1.05-.59-1.41C15.05 3.22 14.55 3 14 3h-4c-1.1 0-2 .9-2 2v2H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2zM10 5h4v2h-4V5zm1 13.5l-1-1 3-3-3-3 1-1 4 4-4 4z"></path></g>\n<g id="note-add"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 14h-3v3h-2v-3H8v-2h3v-3h2v3h3v2zm-3-7V3.5L18.5 9H13z"></path></g>\n<g id="offline-pin"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm5 16H7v-2h10v2zm-6.7-4L7 10.7l1.4-1.4 1.9 1.9 5.3-5.3L17 7.3 10.3 14z"></path></g>\n<g id="opacity"><path d="M17.66 8L12 2.35 6.34 8C4.78 9.56 4 11.64 4 13.64s.78 4.11 2.34 5.67 3.61 2.35 5.66 2.35 4.1-.79 5.66-2.35S20 15.64 20 13.64 19.22 9.56 17.66 8zM6 14c.01-2 .62-3.27 1.76-4.4L12 5.27l4.24 4.38C17.38 10.77 17.99 12 18 14H6z"></path></g>\n<g id="open-in-browser"><path d="M19 4H5c-1.11 0-2 .9-2 2v12c0 1.1.89 2 2 2h4v-2H5V8h14v10h-4v2h4c1.1 0 2-.9 2-2V6c0-1.1-.89-2-2-2zm-7 6l-4 4h3v6h2v-6h3l-4-4z"></path></g>\n<g id="open-in-new"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"></path></g>\n<g id="open-with"><path d="M10 9h4V6h3l-5-5-5 5h3v3zm-1 1H6V7l-5 5 5 5v-3h3v-4zm14 2l-5-5v3h-3v4h3v3l5-5zm-9 3h-4v3H7l5 5 5-5h-3v-3z"></path></g>\n<g id="pageview"><path d="M11.5 9C10.12 9 9 10.12 9 11.5s1.12 2.5 2.5 2.5 2.5-1.12 2.5-2.5S12.88 9 11.5 9zM20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-3.21 14.21l-2.91-2.91c-.69.44-1.51.7-2.39.7C9.01 16 7 13.99 7 11.5S9.01 7 11.5 7 16 9.01 16 11.5c0 .88-.26 1.69-.7 2.39l2.91 2.9-1.42 1.42z"></path></g>\n<g id="pan-tool"><path d="M23 5.5V20c0 2.2-1.8 4-4 4h-7.3c-1.08 0-2.1-.43-2.85-1.19L1 14.83s1.26-1.23 1.3-1.25c.22-.19.49-.29.79-.29.22 0 .42.06.6.16.04.01 4.31 2.46 4.31 2.46V4c0-.83.67-1.5 1.5-1.5S11 3.17 11 4v7h1V1.5c0-.83.67-1.5 1.5-1.5S15 .67 15 1.5V11h1V2.5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5V11h1V5.5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5z"></path></g>\n<g id="payment"><path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"></path></g>\n<g id="perm-camera-mic"><path d="M20 5h-3.17L15 3H9L7.17 5H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h7v-2.09c-2.83-.48-5-2.94-5-5.91h2c0 2.21 1.79 4 4 4s4-1.79 4-4h2c0 2.97-2.17 5.43-5 5.91V21h7c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm-6 8c0 1.1-.9 2-2 2s-2-.9-2-2V9c0-1.1.9-2 2-2s2 .9 2 2v4z"></path></g>\n<g id="perm-contact-calendar"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm6 12H6v-1c0-2 4-3.1 6-3.1s6 1.1 6 3.1v1z"></path></g>\n<g id="perm-data-setting"><path d="M18.99 11.5c.34 0 .67.03 1 .07L20 0 0 20h11.56c-.04-.33-.07-.66-.07-1 0-4.14 3.36-7.5 7.5-7.5zm3.71 7.99c.02-.16.04-.32.04-.49 0-.17-.01-.33-.04-.49l1.06-.83c.09-.08.12-.21.06-.32l-1-1.73c-.06-.11-.19-.15-.31-.11l-1.24.5c-.26-.2-.54-.37-.85-.49l-.19-1.32c-.01-.12-.12-.21-.24-.21h-2c-.12 0-.23.09-.25.21l-.19 1.32c-.3.13-.59.29-.85.49l-1.24-.5c-.11-.04-.24 0-.31.11l-1 1.73c-.06.11-.04.24.06.32l1.06.83c-.02.16-.03.32-.03.49 0 .17.01.33.03.49l-1.06.83c-.09.08-.12.21-.06.32l1 1.73c.06.11.19.15.31.11l1.24-.5c.26.2.54.37.85.49l.19 1.32c.02.12.12.21.25.21h2c.12 0 .23-.09.25-.21l.19-1.32c.3-.13.59-.29.84-.49l1.25.5c.11.04.24 0 .31-.11l1-1.73c.06-.11.03-.24-.06-.32l-1.07-.83zm-3.71 1.01c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"></path></g>\n<g id="perm-device-information"><path d="M13 7h-2v2h2V7zm0 4h-2v6h2v-6zm4-9.99L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z"></path></g>\n<g id="perm-identity"><path d="M12 5.9c1.16 0 2.1.94 2.1 2.1s-.94 2.1-2.1 2.1S9.9 9.16 9.9 8s.94-2.1 2.1-2.1m0 9c2.97 0 6.1 1.46 6.1 2.1v1.1H5.9V17c0-.64 3.13-2.1 6.1-2.1M12 4C9.79 4 8 5.79 8 8s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm0 9c-2.67 0-8 1.34-8 4v3h16v-3c0-2.66-5.33-4-8-4z"></path></g>\n<g id="perm-media"><path d="M2 6H0v5h.01L0 20c0 1.1.9 2 2 2h18v-2H2V6zm20-2h-8l-2-2H6c-1.1 0-1.99.9-1.99 2L4 16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zM7 15l4.5-6 3.5 4.51 2.5-3.01L21 15H7z"></path></g>\n<g id="perm-phone-msg"><path d="M20 15.5c-1.25 0-2.45-.2-3.57-.57-.35-.11-.74-.03-1.02.24l-2.2 2.2c-2.83-1.44-5.15-3.75-6.59-6.58l2.2-2.21c.28-.27.36-.66.25-1.01C8.7 6.45 8.5 5.25 8.5 4c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1 0 9.39 7.61 17 17 17 .55 0 1-.45 1-1v-3.5c0-.55-.45-1-1-1zM12 3v10l3-3h6V3h-9z"></path></g>\n<g id="perm-scan-wifi"><path d="M12 3C6.95 3 3.15 4.85 0 7.23L12 22 24 7.25C20.85 4.87 17.05 3 12 3zm1 13h-2v-6h2v6zm-2-8V6h2v2h-2z"></path></g>\n<g id="pets"><circle cx="4.5" cy="9.5" r="2.5"></circle><circle cx="9" cy="5.5" r="2.5"></circle><circle cx="15" cy="5.5" r="2.5"></circle><circle cx="19.5" cy="9.5" r="2.5"></circle><path d="M17.34 14.86c-.87-1.02-1.6-1.89-2.48-2.91-.46-.54-1.05-1.08-1.75-1.32-.11-.04-.22-.07-.33-.09-.25-.04-.52-.04-.78-.04s-.53 0-.79.05c-.11.02-.22.05-.33.09-.7.24-1.28.78-1.75 1.32-.87 1.02-1.6 1.89-2.48 2.91-1.31 1.31-2.92 2.76-2.62 4.79.29 1.02 1.02 2.03 2.33 2.32.73.15 3.06-.44 5.54-.44h.18c2.48 0 4.81.58 5.54.44 1.31-.29 2.04-1.31 2.33-2.32.31-2.04-1.3-3.49-2.61-4.8z"></path></g>\n<g id="picture-in-picture"><path d="M19 7h-8v6h8V7zm2-4H3c-1.1 0-2 .9-2 2v14c0 1.1.9 1.98 2 1.98h18c1.1 0 2-.88 2-1.98V5c0-1.1-.9-2-2-2zm0 16.01H3V4.98h18v14.03z"></path></g>\n<g id="picture-in-picture-alt"><path d="M19 11h-8v6h8v-6zm4 8V4.98C23 3.88 22.1 3 21 3H3c-1.1 0-2 .88-2 1.98V19c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2zm-2 .02H3V4.97h18v14.05z"></path></g>\n<g id="play-for-work"><path d="M11 5v5.59H7.5l4.5 4.5 4.5-4.5H13V5h-2zm-5 9c0 3.31 2.69 6 6 6s6-2.69 6-6h-2c0 2.21-1.79 4-4 4s-4-1.79-4-4H6z"></path></g>\n<g id="polymer"><path d="M19 4h-4L7.11 16.63 4.5 12 9 4H5L.5 12 5 20h4l7.89-12.63L19.5 12 15 20h4l4.5-8z"></path></g>\n<g id="power-settings-new"><path d="M13 3h-2v10h2V3zm4.83 2.17l-1.42 1.42C17.99 7.86 19 9.81 19 12c0 3.87-3.13 7-7 7s-7-3.13-7-7c0-2.19 1.01-4.14 2.58-5.42L6.17 5.17C4.23 6.82 3 9.26 3 12c0 4.97 4.03 9 9 9s9-4.03 9-9c0-2.74-1.23-5.18-3.17-6.83z"></path></g>\n<g id="pregnant-woman"><path d="M9 4c0-1.11.89-2 2-2s2 .89 2 2-.89 2-2 2-2-.89-2-2zm7 9c-.01-1.34-.83-2.51-2-3 0-1.66-1.34-3-3-3s-3 1.34-3 3v7h2v5h3v-5h3v-4z"></path></g>\n<g id="print"><path d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z"></path></g>\n<g id="query-builder"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"></path></g>\n<g id="question-answer"><path d="M21 6h-2v9H6v2c0 .55.45 1 1 1h11l4 4V7c0-.55-.45-1-1-1zm-4 6V3c0-.55-.45-1-1-1H3c-.55 0-1 .45-1 1v14l4-4h10c.55 0 1-.45 1-1z"></path></g>\n<g id="radio-button-checked"><path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zm0-5C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"></path></g>\n<g id="radio-button-unchecked"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"></path></g>\n<g id="receipt"><path d="M18 17H6v-2h12v2zm0-4H6v-2h12v2zm0-4H6V7h12v2zM3 22l1.5-1.5L6 22l1.5-1.5L9 22l1.5-1.5L12 22l1.5-1.5L15 22l1.5-1.5L18 22l1.5-1.5L21 22V2l-1.5 1.5L18 2l-1.5 1.5L15 2l-1.5 1.5L12 2l-1.5 1.5L9 2 7.5 3.5 6 2 4.5 3.5 3 2v20z"></path></g>\n<g id="record-voice-over"><circle cx="9" cy="9" r="4"></circle><path d="M9 15c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4zm7.76-9.64l-1.68 1.69c.84 1.18.84 2.71 0 3.89l1.68 1.69c2.02-2.02 2.02-5.07 0-7.27zM20.07 2l-1.63 1.63c2.77 3.02 2.77 7.56 0 10.74L20.07 16c3.9-3.89 3.91-9.95 0-14z"></path></g>\n<g id="redeem"><path d="M20 6h-2.18c.11-.31.18-.65.18-1 0-1.66-1.34-3-3-3-1.05 0-1.96.54-2.5 1.35l-.5.67-.5-.68C10.96 2.54 10.05 2 9 2 7.34 2 6 3.34 6 5c0 .35.07.69.18 1H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-5-2c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zM9 4c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm11 15H4v-2h16v2zm0-5H4V8h5.08L7 10.83 8.62 12 11 8.76l1-1.36 1 1.36L15.38 12 17 10.83 14.92 8H20v6z"></path></g>\n<g id="redo"><path d="M18.4 10.6C16.55 8.99 14.15 8 11.5 8c-4.65 0-8.58 3.03-9.96 7.22L3.9 16c1.05-3.19 4.05-5.5 7.6-5.5 1.95 0 3.73.72 5.12 1.88L13 16h9V7l-3.6 3.6z"></path></g>\n<g id="refresh"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"></path></g>\n<g id="remove"><path d="M19 13H5v-2h14v2z"></path></g>\n<g id="remove-circle"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11H7v-2h10v2z"></path></g>\n<g id="remove-circle-outline"><path d="M7 11v2h10v-2H7zm5-9C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"></path></g>\n<g id="remove-shopping-cart"><path d="M22.73 22.73L2.77 2.77 2 2l-.73-.73L0 2.54l4.39 4.39 2.21 4.66-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h7.46l1.38 1.38c-.5.36-.83.95-.83 1.62 0 1.1.89 2 1.99 2 .67 0 1.26-.33 1.62-.84L21.46 24l1.27-1.27zM7.42 15c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h2.36l2 2H7.42zm8.13-2c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H6.54l9.01 9zM7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2z"></path></g>\n<g id="reorder"><path d="M3 15h18v-2H3v2zm0 4h18v-2H3v2zm0-8h18V9H3v2zm0-6v2h18V5H3z"></path></g>\n<g id="reply"><path d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z"></path></g>\n<g id="reply-all"><path d="M7 8V5l-7 7 7 7v-3l-4-4 4-4zm6 1V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z"></path></g>\n<g id="report"><path d="M15.73 3H8.27L3 8.27v7.46L8.27 21h7.46L21 15.73V8.27L15.73 3zM12 17.3c-.72 0-1.3-.58-1.3-1.3 0-.72.58-1.3 1.3-1.3.72 0 1.3.58 1.3 1.3 0 .72-.58 1.3-1.3 1.3zm1-4.3h-2V7h2v6z"></path></g>\n<g id="report-problem"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"></path></g>\n<g id="restore"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"></path></g>\n<g id="restore-page"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm-2 16c-2.05 0-3.81-1.24-4.58-3h1.71c.63.9 1.68 1.5 2.87 1.5 1.93 0 3.5-1.57 3.5-3.5S13.93 9.5 12 9.5c-1.35 0-2.52.78-3.1 1.9l1.6 1.6h-4V9l1.3 1.3C8.69 8.92 10.23 8 12 8c2.76 0 5 2.24 5 5s-2.24 5-5 5z"></path></g>\n<g id="room"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"></path></g>\n<g id="rounded-corner"><path d="M19 19h2v2h-2v-2zm0-2h2v-2h-2v2zM3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm0-4h2V3H3v2zm4 0h2V3H7v2zm8 16h2v-2h-2v2zm-4 0h2v-2h-2v2zm4 0h2v-2h-2v2zm-8 0h2v-2H7v2zm-4 0h2v-2H3v2zM21 8c0-2.76-2.24-5-5-5h-5v2h5c1.65 0 3 1.35 3 3v5h2V8z"></path></g>\n<g id="rowing"><path d="M8.5 14.5L4 19l1.5 1.5L9 17h2l-2.5-2.5zM15 1c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm6 20.01L18 24l-2.99-3.01V19.5l-7.1-7.09c-.31.05-.61.07-.91.07v-2.16c1.66.03 3.61-.87 4.67-2.04l1.4-1.55c.19-.21.43-.38.69-.5.29-.14.62-.23.96-.23h.03C15.99 6.01 17 7.02 17 8.26v5.75c0 .84-.35 1.61-.92 2.16l-3.58-3.58v-2.27c-.63.52-1.43 1.02-2.29 1.39L16.5 18H18l3 3.01z"></path></g>\n<g id="save"><path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"></path></g>\n<g id="schedule"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"></path></g>\n<g id="search"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"></path></g>\n<g id="select-all"><path d="M3 5h2V3c-1.1 0-2 .9-2 2zm0 8h2v-2H3v2zm4 8h2v-2H7v2zM3 9h2V7H3v2zm10-6h-2v2h2V3zm6 0v2h2c0-1.1-.9-2-2-2zM5 21v-2H3c0 1.1.9 2 2 2zm-2-4h2v-2H3v2zM9 3H7v2h2V3zm2 18h2v-2h-2v2zm8-8h2v-2h-2v2zm0 8c1.1 0 2-.9 2-2h-2v2zm0-12h2V7h-2v2zm0 8h2v-2h-2v2zm-4 4h2v-2h-2v2zm0-16h2V3h-2v2zM7 17h10V7H7v10zm2-8h6v6H9V9z"></path></g>\n<g id="send"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></g>\n<g id="settings"><path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"></path></g>\n<g id="settings-applications"><path d="M12 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm7-7H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.11 0 2-.9 2-2V5c0-1.1-.89-2-2-2zm-1.75 9c0 .23-.02.46-.05.68l1.48 1.16c.13.11.17.3.08.45l-1.4 2.42c-.09.15-.27.21-.43.15l-1.74-.7c-.36.28-.76.51-1.18.69l-.26 1.85c-.03.17-.18.3-.35.3h-2.8c-.17 0-.32-.13-.35-.29l-.26-1.85c-.43-.18-.82-.41-1.18-.69l-1.74.7c-.16.06-.34 0-.43-.15l-1.4-2.42c-.09-.15-.05-.34.08-.45l1.48-1.16c-.03-.23-.05-.46-.05-.69 0-.23.02-.46.05-.68l-1.48-1.16c-.13-.11-.17-.3-.08-.45l1.4-2.42c.09-.15.27-.21.43-.15l1.74.7c.36-.28.76-.51 1.18-.69l.26-1.85c.03-.17.18-.3.35-.3h2.8c.17 0 .32.13.35.29l.26 1.85c.43.18.82.41 1.18.69l1.74-.7c.16-.06.34 0 .43.15l1.4 2.42c.09.15.05.34-.08.45l-1.48 1.16c.03.23.05.46.05.69z"></path></g>\n<g id="settings-backup-restore"><path d="M14 12c0-1.1-.9-2-2-2s-2 .9-2 2 .9 2 2 2 2-.9 2-2zm-2-9c-4.97 0-9 4.03-9 9H0l4 4 4-4H5c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.51 0-2.91-.49-4.06-1.3l-1.42 1.44C8.04 20.3 9.94 21 12 21c4.97 0 9-4.03 9-9s-4.03-9-9-9z"></path></g>\n<g id="settings-bluetooth"><path d="M11 24h2v-2h-2v2zm-4 0h2v-2H7v2zm8 0h2v-2h-2v2zm2.71-18.29L12 0h-1v7.59L6.41 3 5 4.41 10.59 10 5 15.59 6.41 17 11 12.41V20h1l5.71-5.71-4.3-4.29 4.3-4.29zM13 3.83l1.88 1.88L13 7.59V3.83zm1.88 10.46L13 16.17v-3.76l1.88 1.88z"></path></g>\n<g id="settings-brightness"><path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16.01H3V4.99h18v14.02zM8 16h2.5l1.5 1.5 1.5-1.5H16v-2.5l1.5-1.5-1.5-1.5V8h-2.5L12 6.5 10.5 8H8v2.5L6.5 12 8 13.5V16zm4-7c1.66 0 3 1.34 3 3s-1.34 3-3 3V9z"></path></g>\n<g id="settings-cell"><path d="M7 24h2v-2H7v2zm4 0h2v-2h-2v2zm4 0h2v-2h-2v2zM16 .01L8 0C6.9 0 6 .9 6 2v16c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V2c0-1.1-.9-1.99-2-1.99zM16 16H8V4h8v12z"></path></g>\n<g id="settings-ethernet"><path d="M7.77 6.76L6.23 5.48.82 12l5.41 6.52 1.54-1.28L3.42 12l4.35-5.24zM7 13h2v-2H7v2zm10-2h-2v2h2v-2zm-6 2h2v-2h-2v2zm6.77-7.52l-1.54 1.28L20.58 12l-4.35 5.24 1.54 1.28L23.18 12l-5.41-6.52z"></path></g>\n<g id="settings-input-antenna"><path d="M12 5c-3.87 0-7 3.13-7 7h2c0-2.76 2.24-5 5-5s5 2.24 5 5h2c0-3.87-3.13-7-7-7zm1 9.29c.88-.39 1.5-1.26 1.5-2.29 0-1.38-1.12-2.5-2.5-2.5S9.5 10.62 9.5 12c0 1.02.62 1.9 1.5 2.29v3.3L7.59 21 9 22.41l3-3 3 3L16.41 21 13 17.59v-3.3zM12 1C5.93 1 1 5.93 1 12h2c0-4.97 4.03-9 9-9s9 4.03 9 9h2c0-6.07-4.93-11-11-11z"></path></g>\n<g id="settings-input-component"><path d="M5 2c0-.55-.45-1-1-1s-1 .45-1 1v4H1v6h6V6H5V2zm4 14c0 1.3.84 2.4 2 2.82V23h2v-4.18c1.16-.41 2-1.51 2-2.82v-2H9v2zm-8 0c0 1.3.84 2.4 2 2.82V23h2v-4.18C6.16 18.4 7 17.3 7 16v-2H1v2zM21 6V2c0-.55-.45-1-1-1s-1 .45-1 1v4h-2v6h6V6h-2zm-8-4c0-.55-.45-1-1-1s-1 .45-1 1v4H9v6h6V6h-2V2zm4 14c0 1.3.84 2.4 2 2.82V23h2v-4.18c1.16-.41 2-1.51 2-2.82v-2h-6v2z"></path></g>\n<g id="settings-input-composite"><path d="M5 2c0-.55-.45-1-1-1s-1 .45-1 1v4H1v6h6V6H5V2zm4 14c0 1.3.84 2.4 2 2.82V23h2v-4.18c1.16-.41 2-1.51 2-2.82v-2H9v2zm-8 0c0 1.3.84 2.4 2 2.82V23h2v-4.18C6.16 18.4 7 17.3 7 16v-2H1v2zM21 6V2c0-.55-.45-1-1-1s-1 .45-1 1v4h-2v6h6V6h-2zm-8-4c0-.55-.45-1-1-1s-1 .45-1 1v4H9v6h6V6h-2V2zm4 14c0 1.3.84 2.4 2 2.82V23h2v-4.18c1.16-.41 2-1.51 2-2.82v-2h-6v2z"></path></g>\n<g id="settings-input-hdmi"><path d="M18 7V4c0-1.1-.9-2-2-2H8c-1.1 0-2 .9-2 2v3H5v6l3 6v3h8v-3l3-6V7h-1zM8 4h8v3h-2V5h-1v2h-2V5h-1v2H8V4z"></path></g>\n<g id="settings-input-svideo"><path d="M8 11.5c0-.83-.67-1.5-1.5-1.5S5 10.67 5 11.5 5.67 13 6.5 13 8 12.33 8 11.5zm7-5c0-.83-.67-1.5-1.5-1.5h-3C9.67 5 9 5.67 9 6.5S9.67 8 10.5 8h3c.83 0 1.5-.67 1.5-1.5zM8.5 15c-.83 0-1.5.67-1.5 1.5S7.67 18 8.5 18s1.5-.67 1.5-1.5S9.33 15 8.5 15zM12 1C5.93 1 1 5.93 1 12s4.93 11 11 11 11-4.93 11-11S18.07 1 12 1zm0 20c-4.96 0-9-4.04-9-9s4.04-9 9-9 9 4.04 9 9-4.04 9-9 9zm5.5-11c-.83 0-1.5.67-1.5 1.5s.67 1.5 1.5 1.5 1.5-.67 1.5-1.5-.67-1.5-1.5-1.5zm-2 5c-.83 0-1.5.67-1.5 1.5s.67 1.5 1.5 1.5 1.5-.67 1.5-1.5-.67-1.5-1.5-1.5z"></path></g>\n<g id="settings-overscan"><path d="M12.01 5.5L10 8h4l-1.99-2.5zM18 10v4l2.5-1.99L18 10zM6 10l-2.5 2.01L6 14v-4zm8 6h-4l2.01 2.5L14 16zm7-13H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16.01H3V4.99h18v14.02z"></path></g>\n<g id="settings-phone"><path d="M13 9h-2v2h2V9zm4 0h-2v2h2V9zm3 6.5c-1.25 0-2.45-.2-3.57-.57-.35-.11-.74-.03-1.02.24l-2.2 2.2c-2.83-1.44-5.15-3.75-6.59-6.58l2.2-2.21c.28-.27.36-.66.25-1.01C8.7 6.45 8.5 5.25 8.5 4c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1 0 9.39 7.61 17 17 17 .55 0 1-.45 1-1v-3.5c0-.55-.45-1-1-1zM19 9v2h2V9h-2z"></path></g>\n<g id="settings-power"><path d="M7 24h2v-2H7v2zm4 0h2v-2h-2v2zm2-22h-2v10h2V2zm3.56 2.44l-1.45 1.45C16.84 6.94 18 8.83 18 11c0 3.31-2.69 6-6 6s-6-2.69-6-6c0-2.17 1.16-4.06 2.88-5.12L7.44 4.44C5.36 5.88 4 8.28 4 11c0 4.42 3.58 8 8 8s8-3.58 8-8c0-2.72-1.36-5.12-3.44-6.56zM15 24h2v-2h-2v2z"></path></g>\n<g id="settings-remote"><path d="M15 9H9c-.55 0-1 .45-1 1v12c0 .55.45 1 1 1h6c.55 0 1-.45 1-1V10c0-.55-.45-1-1-1zm-3 6c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zM7.05 6.05l1.41 1.41C9.37 6.56 10.62 6 12 6s2.63.56 3.54 1.46l1.41-1.41C15.68 4.78 13.93 4 12 4s-3.68.78-4.95 2.05zM12 0C8.96 0 6.21 1.23 4.22 3.22l1.41 1.41C7.26 3.01 9.51 2 12 2s4.74 1.01 6.36 2.64l1.41-1.41C17.79 1.23 15.04 0 12 0z"></path></g>\n<g id="settings-voice"><path d="M7 24h2v-2H7v2zm5-11c1.66 0 2.99-1.34 2.99-3L15 4c0-1.66-1.34-3-3-3S9 2.34 9 4v6c0 1.66 1.34 3 3 3zm-1 11h2v-2h-2v2zm4 0h2v-2h-2v2zm4-14h-1.7c0 3-2.54 5.1-5.3 5.1S6.7 13 6.7 10H5c0 3.41 2.72 6.23 6 6.72V20h2v-3.28c3.28-.49 6-3.31 6-6.72z"></path></g>\n<g id="shop"><path d="M16 6V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H2v13c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6h-6zm-6-2h4v2h-4V4zM9 18V9l7.5 4L9 18z"></path></g>\n<g id="shop-two"><path d="M3 9H1v11c0 1.11.89 2 2 2h14c1.11 0 2-.89 2-2H3V9zm15-4V3c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H5v11c0 1.11.89 2 2 2h14c1.11 0 2-.89 2-2V5h-5zm-6-2h4v2h-4V3zm0 12V8l5.5 3-5.5 4z"></path></g>\n<g id="shopping-basket"><path d="M17.21 9l-4.38-6.56c-.19-.28-.51-.42-.83-.42-.32 0-.64.14-.83.43L6.79 9H2c-.55 0-1 .45-1 1 0 .09.01.18.04.27l2.54 9.27c.23.84 1 1.46 1.92 1.46h13c.92 0 1.69-.62 1.93-1.46l2.54-9.27L23 10c0-.55-.45-1-1-1h-4.79zM9 9l3-4.4L15 9H9zm3 8c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"></path></g>\n<g id="shopping-cart"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"></path></g>\n<g id="sort"><path d="M3 18h6v-2H3v2zM3 6v2h18V6H3zm0 7h12v-2H3v2z"></path></g>\n<g id="speaker-notes"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM8 14H6v-2h2v2zm0-3H6V9h2v2zm0-3H6V6h2v2zm7 6h-5v-2h5v2zm3-3h-8V9h8v2zm0-3h-8V6h8v2z"></path></g>\n<g id="speaker-notes-off"><path d="M10.54 11l-.54-.54L7.54 8 6 6.46 2.38 2.84 1.27 1.73 0 3l2.01 2.01L2 22l4-4h9l5.73 5.73L22 22.46 17.54 18l-7-7zM8 14H6v-2h2v2zm-2-3V9l2 2H6zm14-9H4.08L10 7.92V6h8v2h-7.92l1 1H18v2h-4.92l6.99 6.99C21.14 17.95 22 17.08 22 16V4c0-1.1-.9-2-2-2z"></path></g>\n<g id="spellcheck"><path d="M12.45 16h2.09L9.43 3H7.57L2.46 16h2.09l1.12-3h5.64l1.14 3zm-6.02-5L8.5 5.48 10.57 11H6.43zm15.16.59l-8.09 8.09L9.83 16l-1.41 1.41 5.09 5.09L23 13l-1.41-1.41z"></path></g>\n<g id="star"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path></g>\n<g id="star-border"><path d="M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z"></path></g>\n<g id="star-half"><path d="M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4V6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z"></path></g>\n<g id="stars"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zm4.24 16L12 15.45 7.77 18l1.12-4.81-3.73-3.23 4.92-.42L12 5l1.92 4.53 4.92.42-3.73 3.23L16.23 18z"></path></g>\n<g id="store"><path d="M20 4H4v2h16V4zm1 10v-2l-1-5H4l-1 5v2h1v6h10v-6h4v6h2v-6h1zm-9 4H6v-4h6v4z"></path></g>\n<g id="subdirectory-arrow-left"><path d="M11 9l1.42 1.42L8.83 14H18V4h2v12H8.83l3.59 3.58L11 21l-6-6 6-6z"></path></g>\n<g id="subdirectory-arrow-right"><path d="M19 15l-6 6-1.42-1.42L15.17 16H4V4h2v10h9.17l-3.59-3.58L13 9l6 6z"></path></g>\n<g id="subject"><path d="M14 17H4v2h10v-2zm6-8H4v2h16V9zM4 15h16v-2H4v2zM4 5v2h16V5H4z"></path></g>\n<g id="supervisor-account"><path d="M16.5 12c1.38 0 2.49-1.12 2.49-2.5S17.88 7 16.5 7C15.12 7 14 8.12 14 9.5s1.12 2.5 2.5 2.5zM9 11c1.66 0 2.99-1.34 2.99-3S10.66 5 9 5C7.34 5 6 6.34 6 8s1.34 3 3 3zm7.5 3c-1.83 0-5.5.92-5.5 2.75V19h11v-2.25c0-1.83-3.67-2.75-5.5-2.75zM9 13c-2.33 0-7 1.17-7 3.5V19h7v-2.25c0-.85.33-2.34 2.37-3.47C10.5 13.1 9.66 13 9 13z"></path></g>\n<g id="swap-horiz"><path d="M6.99 11L3 15l3.99 4v-3H14v-2H6.99v-3zM21 9l-3.99-4v3H10v2h7.01v3L21 9z"></path></g>\n<g id="swap-vert"><path d="M16 17.01V10h-2v7.01h-3L15 21l4-3.99h-3zM9 3L5 6.99h3V14h2V6.99h3L9 3z"></path></g>\n<g id="swap-vertical-circle"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zM6.5 9L10 5.5 13.5 9H11v4H9V9H6.5zm11 6L14 18.5 10.5 15H13v-4h2v4h2.5z"></path></g>\n<g id="system-update-alt"><path d="M12 16.5l4-4h-3v-9h-2v9H8l4 4zm9-13h-6v1.99h6v14.03H3V5.49h6V3.5H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2v-14c0-1.1-.9-2-2-2z"></path></g>\n<g id="tab"><path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3V5h10v4h8v10z"></path></g>\n<g id="tab-unselected"><path d="M1 9h2V7H1v2zm0 4h2v-2H1v2zm0-8h2V3c-1.1 0-2 .9-2 2zm8 16h2v-2H9v2zm-8-4h2v-2H1v2zm2 4v-2H1c0 1.1.9 2 2 2zM21 3h-8v6h10V5c0-1.1-.9-2-2-2zm0 14h2v-2h-2v2zM9 5h2V3H9v2zM5 21h2v-2H5v2zM5 5h2V3H5v2zm16 16c1.1 0 2-.9 2-2h-2v2zm0-8h2v-2h-2v2zm-8 8h2v-2h-2v2zm4 0h2v-2h-2v2z"></path></g>\n<g id="text-format"><path d="M5 17v2h14v-2H5zm4.5-4.2h5l.9 2.2h2.1L12.75 4h-1.5L6.5 15h2.1l.9-2.2zM12 5.98L13.87 11h-3.74L12 5.98z"></path></g>\n<g id="theaters"><path d="M18 3v2h-2V3H8v2H6V3H4v18h2v-2h2v2h8v-2h2v2h2V3h-2zM8 17H6v-2h2v2zm0-4H6v-2h2v2zm0-4H6V7h2v2zm10 8h-2v-2h2v2zm0-4h-2v-2h2v2zm0-4h-2V7h2v2z"></path></g>\n<g id="thumb-down"><path d="M15 3H6c-.83 0-1.54.5-1.84 1.22l-3.02 7.05c-.09.23-.14.47-.14.73v1.91l.01.01L1 14c0 1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L9.83 23l6.59-6.59c.36-.36.58-.86.58-1.41V5c0-1.1-.9-2-2-2zm4 0v12h4V3h-4z"></path></g>\n<g id="thumb-up"><path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-1.91l-.01-.01L23 10z"></path></g>\n<g id="thumbs-up-down"><path d="M12 6c0-.55-.45-1-1-1H5.82l.66-3.18.02-.23c0-.31-.13-.59-.33-.8L5.38 0 .44 4.94C.17 5.21 0 5.59 0 6v6.5c0 .83.67 1.5 1.5 1.5h6.75c.62 0 1.15-.38 1.38-.91l2.26-5.29c.07-.17.11-.36.11-.55V6zm10.5 4h-6.75c-.62 0-1.15.38-1.38.91l-2.26 5.29c-.07.17-.11.36-.11.55V18c0 .55.45 1 1 1h5.18l-.66 3.18-.02.24c0 .31.13.59.33.8l.79.78 4.94-4.94c.27-.27.44-.65.44-1.06v-6.5c0-.83-.67-1.5-1.5-1.5z"></path></g>\n<g id="timeline"><path d="M23 8c0 1.1-.9 2-2 2-.18 0-.35-.02-.51-.07l-3.56 3.55c.05.16.07.34.07.52 0 1.1-.9 2-2 2s-2-.9-2-2c0-.18.02-.36.07-.52l-2.55-2.55c-.16.05-.34.07-.52.07s-.36-.02-.52-.07l-4.55 4.56c.05.16.07.33.07.51 0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2c.18 0 .35.02.51.07l4.56-4.55C8.02 9.36 8 9.18 8 9c0-1.1.9-2 2-2s2 .9 2 2c0 .18-.02.36-.07.52l2.55 2.55c.16-.05.34-.07.52-.07s.36.02.52.07l3.55-3.56C19.02 8.35 19 8.18 19 8c0-1.1.9-2 2-2s2 .9 2 2z"></path></g>\n<g id="toc"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z"></path></g>\n<g id="today"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"></path></g>\n<g id="toll"><path d="M15 4c-4.42 0-8 3.58-8 8s3.58 8 8 8 8-3.58 8-8-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6zM3 12c0-2.61 1.67-4.83 4-5.65V4.26C3.55 5.15 1 8.27 1 12s2.55 6.85 6 7.74v-2.09c-2.33-.82-4-3.04-4-5.65z"></path></g>\n<g id="touch-app"><path d="M9 11.24V7.5C9 6.12 10.12 5 11.5 5S14 6.12 14 7.5v3.74c1.21-.81 2-2.18 2-3.74C16 5.01 13.99 3 11.5 3S7 5.01 7 7.5c0 1.56.79 2.93 2 3.74zm9.84 4.63l-4.54-2.26c-.17-.07-.35-.11-.54-.11H13v-6c0-.83-.67-1.5-1.5-1.5S10 6.67 10 7.5v10.74l-3.43-.72c-.08-.01-.15-.03-.24-.03-.31 0-.59.13-.79.33l-.79.8 4.94 4.94c.27.27.65.44 1.06.44h6.79c.75 0 1.33-.55 1.44-1.28l.75-5.27c.01-.07.02-.14.02-.2 0-.62-.38-1.16-.91-1.38z"></path></g>\n<g id="track-changes"><path d="M19.07 4.93l-1.41 1.41C19.1 7.79 20 9.79 20 12c0 4.42-3.58 8-8 8s-8-3.58-8-8c0-4.08 3.05-7.44 7-7.93v2.02C8.16 6.57 6 9.03 6 12c0 3.31 2.69 6 6 6s6-2.69 6-6c0-1.66-.67-3.16-1.76-4.24l-1.41 1.41C15.55 9.9 16 10.9 16 12c0 2.21-1.79 4-4 4s-4-1.79-4-4c0-1.86 1.28-3.41 3-3.86v2.14c-.6.35-1 .98-1 1.72 0 1.1.9 2 2 2s2-.9 2-2c0-.74-.4-1.38-1-1.72V2h-1C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10c0-2.76-1.12-5.26-2.93-7.07z"></path></g>\n<g id="translate"><path d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v1.99h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"></path></g>\n<g id="trending-down"><path d="M16 18l2.29-2.29-4.88-4.88-4 4L2 7.41 3.41 6l6 6 4-4 6.3 6.29L22 12v6z"></path></g>\n<g id="trending-flat"><path d="M22 12l-4-4v3H3v2h15v3z"></path></g>\n<g id="trending-up"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"></path></g>\n<g id="turned-in"><path d="M17 3H7c-1.1 0-1.99.9-1.99 2L5 21l7-3 7 3V5c0-1.1-.9-2-2-2z"></path></g>\n<g id="turned-in-not"><path d="M17 3H7c-1.1 0-1.99.9-1.99 2L5 21l7-3 7 3V5c0-1.1-.9-2-2-2zm0 15l-5-2.18L7 18V5h10v13z"></path></g>\n<g id="unarchive"><path d="M20.55 5.22l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.15.55L3.46 5.22C3.17 5.57 3 6.01 3 6.5V19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.49-.17-.93-.45-1.28zM12 9.5l5.5 5.5H14v2h-4v-2H6.5L12 9.5zM5.12 5l.82-1h12l.93 1H5.12z"></path></g>\n<g id="undo"><path d="M12.5 8c-2.65 0-5.05.99-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C21.08 11.03 17.15 8 12.5 8z"></path></g>\n<g id="unfold-less"><path d="M7.41 18.59L8.83 20 12 16.83 15.17 20l1.41-1.41L12 14l-4.59 4.59zm9.18-13.18L15.17 4 12 7.17 8.83 4 7.41 5.41 12 10l4.59-4.59z"></path></g>\n<g id="unfold-more"><path d="M12 5.83L15.17 9l1.41-1.41L12 3 7.41 7.59 8.83 9 12 5.83zm0 12.34L8.83 15l-1.41 1.41L12 21l4.59-4.59L15.17 15 12 18.17z"></path></g>\n<g id="update"><path d="M21 10.12h-6.78l2.74-2.82c-2.73-2.7-7.15-2.8-9.88-.1-2.73 2.71-2.73 7.08 0 9.79 2.73 2.71 7.15 2.71 9.88 0C18.32 15.65 19 14.08 19 12.1h2c0 1.98-.88 4.55-2.64 6.29-3.51 3.48-9.21 3.48-12.72 0-3.5-3.47-3.53-9.11-.02-12.58 3.51-3.47 9.14-3.47 12.65 0L21 3v7.12zM12.5 8v4.25l3.5 2.08-.72 1.21L11 13V8h1.5z"></path></g>\n<g id="verified-user"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"></path></g>\n<g id="view-agenda"><path d="M20 13H3c-.55 0-1 .45-1 1v6c0 .55.45 1 1 1h17c.55 0 1-.45 1-1v-6c0-.55-.45-1-1-1zm0-10H3c-.55 0-1 .45-1 1v6c0 .55.45 1 1 1h17c.55 0 1-.45 1-1V4c0-.55-.45-1-1-1z"></path></g>\n<g id="view-array"><path d="M4 18h3V5H4v13zM18 5v13h3V5h-3zM8 18h9V5H8v13z"></path></g>\n<g id="view-carousel"><path d="M7 19h10V4H7v15zm-5-2h4V6H2v11zM18 6v11h4V6h-4z"></path></g>\n<g id="view-column"><path d="M10 18h5V5h-5v13zm-6 0h5V5H4v13zM16 5v13h5V5h-5z"></path></g>\n<g id="view-day"><path d="M2 21h19v-3H2v3zM20 8H3c-.55 0-1 .45-1 1v6c0 .55.45 1 1 1h17c.55 0 1-.45 1-1V9c0-.55-.45-1-1-1zM2 3v3h19V3H2z"></path></g>\n<g id="view-headline"><path d="M4 15h16v-2H4v2zm0 4h16v-2H4v2zm0-8h16V9H4v2zm0-6v2h16V5H4z"></path></g>\n<g id="view-list"><path d="M4 14h4v-4H4v4zm0 5h4v-4H4v4zM4 9h4V5H4v4zm5 5h12v-4H9v4zm0 5h12v-4H9v4zM9 5v4h12V5H9z"></path></g>\n<g id="view-module"><path d="M4 11h5V5H4v6zm0 7h5v-6H4v6zm6 0h5v-6h-5v6zm6 0h5v-6h-5v6zm-6-7h5V5h-5v6zm6-6v6h5V5h-5z"></path></g>\n<g id="view-quilt"><path d="M10 18h5v-6h-5v6zm-6 0h5V5H4v13zm12 0h5v-6h-5v6zM10 5v6h11V5H10z"></path></g>\n<g id="view-stream"><path d="M4 18h17v-6H4v6zM4 5v6h17V5H4z"></path></g>\n<g id="view-week"><path d="M6 5H3c-.55 0-1 .45-1 1v12c0 .55.45 1 1 1h3c.55 0 1-.45 1-1V6c0-.55-.45-1-1-1zm14 0h-3c-.55 0-1 .45-1 1v12c0 .55.45 1 1 1h3c.55 0 1-.45 1-1V6c0-.55-.45-1-1-1zm-7 0h-3c-.55 0-1 .45-1 1v12c0 .55.45 1 1 1h3c.55 0 1-.45 1-1V6c0-.55-.45-1-1-1z"></path></g>\n<g id="visibility"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"></path></g>\n<g id="visibility-off"><path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"></path></g>\n<g id="warning"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"></path></g>\n<g id="watch-later"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm4.2 14.2L11 13V7h1.5v5.2l4.5 2.7-.8 1.3z"></path></g>\n<g id="weekend"><path d="M21 10c-1.1 0-2 .9-2 2v3H5v-3c0-1.1-.9-2-2-2s-2 .9-2 2v5c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2v-5c0-1.1-.9-2-2-2zm-3-5H6c-1.1 0-2 .9-2 2v2.15c1.16.41 2 1.51 2 2.82V14h12v-2.03c0-1.3.84-2.4 2-2.82V7c0-1.1-.9-2-2-2z"></path></g>\n<g id="work"><path d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z"></path></g>\n<g id="youtube-searched-for"><path d="M17.01 14h-.8l-.27-.27c.98-1.14 1.57-2.61 1.57-4.23 0-3.59-2.91-6.5-6.5-6.5s-6.5 3-6.5 6.5H2l3.84 4 4.16-4H6.51C6.51 7 8.53 5 11.01 5s4.5 2.01 4.5 4.5c0 2.48-2.02 4.5-4.5 4.5-.65 0-1.26-.14-1.82-.38L7.71 15.1c.97.57 2.09.9 3.3.9 1.61 0 3.08-.59 4.22-1.57l.27.27v.79l5.01 4.99L22 19l-4.99-5z"></path></g>\n<g id="zoom-in"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14zm2.5-4h-2v2H9v-2H7V9h2V7h1v2h2v1z"></path></g>\n<g id="zoom-out"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14zM7 9h5v1H7z"></path></g>\n</defs></svg>\n</iron-iconset-svg>';
+
+document.head.appendChild($_documentContainer.content);
+
+/**
+@license
+Copyright (c) 2014 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+*/
+/**
+
+`iron-icons` is a utility import that includes the definition for the `iron-icon` element, `iron-iconset-svg` element, as well as an import for the default icon set.
+
+The `iron-icons` directory also includes imports for additional icon sets that can be loaded into your project.
+
+Example loading icon set:
+
+    <link rel="import" href="../iron-icons/maps-icons.html">
+
+To use an icon from one of these sets, first prefix your `iron-icon` with the icon set name, followed by a colon, ":", and then the icon id.
+
+Example using the directions-bus icon from the maps icon set:
+
+    <iron-icon icon="maps:directions-bus"></iron-icon>
+
+    To load a subset of icons from one of the default `iron-icons` sets, you can
+    use the [poly-icon](https://poly-icon.appspot.com/) tool. It allows you
+    to select individual icons, and creates an iconset from them that you can
+    use directly in your elements.
+
+See [iron-icon](#iron-icon) for more information about working with icons.
+
+See [iron-iconset](#iron-iconset) and [iron-iconset-svg](#iron-iconset-svg) for more information about how to create a custom iconset.
+
+@group Iron Elements
+@pseudoElement iron-icons
+@demo demo/index.html
+*/
+/*
+  FIXME(polymer-modulizer): the above comments were extracted
+  from HTML and may be out of place here. Review them and
+  then delete this comment!
+*/
+;
+
+/***/ }),
+
+/***/ "./node_modules/@polymer/iron-iconset-svg/iron-iconset-svg.js":
+/*!********************************************************************!*\
+  !*** ./node_modules/@polymer/iron-iconset-svg/iron-iconset-svg.js ***!
+  \********************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+__webpack_require__(/*! @polymer/polymer/polymer-legacy.js */ "./node_modules/@polymer/polymer/polymer-legacy.js");
+
+var _ironMeta = __webpack_require__(/*! @polymer/iron-meta/iron-meta.js */ "./node_modules/@polymer/iron-meta/iron-meta.js");
+
+var _polymerFn = __webpack_require__(/*! @polymer/polymer/lib/legacy/polymer-fn.js */ "./node_modules/@polymer/polymer/lib/legacy/polymer-fn.js");
+
+var _polymerDom = __webpack_require__(/*! @polymer/polymer/lib/legacy/polymer.dom.js */ "./node_modules/@polymer/polymer/lib/legacy/polymer.dom.js");
+
+/**
+ * The `iron-iconset-svg` element allows users to define their own icon sets
+ * that contain svg icons. The svg icon elements should be children of the
+ * `iron-iconset-svg` element. Multiple icons should be given distinct id's.
+ *
+ * Using svg elements to create icons has a few advantages over traditional
+ * bitmap graphics like jpg or png. Icons that use svg are vector based so
+ * they are resolution independent and should look good on any device. They
+ * are stylable via css. Icons can be themed, colorized, and even animated.
+ *
+ * Example:
+ *
+ *     <iron-iconset-svg name="my-svg-icons" size="24">
+ *       <svg>
+ *         <defs>
+ *           <g id="shape">
+ *             <rect x="12" y="0" width="12" height="24" />
+ *             <circle cx="12" cy="12" r="12" />
+ *           </g>
+ *         </defs>
+ *       </svg>
+ *     </iron-iconset-svg>
+ *
+ * This will automatically register the icon set "my-svg-icons" to the iconset
+ * database.  To use these icons from within another element, make a
+ * `iron-iconset` element and call the `byId` method
+ * to retrieve a given iconset. To apply a particular icon inside an
+ * element use the `applyIcon` method. For example:
+ *
+ *     iconset.applyIcon(iconNode, 'car');
+ *
+ * @element iron-iconset-svg
+ * @demo demo/index.html
+ * @implements {Polymer.Iconset}
+ */
+/**
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+*/
+(0, _polymerFn.Polymer)({
+  is: 'iron-iconset-svg',
+
+  properties: {
+
+    /**
+     * The name of the iconset.
+     */
+    name: { type: String, observer: '_nameChanged' },
+
+    /**
+     * The size of an individual icon. Note that icons must be square.
+     */
+    size: { type: Number, value: 24 },
+
+    /**
+     * Set to true to enable mirroring of icons where specified when they are
+     * stamped. Icons that should be mirrored should be decorated with a
+     * `mirror-in-rtl` attribute.
+     *
+     * NOTE: For performance reasons, direction will be resolved once per
+     * document per iconset, so moving icons in and out of RTL subtrees will
+     * not cause their mirrored state to change.
+     */
+    rtlMirroring: { type: Boolean, value: false },
+
+    /**
+     * Set to true to measure RTL based on the dir attribute on the body or
+     * html elements (measured on document.body or document.documentElement as
+     * available).
+     */
+    useGlobalRtlAttribute: { type: Boolean, value: false }
+  },
+
+  created: function created() {
+    this._meta = new _ironMeta.IronMeta({ type: 'iconset', key: null, value: null });
+  },
+
+  attached: function attached() {
+    this.style.display = 'none';
+  },
+
+  /**
+   * Construct an array of all icon names in this iconset.
+   *
+   * @return {!Array} Array of icon names.
+   */
+  getIconNames: function getIconNames() {
+    this._icons = this._createIconMap();
+    return Object.keys(this._icons).map(function (n) {
+      return this.name + ':' + n;
+    }, this);
+  },
+
+  /**
+   * Applies an icon to the given element.
+   *
+   * An svg icon is prepended to the element's shadowRoot if it exists,
+   * otherwise to the element itself.
+   *
+   * If RTL mirroring is enabled, and the icon is marked to be mirrored in
+   * RTL, the element will be tested (once and only once ever for each
+   * iconset) to determine the direction of the subtree the element is in.
+   * This direction will apply to all future icon applications, although only
+   * icons marked to be mirrored will be affected.
+   *
+   * @method applyIcon
+   * @param {Element} element Element to which the icon is applied.
+   * @param {string} iconName Name of the icon to apply.
+   * @return {?Element} The svg element which renders the icon.
+   */
+  applyIcon: function applyIcon(element, iconName) {
+    // Remove old svg element
+    this.removeIcon(element);
+    // install new svg element
+    var svg = this._cloneIcon(iconName, this.rtlMirroring && this._targetIsRTL(element));
+    if (svg) {
+      // insert svg element into shadow root, if it exists
+      var pde = (0, _polymerDom.dom)(element.root || element);
+      pde.insertBefore(svg, pde.childNodes[0]);
+      return element._svgIcon = svg;
+    }
+    return null;
+  },
+
+  /**
+   * Remove an icon from the given element by undoing the changes effected
+   * by `applyIcon`.
+   *
+   * @param {Element} element The element from which the icon is removed.
+   */
+  removeIcon: function removeIcon(element) {
+    // Remove old svg element
+    if (element._svgIcon) {
+      (0, _polymerDom.dom)(element.root || element).removeChild(element._svgIcon);
+      element._svgIcon = null;
+    }
+  },
+
+  /**
+   * Measures and memoizes the direction of the element. Note that this
+   * measurement is only done once and the result is memoized for future
+   * invocations.
+   */
+  _targetIsRTL: function _targetIsRTL(target) {
+    if (this.__targetIsRTL == null) {
+      if (this.useGlobalRtlAttribute) {
+        var globalElement = document.body && document.body.hasAttribute('dir') ? document.body : document.documentElement;
+
+        this.__targetIsRTL = globalElement.getAttribute('dir') === 'rtl';
+      } else {
+        if (target && target.nodeType !== Node.ELEMENT_NODE) {
+          target = target.host;
+        }
+
+        this.__targetIsRTL = target && window.getComputedStyle(target)['direction'] === 'rtl';
+      }
+    }
+
+    return this.__targetIsRTL;
+  },
+
+  /**
+   *
+   * When name is changed, register iconset metadata
+   *
+   */
+  _nameChanged: function _nameChanged() {
+    this._meta.value = null;
+    this._meta.key = this.name;
+    this._meta.value = this;
+
+    this.async(function () {
+      this.fire('iron-iconset-added', this, { node: window });
+    });
+  },
+
+  /**
+   * Create a map of child SVG elements by id.
+   *
+   * @return {!Object} Map of id's to SVG elements.
+   */
+  _createIconMap: function _createIconMap() {
+    // Objects chained to Object.prototype (`{}`) have members. Specifically,
+    // on FF there is a `watch` method that confuses the icon map, so we
+    // need to use a null-based object here.
+    var icons = Object.create(null);
+    (0, _polymerDom.dom)(this).querySelectorAll('[id]').forEach(function (icon) {
+      icons[icon.id] = icon;
+    });
+    return icons;
+  },
+
+  /**
+   * Produce installable clone of the SVG element matching `id` in this
+   * iconset, or `undefined` if there is no matching element.
+   *
+   * @return {Element} Returns an installable clone of the SVG element
+   * matching `id`.
+   */
+  _cloneIcon: function _cloneIcon(id, mirrorAllowed) {
+    // create the icon map on-demand, since the iconset itself has no discrete
+    // signal to know when it's children are fully parsed
+    this._icons = this._icons || this._createIconMap();
+    return this._prepareSvgClone(this._icons[id], this.size, mirrorAllowed);
+  },
+
+  /**
+   * @param {Element} sourceSvg
+   * @param {number} size
+   * @param {Boolean} mirrorAllowed
+   * @return {Element}
+   */
+  _prepareSvgClone: function _prepareSvgClone(sourceSvg, size, mirrorAllowed) {
+    if (sourceSvg) {
+      var content = sourceSvg.cloneNode(true),
+          svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg'),
+          viewBox = content.getAttribute('viewBox') || '0 0 ' + size + ' ' + size,
+          cssText = 'pointer-events: none; display: block; width: 100%; height: 100%;';
+
+      if (mirrorAllowed && content.hasAttribute('mirror-in-rtl')) {
+        cssText += '-webkit-transform:scale(-1,1);transform:scale(-1,1);transform-origin:center;';
+      }
+
+      svg.setAttribute('viewBox', viewBox);
+      svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+      svg.setAttribute('focusable', 'false');
+      // TODO(dfreedm): `pointer-events: none` works around
+      // https://crbug.com/370136
+      // TODO(sjmiles): inline style may not be ideal, but avoids requiring a
+      // shadow-root
+      svg.style.cssText = cssText;
+      svg.appendChild(content).removeAttribute('id');
+      return svg;
+    }
+    return null;
+  }
+
+});
+
+/***/ }),
+
+/***/ "./node_modules/@polymer/iron-meta/iron-meta.js":
+/*!******************************************************!*\
+  !*** ./node_modules/@polymer/iron-meta/iron-meta.js ***!
+  \******************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.IronMeta = undefined;
+
+__webpack_require__(/*! @polymer/polymer/polymer-legacy.js */ "./node_modules/@polymer/polymer/polymer-legacy.js");
+
+var _polymerFn = __webpack_require__(/*! @polymer/polymer/lib/legacy/polymer-fn.js */ "./node_modules/@polymer/polymer/lib/legacy/polymer-fn.js");
+
+/**
+ * @constructor
+ * @param {{
+ *   type: (string|null|undefined),
+ *   key: (string|null|undefined),
+ *   value: *,
+ * }=} options
+ */
+/**
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+*/
+/**
+`iron-meta` is a generic element you can use for sharing information across the DOM tree.
+It uses [monostate pattern](http://c2.com/cgi/wiki?MonostatePattern) such that any
+instance of iron-meta has access to the shared
+information. You can use `iron-meta` to share whatever you want (or create an extension
+[like x-meta] for enhancements).
+
+The `iron-meta` instances containing your actual data can be loaded in an import,
+or constructed in any way you see fit. The only requirement is that you create them
+before you try to access them.
+
+Examples:
+
+If I create an instance like this:
+
+    <iron-meta key="info" value="foo/bar"></iron-meta>
+
+Note that value="foo/bar" is the metadata I've defined. I could define more
+attributes or use child nodes to define additional metadata.
+
+Now I can access that element (and it's metadata) from any iron-meta instance
+via the byKey method, e.g.
+
+    meta.byKey('info');
+
+Pure imperative form would be like:
+
+    document.createElement('iron-meta').byKey('info');
+
+Or, in a Polymer element, you can include a meta in your template:
+
+    <iron-meta id="meta"></iron-meta>
+    ...
+    this.$.meta.byKey('info');
+
+@group Iron Elements
+@demo demo/index.html
+@hero hero.svg
+@element iron-meta
+*/
+/*
+  FIXME(polymer-modulizer): the above comments were extracted
+  from HTML and may be out of place here. Review them and
+  then delete this comment!
+*/
+var IronMeta = exports.IronMeta = function IronMeta(options) {
+  IronMeta[' '](options);
+
+  this.type = options && options.type || 'default';
+  this.key = options && options.key;
+  if (options && 'value' in options) {
+    this.value = options.value;
+  }
+};
+
+// This function is used to convince Closure not to remove constructor calls
+// for instances that are not held anywhere. For example, when
+// `new Polymer.IronMeta({...})` is used only for the side effect of adding
+// a value.
+IronMeta[' '] = function () {};
+
+IronMeta.types = {};
+
+IronMeta.prototype = {
+  get value() {
+    var type = this.type;
+    var key = this.key;
+
+    if (type && key) {
+      return IronMeta.types[type] && IronMeta.types[type][key];
+    }
+  },
+
+  set value(value) {
+    var type = this.type;
+    var key = this.key;
+
+    if (type && key) {
+      type = IronMeta.types[type] = IronMeta.types[type] || {};
+      if (value == null) {
+        delete type[key];
+      } else {
+        type[key] = value;
+      }
+    }
+  },
+
+  get list() {
+    var type = this.type;
+
+    if (type) {
+      var items = IronMeta.types[this.type];
+      if (!items) {
+        return [];
+      }
+
+      return Object.keys(items).map(function (key) {
+        return metaDatas[this.type][key];
+      }, this);
+    }
+  },
+
+  byKey: function byKey(key) {
+    this.key = key;
+    return this.value;
+  }
+};
+
+var metaDatas = IronMeta.types;
+
+(0, _polymerFn.Polymer)({
+
+  is: 'iron-meta',
+
+  properties: {
+
+    /**
+     * The type of meta-data.  All meta-data of the same type is stored
+     * together.
+     * @type {string}
+     */
+    type: {
+      type: String,
+      value: 'default'
+    },
+
+    /**
+     * The key used to store `value` under the `type` namespace.
+     * @type {?string}
+     */
+    key: {
+      type: String
+    },
+
+    /**
+     * The meta-data to store or retrieve.
+     * @type {*}
+     */
+    value: {
+      type: String,
+      notify: true
+    },
+
+    /**
+     * If true, `value` is set to the iron-meta instance itself.
+     */
+    self: { type: Boolean, observer: '_selfChanged' },
+
+    __meta: { type: Boolean, computed: '__computeMeta(type, key, value)' }
+  },
+
+  hostAttributes: { hidden: true },
+
+  __computeMeta: function __computeMeta(type, key, value) {
+    var meta = new IronMeta({ type: type, key: key });
+
+    if (value !== undefined && value !== meta.value) {
+      meta.value = value;
+    } else if (this.value !== meta.value) {
+      this.value = meta.value;
+    }
+
+    return meta;
+  },
+
+  get list() {
+    return this.__meta && this.__meta.list;
+  },
+
+  _selfChanged: function _selfChanged(self) {
+    if (self) {
+      this.value = this;
+    }
+  },
+
+  /**
+   * Retrieves meta data value by key.
+   *
+   * @method byKey
+   * @param {string} key The key of the meta-data to be returned.
+   * @return {*}
+   */
+  byKey: function byKey(key) {
+    return new IronMeta({ type: this.type, key: key }).value;
+  }
+});
+
+/***/ }),
+
+/***/ "./node_modules/@polymer/paper-behaviors/paper-button-behavior.js":
+/*!************************************************************************!*\
+  !*** ./node_modules/@polymer/paper-behaviors/paper-button-behavior.js ***!
+  \************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.PaperButtonBehavior = exports.PaperButtonBehaviorImpl = undefined;
+
+__webpack_require__(/*! @polymer/polymer/polymer-legacy.js */ "./node_modules/@polymer/polymer/polymer-legacy.js");
+
+var _ironButtonState = __webpack_require__(/*! @polymer/iron-behaviors/iron-button-state.js */ "./node_modules/@polymer/iron-behaviors/iron-button-state.js");
+
+var _paperRippleBehavior = __webpack_require__(/*! ./paper-ripple-behavior.js */ "./node_modules/@polymer/paper-behaviors/paper-ripple-behavior.js");
+
+var _ironControlState = __webpack_require__(/*! @polymer/iron-behaviors/iron-control-state.js */ "./node_modules/@polymer/iron-behaviors/iron-control-state.js");
+
+/** @polymerBehavior Polymer.PaperButtonBehavior */
+/**
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+*/
+var PaperButtonBehaviorImpl = exports.PaperButtonBehaviorImpl = {
+  properties: {
+    /**
+     * The z-depth of this element, from 0-5. Setting to 0 will remove the
+     * shadow, and each increasing number greater than 0 will be "deeper"
+     * than the last.
+     *
+     * @attribute elevation
+     * @type number
+     * @default 1
+     */
+    elevation: { type: Number, reflectToAttribute: true, readOnly: true }
+  },
+
+  observers: ['_calculateElevation(focused, disabled, active, pressed, receivedFocusFromKeyboard)', '_computeKeyboardClass(receivedFocusFromKeyboard)'],
+
+  hostAttributes: { role: 'button', tabindex: '0', animated: true },
+
+  _calculateElevation: function _calculateElevation() {
+    var e = 1;
+    if (this.disabled) {
+      e = 0;
+    } else if (this.active || this.pressed) {
+      e = 4;
+    } else if (this.receivedFocusFromKeyboard) {
+      e = 3;
+    }
+    this._setElevation(e);
+  },
+
+  _computeKeyboardClass: function _computeKeyboardClass(receivedFocusFromKeyboard) {
+    this.toggleClass('keyboard-focus', receivedFocusFromKeyboard);
+  },
+
+  /**
+   * In addition to `IronButtonState` behavior, when space key goes down,
+   * create a ripple down effect.
+   *
+   * @param {!KeyboardEvent} event .
+   */
+  _spaceKeyDownHandler: function _spaceKeyDownHandler(event) {
+    _ironButtonState.IronButtonStateImpl._spaceKeyDownHandler.call(this, event);
+    // Ensure that there is at most one ripple when the space key is held down.
+    if (this.hasRipple() && this.getRipple().ripples.length < 1) {
+      this._ripple.uiDownAction();
+    }
+  },
+
+  /**
+   * In addition to `IronButtonState` behavior, when space key goes up,
+   * create a ripple up effect.
+   *
+   * @param {!KeyboardEvent} event .
+   */
+  _spaceKeyUpHandler: function _spaceKeyUpHandler(event) {
+    _ironButtonState.IronButtonStateImpl._spaceKeyUpHandler.call(this, event);
+    if (this.hasRipple()) {
+      this._ripple.uiUpAction();
+    }
+  }
+};
+
+/** @polymerBehavior */
+var PaperButtonBehavior = exports.PaperButtonBehavior = [_ironButtonState.IronButtonState, _ironControlState.IronControlState, _paperRippleBehavior.PaperRippleBehavior, PaperButtonBehaviorImpl];
+
+/***/ }),
+
+/***/ "./node_modules/@polymer/paper-behaviors/paper-ripple-behavior.js":
+/*!************************************************************************!*\
+  !*** ./node_modules/@polymer/paper-behaviors/paper-ripple-behavior.js ***!
+  \************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.PaperRippleBehavior = undefined;
+
+__webpack_require__(/*! @polymer/polymer/polymer-legacy.js */ "./node_modules/@polymer/polymer/polymer-legacy.js");
+
+var _ironButtonState = __webpack_require__(/*! @polymer/iron-behaviors/iron-button-state.js */ "./node_modules/@polymer/iron-behaviors/iron-button-state.js");
+
+__webpack_require__(/*! @polymer/paper-ripple/paper-ripple.js */ "./node_modules/@polymer/paper-ripple/paper-ripple.js");
+
+var _polymerDom = __webpack_require__(/*! @polymer/polymer/lib/legacy/polymer.dom.js */ "./node_modules/@polymer/polymer/lib/legacy/polymer.dom.js");
+
+/**
+ * `Polymer.PaperRippleBehavior` dynamically implements a ripple
+ * when the element has focus via pointer or keyboard.
+ *
+ * NOTE: This behavior is intended to be used in conjunction with and after
+ * `Polymer.IronButtonState` and `Polymer.IronControlState`.
+ *
+ * @polymerBehavior Polymer.PaperRippleBehavior
+ */
+/**
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+*/
+var PaperRippleBehavior = exports.PaperRippleBehavior = {
+  properties: {
+    /**
+     * If true, the element will not produce a ripple effect when interacted
+     * with via the pointer.
+     */
+    noink: { type: Boolean, observer: '_noinkChanged' },
+
+    /**
+     * @type {Element|undefined}
+     */
+    _rippleContainer: {
+      type: Object
+    }
+  },
+
+  /**
+   * Ensures a `<paper-ripple>` element is available when the element is
+   * focused.
+   */
+  _buttonStateChanged: function _buttonStateChanged() {
+    if (this.focused) {
+      this.ensureRipple();
+    }
+  },
+
+  /**
+   * In addition to the functionality provided in `IronButtonState`, ensures
+   * a ripple effect is created when the element is in a `pressed` state.
+   */
+  _downHandler: function _downHandler(event) {
+    _ironButtonState.IronButtonStateImpl._downHandler.call(this, event);
+    if (this.pressed) {
+      this.ensureRipple(event);
+    }
+  },
+
+  /**
+   * Ensures this element contains a ripple effect. For startup efficiency
+   * the ripple effect is dynamically on demand when needed.
+   * @param {!Event=} optTriggeringEvent (optional) event that triggered the
+   * ripple.
+   */
+  ensureRipple: function ensureRipple(optTriggeringEvent) {
+    if (!this.hasRipple()) {
+      this._ripple = this._createRipple();
+      this._ripple.noink = this.noink;
+      var rippleContainer = this._rippleContainer || this.root;
+      if (rippleContainer) {
+        (0, _polymerDom.dom)(rippleContainer).appendChild(this._ripple);
+      }
+      if (optTriggeringEvent) {
+        // Check if the event happened inside of the ripple container
+        // Fall back to host instead of the root because distributed text
+        // nodes are not valid event targets
+        var domContainer = (0, _polymerDom.dom)(this._rippleContainer || this);
+        var target = (0, _polymerDom.dom)(optTriggeringEvent).rootTarget;
+        if (domContainer.deepContains( /** @type {Node} */target)) {
+          this._ripple.uiDownAction(optTriggeringEvent);
+        }
+      }
+    }
+  },
+
+  /**
+   * Returns the `<paper-ripple>` element used by this element to create
+   * ripple effects. The element's ripple is created on demand, when
+   * necessary, and calling this method will force the
+   * ripple to be created.
+   */
+  getRipple: function getRipple() {
+    this.ensureRipple();
+    return this._ripple;
+  },
+
+  /**
+   * Returns true if this element currently contains a ripple effect.
+   * @return {boolean}
+   */
+  hasRipple: function hasRipple() {
+    return Boolean(this._ripple);
+  },
+
+  /**
+   * Create the element's ripple effect via creating a `<paper-ripple>`.
+   * Override this method to customize the ripple element.
+   * @return {!PaperRippleElement} Returns a `<paper-ripple>` element.
+   */
+  _createRipple: function _createRipple() {
+    var element = /** @type {!PaperRippleElement} */document.createElement('paper-ripple');
+    return element;
+  },
+
+  _noinkChanged: function _noinkChanged(noink) {
+    if (this.hasRipple()) {
+      this._ripple.noink = noink;
+    }
+  }
+};
+
+/***/ }),
+
+/***/ "./node_modules/@polymer/paper-fab/paper-fab.js":
+/*!******************************************************!*\
+  !*** ./node_modules/@polymer/paper-fab/paper-fab.js ***!
+  \******************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+__webpack_require__(/*! @polymer/polymer/polymer-legacy.js */ "./node_modules/@polymer/polymer/polymer-legacy.js");
+
+__webpack_require__(/*! @polymer/iron-flex-layout/iron-flex-layout.js */ "./node_modules/@polymer/iron-flex-layout/iron-flex-layout.js");
+
+__webpack_require__(/*! @polymer/iron-icon/iron-icon.js */ "./node_modules/@polymer/iron-icon/iron-icon.js");
+
+var _paperButtonBehavior = __webpack_require__(/*! @polymer/paper-behaviors/paper-button-behavior.js */ "./node_modules/@polymer/paper-behaviors/paper-button-behavior.js");
+
+__webpack_require__(/*! @polymer/paper-styles/element-styles/paper-material-styles.js */ "./node_modules/@polymer/paper-styles/element-styles/paper-material-styles.js");
+
+__webpack_require__(/*! @polymer/paper-styles/color.js */ "./node_modules/@polymer/paper-styles/color.js");
+
+__webpack_require__(/*! @polymer/paper-styles/default-theme.js */ "./node_modules/@polymer/paper-styles/default-theme.js");
+
+var _polymerFn = __webpack_require__(/*! @polymer/polymer/lib/legacy/polymer-fn.js */ "./node_modules/@polymer/polymer/lib/legacy/polymer-fn.js");
+
+/**
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+*/
+/**
+Material design: [Floating Action Button](https://www.google.com/design/spec/components/buttons-floating-action-button.html)
+
+`paper-fab` is a floating action button. It contains an image placed in the center and
+comes in two sizes: regular size and a smaller size by applying the attribute `mini`. When
+the user touches the button, a ripple effect emanates from the center of the button.
+
+You may import `iron-icons` to use with this element, or provide a URL to a custom icon.
+See `iron-iconset` for more information about how to use a custom icon set.
+
+Example:
+
+    <link href="path/to/iron-icons/iron-icons.html" rel="import">
+
+    <paper-fab icon="add"></paper-fab>
+    <paper-fab mini icon="favorite"></paper-fab>
+    <paper-fab src="star.png"></paper-fab>
+
+
+### Styling
+
+The following custom properties and mixins are available for styling:
+
+Custom property | Description | Default
+----------------|-------------|----------
+`--paper-fab-background` | The background color of the button | `--accent-color`
+`--paper-fab-keyboard-focus-background` | The background color of the button when focused | `--paper-pink-900`
+`--paper-fab-disabled-background` | The background color of the button when it's disabled | `--paper-grey-300`
+`--paper-fab-disabled-text` | The text color of the button when it's disabled | `--paper-grey-500`
+`--paper-fab` | Mixin applied to the button | `{}`
+`--paper-fab-mini` | Mixin applied to a mini button | `{}`
+`--paper-fab-disabled` | Mixin applied to a disabled button | `{}`
+`--paper-fab-iron-icon` | Mixin applied to the iron-icon within the button | `{}`
+`--paper-fab-label` | Mixin applied to the label within the button | `{}`
+
+@group Paper Elements
+@demo demo/index.html
+*/
+/*
+  FIXME(polymer-modulizer): the above comments were extracted
+  from HTML and may be out of place here. Review them and
+  then delete this comment!
+*/
+var $_documentContainer = document.createElement('template');
+$_documentContainer.setAttribute('style', 'display: none;');
+
+$_documentContainer.innerHTML = '<dom-module id="paper-fab">\n  <template strip-whitespace="">\n    <style include="paper-material-styles">\n      :host {\n        @apply --layout-vertical;\n        @apply --layout-center-center;\n\n        background: var(--paper-fab-background, var(--accent-color));\n        border-radius: 50%;\n        box-sizing: border-box;\n        color: var(--text-primary-color);\n        cursor: pointer;\n        height: 56px;\n        min-width: 0;\n        outline: none;\n        padding: 16px;\n        position: relative;\n        -moz-user-select: none;\n        -ms-user-select: none;\n        -webkit-user-select: none;\n        user-select: none;\n        width: 56px;\n        z-index: 0;\n\n        /* NOTE: Both values are needed, since some phones require the value `transparent`. */\n        -webkit-tap-highlight-color: rgba(0,0,0,0);\n        -webkit-tap-highlight-color: transparent;\n\n        @apply --paper-fab;\n      }\n\n      [hidden] {\n        display: none !important;\n      }\n\n      :host([mini]) {\n        width: 40px;\n        height: 40px;\n        padding: 8px;\n\n        @apply --paper-fab-mini;\n      }\n\n      :host([disabled]) {\n        color: var(--paper-fab-disabled-text, var(--paper-grey-500));\n        background: var(--paper-fab-disabled-background, var(--paper-grey-300));\n\n        @apply --paper-fab-disabled;\n      }\n\n      iron-icon {\n        @apply --paper-fab-iron-icon;\n      }\n\n      span {\n        width: 100%;\n        white-space: nowrap;\n        overflow: hidden;\n        text-overflow: ellipsis;\n        text-align: center;\n\n        @apply --paper-fab-label;\n      }\n\n      :host(.keyboard-focus) {\n        background: var(--paper-fab-keyboard-focus-background, var(--paper-pink-900));\n      }\n\n      :host([elevation="1"]) {\n        @apply --paper-material-elevation-1;\n      }\n\n      :host([elevation="2"]) {\n        @apply --paper-material-elevation-2;\n      }\n\n      :host([elevation="3"]) {\n        @apply --paper-material-elevation-3;\n      }\n\n      :host([elevation="4"]) {\n        @apply --paper-material-elevation-4;\n      }\n\n      :host([elevation="5"]) {\n        @apply --paper-material-elevation-5;\n      }\n    </style>\n\n    <iron-icon id="icon" hidden$="{{!_computeIsIconFab(icon, src)}}" src="[[src]]" icon="[[icon]]"></iron-icon>\n    <span hidden$="{{_computeIsIconFab(icon, src)}}">{{label}}</span>\n  </template>\n\n  \n</dom-module>';
+
+document.head.appendChild($_documentContainer.content);
+(0, _polymerFn.Polymer)({
+  is: 'paper-fab',
+
+  behaviors: [_paperButtonBehavior.PaperButtonBehavior],
+
+  properties: {
+    /**
+     * The URL of an image for the icon. If the src property is specified,
+     * the icon property should not be.
+     */
+    src: { type: String, value: '' },
+
+    /**
+     * Specifies the icon name or index in the set of icons available in
+     * the icon's icon set. If the icon property is specified,
+     * the src property should not be.
+     */
+    icon: { type: String, value: '' },
+
+    /**
+     * Set this to true to style this is a "mini" FAB.
+     */
+    mini: { type: Boolean, value: false, reflectToAttribute: true },
+
+    /**
+     * The label displayed in the badge. The label is centered, and ideally
+     * should have very few characters.
+     */
+    label: { type: String, observer: '_labelChanged' }
+  },
+
+  _labelChanged: function _labelChanged() {
+    this.setAttribute('aria-label', this.label);
+  },
+
+  _computeIsIconFab: function _computeIsIconFab(icon, src) {
+    return icon.length > 0 || src.length > 0;
+  }
+});
+
+/***/ }),
+
+/***/ "./node_modules/@polymer/paper-ripple/paper-ripple.js":
+/*!************************************************************!*\
+  !*** ./node_modules/@polymer/paper-ripple/paper-ripple.js ***!
+  \************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _templateObject = _taggedTemplateLiteral(['\n    <style>\n      :host {\n        display: block;\n        position: absolute;\n        border-radius: inherit;\n        overflow: hidden;\n        top: 0;\n        left: 0;\n        right: 0;\n        bottom: 0;\n\n        /* See PolymerElements/paper-behaviors/issues/34. On non-Chrome browsers,\n         * creating a node (with a position:absolute) in the middle of an event\n         * handler "interrupts" that event handler (which happens when the\n         * ripple is created on demand) */\n        pointer-events: none;\n      }\n\n      :host([animating]) {\n        /* This resolves a rendering issue in Chrome (as of 40) where the\n           ripple is not properly clipped by its parent (which may have\n           rounded corners). See: http://jsbin.com/temexa/4\n\n           Note: We only apply this style conditionally. Otherwise, the browser\n           will create a new compositing layer for every ripple element on the\n           page, and that would be bad. */\n        -webkit-transform: translate(0, 0);\n        transform: translate3d(0, 0, 0);\n      }\n\n      #background,\n      #waves,\n      .wave-container,\n      .wave {\n        pointer-events: none;\n        position: absolute;\n        top: 0;\n        left: 0;\n        width: 100%;\n        height: 100%;\n      }\n\n      #background,\n      .wave {\n        opacity: 0;\n      }\n\n      #waves,\n      .wave {\n        overflow: hidden;\n      }\n\n      .wave-container,\n      .wave {\n        border-radius: 50%;\n      }\n\n      :host(.circle) #background,\n      :host(.circle) #waves {\n        border-radius: 50%;\n      }\n\n      :host(.circle) .wave-container {\n        overflow: hidden;\n      }\n    </style>\n\n    <div id="background"></div>\n    <div id="waves"></div>\n'], ['\n    <style>\n      :host {\n        display: block;\n        position: absolute;\n        border-radius: inherit;\n        overflow: hidden;\n        top: 0;\n        left: 0;\n        right: 0;\n        bottom: 0;\n\n        /* See PolymerElements/paper-behaviors/issues/34. On non-Chrome browsers,\n         * creating a node (with a position:absolute) in the middle of an event\n         * handler "interrupts" that event handler (which happens when the\n         * ripple is created on demand) */\n        pointer-events: none;\n      }\n\n      :host([animating]) {\n        /* This resolves a rendering issue in Chrome (as of 40) where the\n           ripple is not properly clipped by its parent (which may have\n           rounded corners). See: http://jsbin.com/temexa/4\n\n           Note: We only apply this style conditionally. Otherwise, the browser\n           will create a new compositing layer for every ripple element on the\n           page, and that would be bad. */\n        -webkit-transform: translate(0, 0);\n        transform: translate3d(0, 0, 0);\n      }\n\n      #background,\n      #waves,\n      .wave-container,\n      .wave {\n        pointer-events: none;\n        position: absolute;\n        top: 0;\n        left: 0;\n        width: 100%;\n        height: 100%;\n      }\n\n      #background,\n      .wave {\n        opacity: 0;\n      }\n\n      #waves,\n      .wave {\n        overflow: hidden;\n      }\n\n      .wave-container,\n      .wave {\n        border-radius: 50%;\n      }\n\n      :host(.circle) #background,\n      :host(.circle) #waves {\n        border-radius: 50%;\n      }\n\n      :host(.circle) .wave-container {\n        overflow: hidden;\n      }\n    </style>\n\n    <div id="background"></div>\n    <div id="waves"></div>\n']);
+
+__webpack_require__(/*! @polymer/polymer/polymer-legacy.js */ "./node_modules/@polymer/polymer/polymer-legacy.js");
+
+var _ironA11yKeysBehavior = __webpack_require__(/*! @polymer/iron-a11y-keys-behavior/iron-a11y-keys-behavior.js */ "./node_modules/@polymer/iron-a11y-keys-behavior/iron-a11y-keys-behavior.js");
+
+var _polymerDom = __webpack_require__(/*! @polymer/polymer/lib/legacy/polymer.dom.js */ "./node_modules/@polymer/polymer/lib/legacy/polymer.dom.js");
+
+var _polymerFn = __webpack_require__(/*! @polymer/polymer/lib/legacy/polymer-fn.js */ "./node_modules/@polymer/polymer/lib/legacy/polymer-fn.js");
+
+var _htmlTag = __webpack_require__(/*! @polymer/polymer/lib/utils/html-tag.js */ "./node_modules/@polymer/polymer/lib/utils/html-tag.js");
+
+function _taggedTemplateLiteral(strings, raw) { return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); } /**
+                                                                                                                                                  @license
+                                                                                                                                                  Copyright (c) 2014 The Polymer Project Authors. All rights reserved.
+                                                                                                                                                  This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+                                                                                                                                                  The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+                                                                                                                                                  The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+                                                                                                                                                  Code distributed by Google as part of the polymer project is also
+                                                                                                                                                  subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+                                                                                                                                                  */
+/**
+Material design: [Surface reaction](https://www.google.com/design/spec/animation/responsive-interaction.html#responsive-interaction-surface-reaction)
+
+`paper-ripple` provides a visual effect that other paper elements can
+use to simulate a rippling effect emanating from the point of contact.  The
+effect can be visualized as a concentric circle with motion.
+
+Example:
+
+    <div style="position:relative">
+      <paper-ripple></paper-ripple>
+    </div>
+
+Note, it's important that the parent container of the ripple be relative position, otherwise
+the ripple will emanate outside of the desired container.
+
+`paper-ripple` listens to "mousedown" and "mouseup" events so it would display ripple
+effect when touches on it.  You can also defeat the default behavior and
+manually route the down and up actions to the ripple element.  Note that it is
+important if you call `downAction()` you will have to make sure to call
+`upAction()` so that `paper-ripple` would end the animation loop.
+
+Example:
+
+    <paper-ripple id="ripple" style="pointer-events: none;"></paper-ripple>
+    ...
+    downAction: function(e) {
+      this.$.ripple.downAction(e.detail);
+    },
+    upAction: function(e) {
+      this.$.ripple.upAction();
+    }
+
+Styling ripple effect:
+
+  Use CSS color property to style the ripple:
+
+    paper-ripple {
+      color: #4285f4;
+    }
+
+  Note that CSS color property is inherited so it is not required to set it on
+  the `paper-ripple` element directly.
+
+By default, the ripple is centered on the point of contact.  Apply the `recenters`
+attribute to have the ripple grow toward the center of its container.
+
+    <paper-ripple recenters></paper-ripple>
+
+You can also  center the ripple inside its container from the start.
+
+    <paper-ripple center></paper-ripple>
+
+Apply `circle` class to make the rippling effect within a circle.
+
+    <paper-ripple class="circle"></paper-ripple>
+
+@group Paper Elements
+@element paper-ripple
+@hero hero.svg
+@demo demo/index.html
+*/
+/*
+  FIXME(polymer-modulizer): the above comments were extracted
+  from HTML and may be out of place here. Review them and
+  then delete this comment!
+*/
+
+
+var Utility = {
+  distance: function distance(x1, y1, x2, y2) {
+    var xDelta = x1 - x2;
+    var yDelta = y1 - y2;
+
+    return Math.sqrt(xDelta * xDelta + yDelta * yDelta);
+  },
+
+  now: window.performance && window.performance.now ? window.performance.now.bind(window.performance) : Date.now
+};
+
+/**
+ * @param {HTMLElement} element
+ * @constructor
+ */
+function ElementMetrics(element) {
+  this.element = element;
+  this.width = this.boundingRect.width;
+  this.height = this.boundingRect.height;
+
+  this.size = Math.max(this.width, this.height);
+}
+
+ElementMetrics.prototype = {
+  get boundingRect() {
+    return this.element.getBoundingClientRect();
+  },
+
+  furthestCornerDistanceFrom: function furthestCornerDistanceFrom(x, y) {
+    var topLeft = Utility.distance(x, y, 0, 0);
+    var topRight = Utility.distance(x, y, this.width, 0);
+    var bottomLeft = Utility.distance(x, y, 0, this.height);
+    var bottomRight = Utility.distance(x, y, this.width, this.height);
+
+    return Math.max(topLeft, topRight, bottomLeft, bottomRight);
+  }
+};
+
+/**
+ * @param {HTMLElement} element
+ * @constructor
+ */
+function Ripple(element) {
+  this.element = element;
+  this.color = window.getComputedStyle(element).color;
+
+  this.wave = document.createElement('div');
+  this.waveContainer = document.createElement('div');
+  this.wave.style.backgroundColor = this.color;
+  this.wave.classList.add('wave');
+  this.waveContainer.classList.add('wave-container');
+  (0, _polymerDom.dom)(this.waveContainer).appendChild(this.wave);
+
+  this.resetInteractionState();
+}
+
+Ripple.MAX_RADIUS = 300;
+
+Ripple.prototype = {
+  get recenters() {
+    return this.element.recenters;
+  },
+
+  get center() {
+    return this.element.center;
+  },
+
+  get mouseDownElapsed() {
+    var elapsed;
+
+    if (!this.mouseDownStart) {
+      return 0;
+    }
+
+    elapsed = Utility.now() - this.mouseDownStart;
+
+    if (this.mouseUpStart) {
+      elapsed -= this.mouseUpElapsed;
+    }
+
+    return elapsed;
+  },
+
+  get mouseUpElapsed() {
+    return this.mouseUpStart ? Utility.now() - this.mouseUpStart : 0;
+  },
+
+  get mouseDownElapsedSeconds() {
+    return this.mouseDownElapsed / 1000;
+  },
+
+  get mouseUpElapsedSeconds() {
+    return this.mouseUpElapsed / 1000;
+  },
+
+  get mouseInteractionSeconds() {
+    return this.mouseDownElapsedSeconds + this.mouseUpElapsedSeconds;
+  },
+
+  get initialOpacity() {
+    return this.element.initialOpacity;
+  },
+
+  get opacityDecayVelocity() {
+    return this.element.opacityDecayVelocity;
+  },
+
+  get radius() {
+    var width2 = this.containerMetrics.width * this.containerMetrics.width;
+    var height2 = this.containerMetrics.height * this.containerMetrics.height;
+    var waveRadius = Math.min(Math.sqrt(width2 + height2), Ripple.MAX_RADIUS) * 1.1 + 5;
+
+    var duration = 1.1 - 0.2 * (waveRadius / Ripple.MAX_RADIUS);
+    var timeNow = this.mouseInteractionSeconds / duration;
+    var size = waveRadius * (1 - Math.pow(80, -timeNow));
+
+    return Math.abs(size);
+  },
+
+  get opacity() {
+    if (!this.mouseUpStart) {
+      return this.initialOpacity;
+    }
+
+    return Math.max(0, this.initialOpacity - this.mouseUpElapsedSeconds * this.opacityDecayVelocity);
+  },
+
+  get outerOpacity() {
+    // Linear increase in background opacity, capped at the opacity
+    // of the wavefront (waveOpacity).
+    var outerOpacity = this.mouseUpElapsedSeconds * 0.3;
+    var waveOpacity = this.opacity;
+
+    return Math.max(0, Math.min(outerOpacity, waveOpacity));
+  },
+
+  get isOpacityFullyDecayed() {
+    return this.opacity < 0.01 && this.radius >= Math.min(this.maxRadius, Ripple.MAX_RADIUS);
+  },
+
+  get isRestingAtMaxRadius() {
+    return this.opacity >= this.initialOpacity && this.radius >= Math.min(this.maxRadius, Ripple.MAX_RADIUS);
+  },
+
+  get isAnimationComplete() {
+    return this.mouseUpStart ? this.isOpacityFullyDecayed : this.isRestingAtMaxRadius;
+  },
+
+  get translationFraction() {
+    return Math.min(1, this.radius / this.containerMetrics.size * 2 / Math.sqrt(2));
+  },
+
+  get xNow() {
+    if (this.xEnd) {
+      return this.xStart + this.translationFraction * (this.xEnd - this.xStart);
+    }
+
+    return this.xStart;
+  },
+
+  get yNow() {
+    if (this.yEnd) {
+      return this.yStart + this.translationFraction * (this.yEnd - this.yStart);
+    }
+
+    return this.yStart;
+  },
+
+  get isMouseDown() {
+    return this.mouseDownStart && !this.mouseUpStart;
+  },
+
+  resetInteractionState: function resetInteractionState() {
+    this.maxRadius = 0;
+    this.mouseDownStart = 0;
+    this.mouseUpStart = 0;
+
+    this.xStart = 0;
+    this.yStart = 0;
+    this.xEnd = 0;
+    this.yEnd = 0;
+    this.slideDistance = 0;
+
+    this.containerMetrics = new ElementMetrics(this.element);
+  },
+
+  draw: function draw() {
+    var scale;
+    var dx;
+    var dy;
+
+    this.wave.style.opacity = this.opacity;
+
+    scale = this.radius / (this.containerMetrics.size / 2);
+    dx = this.xNow - this.containerMetrics.width / 2;
+    dy = this.yNow - this.containerMetrics.height / 2;
+
+    // 2d transform for safari because of border-radius and overflow:hidden
+    // clipping bug. https://bugs.webkit.org/show_bug.cgi?id=98538
+    this.waveContainer.style.webkitTransform = 'translate(' + dx + 'px, ' + dy + 'px)';
+    this.waveContainer.style.transform = 'translate3d(' + dx + 'px, ' + dy + 'px, 0)';
+    this.wave.style.webkitTransform = 'scale(' + scale + ',' + scale + ')';
+    this.wave.style.transform = 'scale3d(' + scale + ',' + scale + ',1)';
+  },
+
+  /** @param {Event=} event */
+  downAction: function downAction(event) {
+    var xCenter = this.containerMetrics.width / 2;
+    var yCenter = this.containerMetrics.height / 2;
+
+    this.resetInteractionState();
+    this.mouseDownStart = Utility.now();
+
+    if (this.center) {
+      this.xStart = xCenter;
+      this.yStart = yCenter;
+      this.slideDistance = Utility.distance(this.xStart, this.yStart, this.xEnd, this.yEnd);
+    } else {
+      this.xStart = event ? event.detail.x - this.containerMetrics.boundingRect.left : this.containerMetrics.width / 2;
+      this.yStart = event ? event.detail.y - this.containerMetrics.boundingRect.top : this.containerMetrics.height / 2;
+    }
+
+    if (this.recenters) {
+      this.xEnd = xCenter;
+      this.yEnd = yCenter;
+      this.slideDistance = Utility.distance(this.xStart, this.yStart, this.xEnd, this.yEnd);
+    }
+
+    this.maxRadius = this.containerMetrics.furthestCornerDistanceFrom(this.xStart, this.yStart);
+
+    this.waveContainer.style.top = (this.containerMetrics.height - this.containerMetrics.size) / 2 + 'px';
+    this.waveContainer.style.left = (this.containerMetrics.width - this.containerMetrics.size) / 2 + 'px';
+
+    this.waveContainer.style.width = this.containerMetrics.size + 'px';
+    this.waveContainer.style.height = this.containerMetrics.size + 'px';
+  },
+
+  /** @param {Event=} event */
+  upAction: function upAction(event) {
+    if (!this.isMouseDown) {
+      return;
+    }
+
+    this.mouseUpStart = Utility.now();
+  },
+
+  remove: function remove() {
+    (0, _polymerDom.dom)(this.waveContainer.parentNode).removeChild(this.waveContainer);
+  }
+};
+
+(0, _polymerFn.Polymer)({
+  _template: (0, _htmlTag.html)(_templateObject),
+
+  is: 'paper-ripple',
+  behaviors: [_ironA11yKeysBehavior.IronA11yKeysBehavior],
+
+  properties: {
+    /**
+     * The initial opacity set on the wave.
+     *
+     * @attribute initialOpacity
+     * @type number
+     * @default 0.25
+     */
+    initialOpacity: { type: Number, value: 0.25 },
+
+    /**
+     * How fast (opacity per second) the wave fades out.
+     *
+     * @attribute opacityDecayVelocity
+     * @type number
+     * @default 0.8
+     */
+    opacityDecayVelocity: { type: Number, value: 0.8 },
+
+    /**
+     * If true, ripples will exhibit a gravitational pull towards
+     * the center of their container as they fade away.
+     *
+     * @attribute recenters
+     * @type boolean
+     * @default false
+     */
+    recenters: { type: Boolean, value: false },
+
+    /**
+     * If true, ripples will center inside its container
+     *
+     * @attribute recenters
+     * @type boolean
+     * @default false
+     */
+    center: { type: Boolean, value: false },
+
+    /**
+     * A list of the visual ripples.
+     *
+     * @attribute ripples
+     * @type Array
+     * @default []
+     */
+    ripples: {
+      type: Array,
+      value: function value() {
+        return [];
+      }
+    },
+
+    /**
+     * True when there are visible ripples animating within the
+     * element.
+     */
+    animating: { type: Boolean, readOnly: true, reflectToAttribute: true, value: false },
+
+    /**
+     * If true, the ripple will remain in the "down" state until `holdDown`
+     * is set to false again.
+     */
+    holdDown: { type: Boolean, value: false, observer: '_holdDownChanged' },
+
+    /**
+     * If true, the ripple will not generate a ripple effect
+     * via pointer interaction.
+     * Calling ripple's imperative api like `simulatedRipple` will
+     * still generate the ripple effect.
+     */
+    noink: { type: Boolean, value: false },
+
+    _animating: { type: Boolean },
+
+    _boundAnimate: {
+      type: Function,
+      value: function value() {
+        return this.animate.bind(this);
+      }
+    }
+  },
+
+  get target() {
+    return this.keyEventTarget;
+  },
+
+  /**
+   * @type {!Object}
+   */
+  keyBindings: {
+    'enter:keydown': '_onEnterKeydown',
+    'space:keydown': '_onSpaceKeydown',
+    'space:keyup': '_onSpaceKeyup'
+  },
+
+  attached: function attached() {
+    // Set up a11yKeysBehavior to listen to key events on the target,
+    // so that space and enter activate the ripple even if the target doesn't
+    // handle key events. The key handlers deal with `noink` themselves.
+    if (this.parentNode.nodeType == 11) {
+      // DOCUMENT_FRAGMENT_NODE
+      this.keyEventTarget = (0, _polymerDom.dom)(this).getOwnerRoot().host;
+    } else {
+      this.keyEventTarget = this.parentNode;
+    }
+    var keyEventTarget = /** @type {!EventTarget} */this.keyEventTarget;
+    this.listen(keyEventTarget, 'up', 'uiUpAction');
+    this.listen(keyEventTarget, 'down', 'uiDownAction');
+  },
+
+  detached: function detached() {
+    this.unlisten(this.keyEventTarget, 'up', 'uiUpAction');
+    this.unlisten(this.keyEventTarget, 'down', 'uiDownAction');
+    this.keyEventTarget = null;
+  },
+
+  get shouldKeepAnimating() {
+    for (var index = 0; index < this.ripples.length; ++index) {
+      if (!this.ripples[index].isAnimationComplete) {
+        return true;
+      }
+    }
+
+    return false;
+  },
+
+  simulatedRipple: function simulatedRipple() {
+    this.downAction(null);
+
+    // Please see polymer/polymer#1305
+    this.async(function () {
+      this.upAction();
+    }, 1);
+  },
+
+  /**
+   * Provokes a ripple down effect via a UI event,
+   * respecting the `noink` property.
+   * @param {Event=} event
+   */
+  uiDownAction: function uiDownAction(event) {
+    if (!this.noink) {
+      this.downAction(event);
+    }
+  },
+
+  /**
+   * Provokes a ripple down effect via a UI event,
+   * *not* respecting the `noink` property.
+   * @param {Event=} event
+   */
+  downAction: function downAction(event) {
+    if (this.holdDown && this.ripples.length > 0) {
+      return;
+    }
+
+    var ripple = this.addRipple();
+
+    ripple.downAction(event);
+
+    if (!this._animating) {
+      this._animating = true;
+      this.animate();
+    }
+  },
+
+  /**
+   * Provokes a ripple up effect via a UI event,
+   * respecting the `noink` property.
+   * @param {Event=} event
+   */
+  uiUpAction: function uiUpAction(event) {
+    if (!this.noink) {
+      this.upAction(event);
+    }
+  },
+
+  /**
+   * Provokes a ripple up effect via a UI event,
+   * *not* respecting the `noink` property.
+   * @param {Event=} event
+   */
+  upAction: function upAction(event) {
+    if (this.holdDown) {
+      return;
+    }
+
+    this.ripples.forEach(function (ripple) {
+      ripple.upAction(event);
+    });
+
+    this._animating = true;
+    this.animate();
+  },
+
+  onAnimationComplete: function onAnimationComplete() {
+    this._animating = false;
+    this.$.background.style.backgroundColor = null;
+    this.fire('transitionend');
+  },
+
+  addRipple: function addRipple() {
+    var ripple = new Ripple(this);
+
+    (0, _polymerDom.dom)(this.$.waves).appendChild(ripple.waveContainer);
+    this.$.background.style.backgroundColor = ripple.color;
+    this.ripples.push(ripple);
+
+    this._setAnimating(true);
+
+    return ripple;
+  },
+
+  removeRipple: function removeRipple(ripple) {
+    var rippleIndex = this.ripples.indexOf(ripple);
+
+    if (rippleIndex < 0) {
+      return;
+    }
+
+    this.ripples.splice(rippleIndex, 1);
+
+    ripple.remove();
+
+    if (!this.ripples.length) {
+      this._setAnimating(false);
+    }
+  },
+
+  /**
+   * This conflicts with Element#antimate().
+   * https://developer.mozilla.org/en-US/docs/Web/API/Element/animate
+   * @suppress {checkTypes}
+   */
+  animate: function animate() {
+    if (!this._animating) {
+      return;
+    }
+    var index;
+    var ripple;
+
+    for (index = 0; index < this.ripples.length; ++index) {
+      ripple = this.ripples[index];
+
+      ripple.draw();
+
+      this.$.background.style.opacity = ripple.outerOpacity;
+
+      if (ripple.isOpacityFullyDecayed && !ripple.isRestingAtMaxRadius) {
+        this.removeRipple(ripple);
+      }
+    }
+
+    if (!this.shouldKeepAnimating && this.ripples.length === 0) {
+      this.onAnimationComplete();
+    } else {
+      window.requestAnimationFrame(this._boundAnimate);
+    }
+  },
+
+  _onEnterKeydown: function _onEnterKeydown() {
+    this.uiDownAction();
+    this.async(this.uiUpAction, 1);
+  },
+
+  _onSpaceKeydown: function _onSpaceKeydown() {
+    this.uiDownAction();
+  },
+
+  _onSpaceKeyup: function _onSpaceKeyup() {
+    this.uiUpAction();
+  },
+
+  // note: holdDown does not respect noink since it can be a focus based
+  // effect.
+  _holdDownChanged: function _holdDownChanged(newVal, oldVal) {
+    if (oldVal === undefined) {
+      return;
+    }
+    if (newVal) {
+      this.downAction();
+    } else {
+      this.upAction();
+    }
+  }
+
+  /**
+  Fired when the animation finishes.
+  This is useful if you want to wait until
+  the ripple animation finishes to perform some action.
+   @event transitionend
+  @param {{node: Object}} detail Contains the animated node.
+  */
+});
+
+/***/ }),
+
+/***/ "./node_modules/@polymer/paper-styles/color.js":
+/*!*****************************************************!*\
+  !*** ./node_modules/@polymer/paper-styles/color.js ***!
+  \*****************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+__webpack_require__(/*! @polymer/polymer/polymer-legacy.js */ "./node_modules/@polymer/polymer/polymer-legacy.js");
+
+var $_documentContainer = document.createElement('template');
+$_documentContainer.setAttribute('style', 'display: none;');
+
+$_documentContainer.innerHTML = '<custom-style>\n  <style is="custom-style">\n    html {\n\n      /* Material Design color palette for Google products */\n\n      --google-red-100: #f4c7c3;\n      --google-red-300: #e67c73;\n      --google-red-500: #db4437;\n      --google-red-700: #c53929;\n\n      --google-blue-100: #c6dafc;\n      --google-blue-300: #7baaf7;\n      --google-blue-500: #4285f4;\n      --google-blue-700: #3367d6;\n\n      --google-green-100: #b7e1cd;\n      --google-green-300: #57bb8a;\n      --google-green-500: #0f9d58;\n      --google-green-700: #0b8043;\n\n      --google-yellow-100: #fce8b2;\n      --google-yellow-300: #f7cb4d;\n      --google-yellow-500: #f4b400;\n      --google-yellow-700: #f09300;\n\n      --google-grey-100: #f5f5f5;\n      --google-grey-300: #e0e0e0;\n      --google-grey-500: #9e9e9e;\n      --google-grey-700: #616161;\n\n      /* Material Design color palette from online spec document */\n\n      --paper-red-50: #ffebee;\n      --paper-red-100: #ffcdd2;\n      --paper-red-200: #ef9a9a;\n      --paper-red-300: #e57373;\n      --paper-red-400: #ef5350;\n      --paper-red-500: #f44336;\n      --paper-red-600: #e53935;\n      --paper-red-700: #d32f2f;\n      --paper-red-800: #c62828;\n      --paper-red-900: #b71c1c;\n      --paper-red-a100: #ff8a80;\n      --paper-red-a200: #ff5252;\n      --paper-red-a400: #ff1744;\n      --paper-red-a700: #d50000;\n\n      --paper-pink-50: #fce4ec;\n      --paper-pink-100: #f8bbd0;\n      --paper-pink-200: #f48fb1;\n      --paper-pink-300: #f06292;\n      --paper-pink-400: #ec407a;\n      --paper-pink-500: #e91e63;\n      --paper-pink-600: #d81b60;\n      --paper-pink-700: #c2185b;\n      --paper-pink-800: #ad1457;\n      --paper-pink-900: #880e4f;\n      --paper-pink-a100: #ff80ab;\n      --paper-pink-a200: #ff4081;\n      --paper-pink-a400: #f50057;\n      --paper-pink-a700: #c51162;\n\n      --paper-purple-50: #f3e5f5;\n      --paper-purple-100: #e1bee7;\n      --paper-purple-200: #ce93d8;\n      --paper-purple-300: #ba68c8;\n      --paper-purple-400: #ab47bc;\n      --paper-purple-500: #9c27b0;\n      --paper-purple-600: #8e24aa;\n      --paper-purple-700: #7b1fa2;\n      --paper-purple-800: #6a1b9a;\n      --paper-purple-900: #4a148c;\n      --paper-purple-a100: #ea80fc;\n      --paper-purple-a200: #e040fb;\n      --paper-purple-a400: #d500f9;\n      --paper-purple-a700: #aa00ff;\n\n      --paper-deep-purple-50: #ede7f6;\n      --paper-deep-purple-100: #d1c4e9;\n      --paper-deep-purple-200: #b39ddb;\n      --paper-deep-purple-300: #9575cd;\n      --paper-deep-purple-400: #7e57c2;\n      --paper-deep-purple-500: #673ab7;\n      --paper-deep-purple-600: #5e35b1;\n      --paper-deep-purple-700: #512da8;\n      --paper-deep-purple-800: #4527a0;\n      --paper-deep-purple-900: #311b92;\n      --paper-deep-purple-a100: #b388ff;\n      --paper-deep-purple-a200: #7c4dff;\n      --paper-deep-purple-a400: #651fff;\n      --paper-deep-purple-a700: #6200ea;\n\n      --paper-indigo-50: #e8eaf6;\n      --paper-indigo-100: #c5cae9;\n      --paper-indigo-200: #9fa8da;\n      --paper-indigo-300: #7986cb;\n      --paper-indigo-400: #5c6bc0;\n      --paper-indigo-500: #3f51b5;\n      --paper-indigo-600: #3949ab;\n      --paper-indigo-700: #303f9f;\n      --paper-indigo-800: #283593;\n      --paper-indigo-900: #1a237e;\n      --paper-indigo-a100: #8c9eff;\n      --paper-indigo-a200: #536dfe;\n      --paper-indigo-a400: #3d5afe;\n      --paper-indigo-a700: #304ffe;\n\n      --paper-blue-50: #e3f2fd;\n      --paper-blue-100: #bbdefb;\n      --paper-blue-200: #90caf9;\n      --paper-blue-300: #64b5f6;\n      --paper-blue-400: #42a5f5;\n      --paper-blue-500: #2196f3;\n      --paper-blue-600: #1e88e5;\n      --paper-blue-700: #1976d2;\n      --paper-blue-800: #1565c0;\n      --paper-blue-900: #0d47a1;\n      --paper-blue-a100: #82b1ff;\n      --paper-blue-a200: #448aff;\n      --paper-blue-a400: #2979ff;\n      --paper-blue-a700: #2962ff;\n\n      --paper-light-blue-50: #e1f5fe;\n      --paper-light-blue-100: #b3e5fc;\n      --paper-light-blue-200: #81d4fa;\n      --paper-light-blue-300: #4fc3f7;\n      --paper-light-blue-400: #29b6f6;\n      --paper-light-blue-500: #03a9f4;\n      --paper-light-blue-600: #039be5;\n      --paper-light-blue-700: #0288d1;\n      --paper-light-blue-800: #0277bd;\n      --paper-light-blue-900: #01579b;\n      --paper-light-blue-a100: #80d8ff;\n      --paper-light-blue-a200: #40c4ff;\n      --paper-light-blue-a400: #00b0ff;\n      --paper-light-blue-a700: #0091ea;\n\n      --paper-cyan-50: #e0f7fa;\n      --paper-cyan-100: #b2ebf2;\n      --paper-cyan-200: #80deea;\n      --paper-cyan-300: #4dd0e1;\n      --paper-cyan-400: #26c6da;\n      --paper-cyan-500: #00bcd4;\n      --paper-cyan-600: #00acc1;\n      --paper-cyan-700: #0097a7;\n      --paper-cyan-800: #00838f;\n      --paper-cyan-900: #006064;\n      --paper-cyan-a100: #84ffff;\n      --paper-cyan-a200: #18ffff;\n      --paper-cyan-a400: #00e5ff;\n      --paper-cyan-a700: #00b8d4;\n\n      --paper-teal-50: #e0f2f1;\n      --paper-teal-100: #b2dfdb;\n      --paper-teal-200: #80cbc4;\n      --paper-teal-300: #4db6ac;\n      --paper-teal-400: #26a69a;\n      --paper-teal-500: #009688;\n      --paper-teal-600: #00897b;\n      --paper-teal-700: #00796b;\n      --paper-teal-800: #00695c;\n      --paper-teal-900: #004d40;\n      --paper-teal-a100: #a7ffeb;\n      --paper-teal-a200: #64ffda;\n      --paper-teal-a400: #1de9b6;\n      --paper-teal-a700: #00bfa5;\n\n      --paper-green-50: #e8f5e9;\n      --paper-green-100: #c8e6c9;\n      --paper-green-200: #a5d6a7;\n      --paper-green-300: #81c784;\n      --paper-green-400: #66bb6a;\n      --paper-green-500: #4caf50;\n      --paper-green-600: #43a047;\n      --paper-green-700: #388e3c;\n      --paper-green-800: #2e7d32;\n      --paper-green-900: #1b5e20;\n      --paper-green-a100: #b9f6ca;\n      --paper-green-a200: #69f0ae;\n      --paper-green-a400: #00e676;\n      --paper-green-a700: #00c853;\n\n      --paper-light-green-50: #f1f8e9;\n      --paper-light-green-100: #dcedc8;\n      --paper-light-green-200: #c5e1a5;\n      --paper-light-green-300: #aed581;\n      --paper-light-green-400: #9ccc65;\n      --paper-light-green-500: #8bc34a;\n      --paper-light-green-600: #7cb342;\n      --paper-light-green-700: #689f38;\n      --paper-light-green-800: #558b2f;\n      --paper-light-green-900: #33691e;\n      --paper-light-green-a100: #ccff90;\n      --paper-light-green-a200: #b2ff59;\n      --paper-light-green-a400: #76ff03;\n      --paper-light-green-a700: #64dd17;\n\n      --paper-lime-50: #f9fbe7;\n      --paper-lime-100: #f0f4c3;\n      --paper-lime-200: #e6ee9c;\n      --paper-lime-300: #dce775;\n      --paper-lime-400: #d4e157;\n      --paper-lime-500: #cddc39;\n      --paper-lime-600: #c0ca33;\n      --paper-lime-700: #afb42b;\n      --paper-lime-800: #9e9d24;\n      --paper-lime-900: #827717;\n      --paper-lime-a100: #f4ff81;\n      --paper-lime-a200: #eeff41;\n      --paper-lime-a400: #c6ff00;\n      --paper-lime-a700: #aeea00;\n\n      --paper-yellow-50: #fffde7;\n      --paper-yellow-100: #fff9c4;\n      --paper-yellow-200: #fff59d;\n      --paper-yellow-300: #fff176;\n      --paper-yellow-400: #ffee58;\n      --paper-yellow-500: #ffeb3b;\n      --paper-yellow-600: #fdd835;\n      --paper-yellow-700: #fbc02d;\n      --paper-yellow-800: #f9a825;\n      --paper-yellow-900: #f57f17;\n      --paper-yellow-a100: #ffff8d;\n      --paper-yellow-a200: #ffff00;\n      --paper-yellow-a400: #ffea00;\n      --paper-yellow-a700: #ffd600;\n\n      --paper-amber-50: #fff8e1;\n      --paper-amber-100: #ffecb3;\n      --paper-amber-200: #ffe082;\n      --paper-amber-300: #ffd54f;\n      --paper-amber-400: #ffca28;\n      --paper-amber-500: #ffc107;\n      --paper-amber-600: #ffb300;\n      --paper-amber-700: #ffa000;\n      --paper-amber-800: #ff8f00;\n      --paper-amber-900: #ff6f00;\n      --paper-amber-a100: #ffe57f;\n      --paper-amber-a200: #ffd740;\n      --paper-amber-a400: #ffc400;\n      --paper-amber-a700: #ffab00;\n\n      --paper-orange-50: #fff3e0;\n      --paper-orange-100: #ffe0b2;\n      --paper-orange-200: #ffcc80;\n      --paper-orange-300: #ffb74d;\n      --paper-orange-400: #ffa726;\n      --paper-orange-500: #ff9800;\n      --paper-orange-600: #fb8c00;\n      --paper-orange-700: #f57c00;\n      --paper-orange-800: #ef6c00;\n      --paper-orange-900: #e65100;\n      --paper-orange-a100: #ffd180;\n      --paper-orange-a200: #ffab40;\n      --paper-orange-a400: #ff9100;\n      --paper-orange-a700: #ff6500;\n\n      --paper-deep-orange-50: #fbe9e7;\n      --paper-deep-orange-100: #ffccbc;\n      --paper-deep-orange-200: #ffab91;\n      --paper-deep-orange-300: #ff8a65;\n      --paper-deep-orange-400: #ff7043;\n      --paper-deep-orange-500: #ff5722;\n      --paper-deep-orange-600: #f4511e;\n      --paper-deep-orange-700: #e64a19;\n      --paper-deep-orange-800: #d84315;\n      --paper-deep-orange-900: #bf360c;\n      --paper-deep-orange-a100: #ff9e80;\n      --paper-deep-orange-a200: #ff6e40;\n      --paper-deep-orange-a400: #ff3d00;\n      --paper-deep-orange-a700: #dd2c00;\n\n      --paper-brown-50: #efebe9;\n      --paper-brown-100: #d7ccc8;\n      --paper-brown-200: #bcaaa4;\n      --paper-brown-300: #a1887f;\n      --paper-brown-400: #8d6e63;\n      --paper-brown-500: #795548;\n      --paper-brown-600: #6d4c41;\n      --paper-brown-700: #5d4037;\n      --paper-brown-800: #4e342e;\n      --paper-brown-900: #3e2723;\n\n      --paper-grey-50: #fafafa;\n      --paper-grey-100: #f5f5f5;\n      --paper-grey-200: #eeeeee;\n      --paper-grey-300: #e0e0e0;\n      --paper-grey-400: #bdbdbd;\n      --paper-grey-500: #9e9e9e;\n      --paper-grey-600: #757575;\n      --paper-grey-700: #616161;\n      --paper-grey-800: #424242;\n      --paper-grey-900: #212121;\n\n      --paper-blue-grey-50: #eceff1;\n      --paper-blue-grey-100: #cfd8dc;\n      --paper-blue-grey-200: #b0bec5;\n      --paper-blue-grey-300: #90a4ae;\n      --paper-blue-grey-400: #78909c;\n      --paper-blue-grey-500: #607d8b;\n      --paper-blue-grey-600: #546e7a;\n      --paper-blue-grey-700: #455a64;\n      --paper-blue-grey-800: #37474f;\n      --paper-blue-grey-900: #263238;\n\n      /* opacity for dark text on a light background */\n      --dark-divider-opacity: 0.12;\n      --dark-disabled-opacity: 0.38; /* or hint text or icon */\n      --dark-secondary-opacity: 0.54;\n      --dark-primary-opacity: 0.87;\n\n      /* opacity for light text on a dark background */\n      --light-divider-opacity: 0.12;\n      --light-disabled-opacity: 0.3; /* or hint text or icon */\n      --light-secondary-opacity: 0.7;\n      --light-primary-opacity: 1.0;\n\n    }\n\n  </style>\n</custom-style>';
+
+document.head.appendChild($_documentContainer.content);
+
+/**
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+*/
+/*
+  FIXME(polymer-modulizer): the above comments were extracted
+  from HTML and may be out of place here. Review them and
+  then delete this comment!
+*/
+;
+
+/***/ }),
+
+/***/ "./node_modules/@polymer/paper-styles/default-theme.js":
+/*!*************************************************************!*\
+  !*** ./node_modules/@polymer/paper-styles/default-theme.js ***!
+  \*************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+__webpack_require__(/*! @polymer/polymer/polymer-legacy.js */ "./node_modules/@polymer/polymer/polymer-legacy.js");
+
+__webpack_require__(/*! ./color.js */ "./node_modules/@polymer/paper-styles/color.js");
+
+var $_documentContainer = document.createElement('template');
+$_documentContainer.setAttribute('style', 'display: none;');
+
+$_documentContainer.innerHTML = '<custom-style>\n  <style is="custom-style">\n    html {\n      /*\n       * You can use these generic variables in your elements for easy theming.\n       * For example, if all your elements use `--primary-text-color` as its main\n       * color, then switching from a light to a dark theme is just a matter of\n       * changing the value of `--primary-text-color` in your application.\n       */\n      --primary-text-color: var(--light-theme-text-color);\n      --primary-background-color: var(--light-theme-background-color);\n      --secondary-text-color: var(--light-theme-secondary-color);\n      --disabled-text-color: var(--light-theme-disabled-color);\n      --divider-color: var(--light-theme-divider-color);\n      --error-color: var(--paper-deep-orange-a700);\n\n      /*\n       * Primary and accent colors. Also see color.html for more colors.\n       */\n      --primary-color: var(--paper-indigo-500);\n      --light-primary-color: var(--paper-indigo-100);\n      --dark-primary-color: var(--paper-indigo-700);\n\n      --accent-color: var(--paper-pink-a200);\n      --light-accent-color: var(--paper-pink-a100);\n      --dark-accent-color: var(--paper-pink-a400);\n\n\n      /*\n       * Material Design Light background theme\n       */\n      --light-theme-background-color: #ffffff;\n      --light-theme-base-color: #000000;\n      --light-theme-text-color: var(--paper-grey-900);\n      --light-theme-secondary-color: #737373;  /* for secondary text and icons */\n      --light-theme-disabled-color: #9b9b9b;  /* disabled/hint text */\n      --light-theme-divider-color: #dbdbdb;\n\n      /*\n       * Material Design Dark background theme\n       */\n      --dark-theme-background-color: var(--paper-grey-900);\n      --dark-theme-base-color: #ffffff;\n      --dark-theme-text-color: #ffffff;\n      --dark-theme-secondary-color: #bcbcbc;  /* for secondary text and icons */\n      --dark-theme-disabled-color: #646464;  /* disabled/hint text */\n      --dark-theme-divider-color: #3c3c3c;\n\n      /*\n       * Deprecated values because of their confusing names.\n       */\n      --text-primary-color: var(--dark-theme-text-color);\n      --default-primary-color: var(--primary-color);\n    }\n  </style>\n</custom-style>';
+
+document.head.appendChild($_documentContainer.content);
+
+/**
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+*/
+/* Taken from https://www.google.com/design/spec/style/color.html#color-ui-color-application */
+/*
+  FIXME(polymer-modulizer): the above comments were extracted
+  from HTML and may be out of place here. Review them and
+  then delete this comment!
+*/
+;
+
+/***/ }),
+
+/***/ "./node_modules/@polymer/paper-styles/element-styles/paper-material-styles.js":
+/*!************************************************************************************!*\
+  !*** ./node_modules/@polymer/paper-styles/element-styles/paper-material-styles.js ***!
+  \************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+__webpack_require__(/*! @polymer/polymer/polymer-legacy.js */ "./node_modules/@polymer/polymer/polymer-legacy.js");
+
+__webpack_require__(/*! ../shadow.js */ "./node_modules/@polymer/paper-styles/shadow.js");
+
+var $_documentContainer = document.createElement('template');
+$_documentContainer.setAttribute('style', 'display: none;');
+
+$_documentContainer.innerHTML = '<dom-module id="paper-material-styles">\n  <template>\n    <style>\n      :host, html {\n        --paper-material: {\n          display: block;\n          position: relative;\n        };\n        --paper-material-elevation-1: {\n          @apply --shadow-elevation-2dp;\n        };\n        --paper-material-elevation-2: {\n          @apply --shadow-elevation-4dp;\n        };\n        --paper-material-elevation-3: {\n          @apply --shadow-elevation-6dp;\n        };\n        --paper-material-elevation-4: {\n          @apply --shadow-elevation-8dp;\n        };\n        --paper-material-elevation-5: {\n          @apply --shadow-elevation-16dp;\n        };\n      }\n      :host(.paper-material), .paper-material {\n        @apply --paper-material;\n      }\n      :host(.paper-material[elevation="1"]), .paper-material[elevation="1"] {\n        @apply --paper-material-elevation-1;\n      }\n      :host(.paper-material[elevation="2"]), .paper-material[elevation="2"] {\n        @apply --paper-material-elevation-2;\n      }\n      :host(.paper-material[elevation="3"]), .paper-material[elevation="3"] {\n        @apply --paper-material-elevation-3;\n      }\n      :host(.paper-material[elevation="4"]), .paper-material[elevation="4"] {\n        @apply --paper-material-elevation-4;\n      }\n      :host(.paper-material[elevation="5"]), .paper-material[elevation="5"] {\n        @apply --paper-material-elevation-5;\n      }\n    </style>\n  </template>\n</dom-module>';
+
+document.head.appendChild($_documentContainer.content);
+
+/**
+@license
+Copyright (c) 2017 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+*/
+/**
+Material design: [Cards](https://www.google.com/design/spec/components/cards.html)
+
+Shared styles that you can apply to an element to renders two shadows on top
+of each other,that create the effect of a lifted piece of paper.
+
+Example:
+
+    <custom-style>
+      <style is="custom-style" include="paper-material-styles"></style>
+    </custom-style>
+
+    <div class="paper-material" elevation="1">
+      ... content ...
+    </div>
+
+@group Paper Elements
+@demo demo/index.html
+*/
+/*
+  FIXME(polymer-modulizer): the above comments were extracted
+  from HTML and may be out of place here. Review them and
+  then delete this comment!
+*/
+;
+
+/***/ }),
+
+/***/ "./node_modules/@polymer/paper-styles/shadow.js":
+/*!******************************************************!*\
+  !*** ./node_modules/@polymer/paper-styles/shadow.js ***!
+  \******************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+__webpack_require__(/*! @polymer/polymer/polymer-legacy.js */ "./node_modules/@polymer/polymer/polymer-legacy.js");
+
+var $_documentContainer = document.createElement('template');
+$_documentContainer.setAttribute('style', 'display: none;');
+
+$_documentContainer.innerHTML = '<custom-style>\n  <style is="custom-style">\n    html {\n\n      --shadow-transition: {\n        transition: box-shadow 0.28s cubic-bezier(0.4, 0, 0.2, 1);\n      };\n\n      --shadow-none: {\n        box-shadow: none;\n      };\n\n      /* from http://codepen.io/shyndman/pen/c5394ddf2e8b2a5c9185904b57421cdb */\n\n      --shadow-elevation-2dp: {\n        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),\n                    0 1px 5px 0 rgba(0, 0, 0, 0.12),\n                    0 3px 1px -2px rgba(0, 0, 0, 0.2);\n      };\n\n      --shadow-elevation-3dp: {\n        box-shadow: 0 3px 4px 0 rgba(0, 0, 0, 0.14),\n                    0 1px 8px 0 rgba(0, 0, 0, 0.12),\n                    0 3px 3px -2px rgba(0, 0, 0, 0.4);\n      };\n\n      --shadow-elevation-4dp: {\n        box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.14),\n                    0 1px 10px 0 rgba(0, 0, 0, 0.12),\n                    0 2px 4px -1px rgba(0, 0, 0, 0.4);\n      };\n\n      --shadow-elevation-6dp: {\n        box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.14),\n                    0 1px 18px 0 rgba(0, 0, 0, 0.12),\n                    0 3px 5px -1px rgba(0, 0, 0, 0.4);\n      };\n\n      --shadow-elevation-8dp: {\n        box-shadow: 0 8px 10px 1px rgba(0, 0, 0, 0.14),\n                    0 3px 14px 2px rgba(0, 0, 0, 0.12),\n                    0 5px 5px -3px rgba(0, 0, 0, 0.4);\n      };\n\n      --shadow-elevation-12dp: {\n        box-shadow: 0 12px 16px 1px rgba(0, 0, 0, 0.14),\n                    0 4px 22px 3px rgba(0, 0, 0, 0.12),\n                    0 6px 7px -4px rgba(0, 0, 0, 0.4);\n      };\n\n      --shadow-elevation-16dp: {\n        box-shadow: 0 16px 24px 2px rgba(0, 0, 0, 0.14),\n                    0  6px 30px 5px rgba(0, 0, 0, 0.12),\n                    0  8px 10px -5px rgba(0, 0, 0, 0.4);\n      };\n\n      --shadow-elevation-24dp: {\n        box-shadow: 0 24px 38px 3px rgba(0, 0, 0, 0.14),\n                    0 9px 46px 8px rgba(0, 0, 0, 0.12),\n                    0 11px 15px -7px rgba(0, 0, 0, 0.4);\n      };\n    }\n  </style>\n</custom-style>';
+
+document.head.appendChild($_documentContainer.content);
+
+/**
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+*/
+/*
+  FIXME(polymer-modulizer): the above comments were extracted
+  from HTML and may be out of place here. Review them and
+  then delete this comment!
+*/
+;
 
 /***/ }),
 
@@ -18384,89 +20624,6 @@ function isUnscopedStyle(style) {
 
 /***/ }),
 
-/***/ "./node_modules/polymer-webpack-loader/register-html-template.js":
-/*!***********************************************************************!*\
-  !*** ./node_modules/polymer-webpack-loader/register-html-template.js ***!
-  \***********************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-/* eslint-env browser */
-
-var RegisterHtmlTemplate = function () {
-  function RegisterHtmlTemplate() {
-    _classCallCheck(this, RegisterHtmlTemplate);
-  }
-
-  _createClass(RegisterHtmlTemplate, null, [{
-    key: 'register',
-
-    /**
-     * Create a `<template>` element to hold `<dom-module>` content.
-     * This bit of code will execute in the context of the main document,
-     * calling `importNode` on the `<template>`, which in turn triggers
-     * the lifecycle of the `<dom-module>` and allows it to insert its
-     * content into Polymer's global module map. When a Polymer element
-     * boots up it will fetch its template from this module map.
-     * https://github.com/Polymer/polymer/blob/master/lib/mixins/element-mixin.html#L501-L538
-     * @param {string} val A `<dom-module>` as an HTML string
-     */
-    value: function register(val) {
-      var content = void 0;
-      var template = document.createElement('template');
-      template.innerHTML = val;
-      if (template.content) {
-        content = template.content; // eslint-disable-line prefer-destructuring
-      } else {
-        content = document.createDocumentFragment();
-        while (template.firstChild) {
-          content.appendChild(template.firstChild);
-        }
-      }
-      document.importNode(content, true);
-    }
-    /**
-     * Content that will be injected into the main document. This is primarily
-     * for things like `<iron-iconset>` and `<custom-style>` which do not have
-     * templates but rely on HTML Imports ability to apply content to the main
-     * document.
-     * @param {string} val An HTML string
-     */
-
-  }, {
-    key: 'toBody',
-    value: function toBody(val) {
-      var trimmedVal = val.trim();
-      if (trimmedVal) {
-        var div = document.createElement('div');
-        div.innerHTML = trimmedVal;
-        if (div.firstChild) {
-          if (document.body) {
-            document.body.insertBefore(div.firstChild, document.body.firstChild);
-          } else {
-            document.addEventListener('DOMContentLoaded', function () {
-              document.body.insertBefore(div.firstChild, document.body.firstChild);
-            });
-          }
-        }
-      }
-    }
-  }]);
-
-  return RegisterHtmlTemplate;
-}();
-
-module.exports = RegisterHtmlTemplate;
-
-/***/ }),
-
 /***/ "./src/cat.js":
 /*!********************!*\
   !*** ./src/cat.js ***!
@@ -18572,7 +20729,9 @@ var _welcome = __webpack_require__(/*! ./welcome.ts */ "./src/welcome.ts");
 
 var _welcome2 = _interopRequireDefault(_welcome);
 
-__webpack_require__(/*! ./nps-widget */ "./src/nps-widget/index.js");
+var _index = __webpack_require__(/*! ./nps-widget/index.js */ "./src/nps-widget/index.js");
+
+var _index2 = _interopRequireDefault(_index);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -18581,7 +20740,8 @@ exports.Dog = _dog2.default;
 exports.Welcome = _welcome2.default;
 
 
-var i = document.createElement('NpsWidget');
+//var i = document.createElement('nps-widget');
+var i = new _index2.default();
 document.getElementsByTagName('body')[0].appendChild(i);
 
 /***/ }),
@@ -18602,13 +20762,23 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+var _templateObject = _taggedTemplateLiteral(['\n      <div>This is my chosen colour: [[colour]] (Made by the app \'[[name]]\'.)</div>\n\n      <style is="custom-style">\n        paper-fab {\n          display: inline-block;\n          margin: 8px;\n          z-index: 2;\n          position: fixed;\n          bottom: 30px;\n          right: 25px;\n          --paper-fab-background: var(--smth);\n          color: var(--google-green-500);\n        }\n\n          paper-fab:hover {\n            color: var(--google-yellow-700);\n          }\n      </style>\n\n      <paper-fab icon="icons:feedback" on-click="dosm"/>\n      '], ['\n      <div>This is my chosen colour: [[colour]] (Made by the app \'[[name]]\'.)</div>\n\n      <style is="custom-style">\n        paper-fab {\n          display: inline-block;\n          margin: 8px;\n          z-index: 2;\n          position: fixed;\n          bottom: 30px;\n          right: 25px;\n          --paper-fab-background: var(--smth);\n          color: var(--google-green-500);\n        }\n\n          paper-fab:hover {\n            color: var(--google-yellow-700);\n          }\n      </style>\n\n      <paper-fab icon="icons:feedback" on-click="dosm"/>\n      ']);
+
 var _polymer = __webpack_require__(/*! @polymer/polymer */ "./node_modules/@polymer/polymer/polymer-element.js");
 
-var _template = __webpack_require__(/*! ./template.html */ "./src/nps-widget/template.html");
+__webpack_require__(/*! @polymer/paper-fab/paper-fab.js */ "./node_modules/@polymer/paper-fab/paper-fab.js");
 
-var _template2 = _interopRequireDefault(_template);
+__webpack_require__(/*! @polymer/iron-icons/iron-icons.js */ "./node_modules/@polymer/iron-icons/iron-icons.js");
+
+__webpack_require__(/*! @polymer/paper-styles/color.js */ "./node_modules/@polymer/paper-styles/color.js");
+
+var _stylingProps = __webpack_require__(/*! ./stylingProps.ts */ "./src/nps-widget/stylingProps.ts");
+
+var _stylingProps2 = _interopRequireDefault(_stylingProps);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _taggedTemplateLiteral(strings, raw) { return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -18619,25 +20789,39 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var NpsWidget = function (_PolymerElement) {
   _inherits(NpsWidget, _PolymerElement);
 
-  function NpsWidget() {
-    _classCallCheck(this, NpsWidget);
-
-    return _possibleConstructorReturn(this, (NpsWidget.__proto__ || Object.getPrototypeOf(NpsWidget)).apply(this, arguments));
-  }
-
   _createClass(NpsWidget, null, [{
-    key: 'properties',
+    key: 'is',
     get: function get() {
-      return {
-        name: {
-          type: String
-        }
-      };
+      return 'nps-widget';
     }
   }, {
     key: 'template',
     get: function get() {
-      return (0, _polymer.html)(['' + _template2.default]);
+      return (0, _polymer.html)(_templateObject);
+    }
+  }]);
+
+  function NpsWidget() {
+    _classCallCheck(this, NpsWidget);
+
+    var _this = _possibleConstructorReturn(this, (NpsWidget.__proto__ || Object.getPrototypeOf(NpsWidget)).call(this));
+
+    _this.name = 'Polymer 3.0 test';
+    _this.colour = 'purple';
+    _this.updateStyles({ '--smth': _this.colour });
+    console.log('loaded nps-widget');
+    return _this;
+  }
+
+  _createClass(NpsWidget, [{
+    key: 'dosm',
+    value: function dosm() {
+      console.log('dosm clicked');
+    }
+  }], [{
+    key: 'properties',
+    get: function get() {
+      return _stylingProps2.default;
     }
   }]);
 
@@ -18647,25 +20831,37 @@ var NpsWidget = function (_PolymerElement) {
 exports.default = NpsWidget;
 
 
-window.customElements.define('nps-widget', NpsWidget);
+window.customElements.define(NpsWidget.is, NpsWidget);
 
 /***/ }),
 
-/***/ "./src/nps-widget/template.html":
-/*!**************************************!*\
-  !*** ./src/nps-widget/template.html ***!
-  \**************************************/
+/***/ "./src/nps-widget/stylingProps.ts":
+/*!****************************************!*\
+  !*** ./src/nps-widget/stylingProps.ts ***!
+  \****************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
+Object.defineProperty(exports, "__esModule", { value: true });
+var stylingProps = /** @class */ (function () {
+    function stylingProps() {
+    }
+    Object.defineProperty(stylingProps, "backgroundColour", {
+        get: function () {
+            return this._backgroundColour;
+        },
+        set: function (value) {
+            this._backgroundColour = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    return stylingProps;
+}());
+exports.stylingProps = stylingProps;
 
-__webpack_require__(/*! ../../node_modules/@polymer/iron-fit-behavior/iron-fit-behavior.js */ "./node_modules/@polymer/iron-fit-behavior/iron-fit-behavior.js");
-
-var RegisterHtmlTemplate = __webpack_require__(/*! polymer-webpack-loader/register-html-template */ "./node_modules/polymer-webpack-loader/register-html-template.js");
-
-RegisterHtmlTemplate.toBody("<iron-fit-impl vertical-align=top horizontal-align=right> <h1>Test this</h1> <p> This is some test text. </p> <d2l-button primary=\"\">Save</d2l-button> <d2l-button>Cancel</d2l-button> </iron-fit-impl>");
 
 /***/ }),
 

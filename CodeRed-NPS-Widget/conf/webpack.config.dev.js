@@ -4,8 +4,6 @@ const path = require('path');
 const webpack = require('webpack');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 
-// const UglifyJsPlugin = webpack.optimize.UglifyJsPlugin;
-
 const pkg = require(path.resolve(__dirname, '../package.json'));
 
 let libraryName = pkg.name;
@@ -60,7 +58,7 @@ const config = {
   },
   resolve: {
     modules: [path.resolve(__dirname, '../node_modules'), path.resolve(__dirname, '../src')],
-    extensions: ['.ts', '.tsx', '.json', '.js']
+    extensions: ['.ts', '.tsx', '.json', '.js', '.html']
   },
   plugins: [
     // copy custom static assets

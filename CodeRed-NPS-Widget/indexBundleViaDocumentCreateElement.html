@@ -20,15 +20,28 @@
       });
     }
 
-    injectScript('./lib/dev/codered_nps_widget.js')
+    injectScript('./lib/dev/custom-elements-es5-adapter.js')
       .then(() => {
-        console.log('Script loaded!');
-        welcome = new (codered_nps_widget.Welcome)('Paul');
+        console.log('custom-elements-es5-adapter loaded!');
+        injectScript('./lib/dev/webcomponents-loader.js')
+          .then(() => {
+            console.log('Webcomponents loaded!');
+            injectScript('./lib/dev/codered_nps_widget.js')
+              .then(() => {
+                console.log('Script loaded!');
+                welcome = new (codered_nps_widget.Welcome)('Paul');
+              }).catch(error => {
+                console.log(error);
+              });
+          }).catch(error => {
+            console.log(error);
+          });
       }).catch(error => {
         console.log(error);
       });
 
-    function clickAndChangeName(){
+
+    function clickAndChangeName() {
       welcome.ClickMeButton();
       welcome.usersName = welcome.usersName + '.';
     };
@@ -40,6 +53,6 @@
   <button type="button" class="btn btn-primary btn-md" onclick="clickAndChangeName()">
     Show Message
   </button>
-
+  <nps-widget mood="happy"></nps-widget>
 </body>
 </html>
