@@ -22,7 +22,8 @@ export default class NpsWidgetConfig {
 
 }
 ```
-
+Then there's code blocks like this:
+```markdown
 # Header 1
 ## Header 2
 ### Header 3
@@ -36,6 +37,7 @@ export default class NpsWidgetConfig {
 **Bold** and _Italic_ 
 
 [Link](url) and ![Image](src)
+```
 
 For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
 
