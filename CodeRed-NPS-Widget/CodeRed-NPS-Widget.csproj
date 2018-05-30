@@ -99,7 +99,6 @@
     <Content Include="src\index.js" />
     <Content Include="src\nps-widget\index.js" />
     <Content Include="src\tsconfig.json" />
-    <TypeScriptCompile Include="src\nps-widget\NpsWidgetConfig.ts" />
     <None Include="test\index.spec.js" />
     <Content Include="favicon.ico" />
     <None Include=".gitignore" />
@@ -132,9 +131,11 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="src\nps-widget\config\NpsWidgetConfig.ts" />
+    <TypeScriptCompile Include="src\nps-widget\config\NpsWidgetStylingConfig.ts" />
+    <TypeScriptCompile Include="src\nps-widget\store\configureStore.ts" />
     <TypeScriptCompile Include="src\nps-widget\store\index.ts" />
     <TypeScriptCompile Include="src\nps-widget\store\styling\types.ts" />
-    <TypeScriptCompile Include="src\nps-widget\NpsWidgetStylingConfig.ts" />
     <TypeScriptCompile Include="src\nps-widget\store\styling\actions.ts" />
     <TypeScriptCompile Include="src\nps-widget\store\styling\reducer.ts" />
     <TypeScriptCompile Include="src\welcome.ts" />
@@ -142,9 +143,7 @@
   <ItemGroup>
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="src\nps-widget\config\" />
-  </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
