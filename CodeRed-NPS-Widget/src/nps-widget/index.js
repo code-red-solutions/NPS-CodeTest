@@ -2,14 +2,14 @@ import { PolymerElement, html } from '@polymer/polymer';
 import '@polymer/paper-fab/paper-fab.js';
 import '@polymer/iron-icons/iron-icons.js';
 import '@polymer/paper-styles/color.js';
-import stylingProps from './stylingProps.ts'
+import npsWidgetStyling from './npsWidgetStyling.ts';
 
 export default class NpsWidget extends PolymerElement {
 
   static get is() { return 'nps-widget'; }
 
   static get template() {
-      return html`
+    return html`
       <div>This is my chosen colour: [[colour]] (Made by the app '[[name]]'.)</div>
 
       <style is="custom-style">
@@ -30,19 +30,19 @@ export default class NpsWidget extends PolymerElement {
       </style>
 
       <paper-fab icon="icons:feedback" on-click="dosm"/>
-      `;
+    `;
   }
-  
+
   constructor() {
     super();
     this.name = 'Polymer 3.0 test';
-    this.colour = 'purple';
-    this.updateStyles({ '--smth': this.colour });
+    this.backgroundColour = 'purple';
+    this.updateStyles({ '--smth': this.backgroundColour });
     console.log('loaded nps-widget');
   }
 
   static get properties() {
-    return stylingProps;
+    return npsWidgetStyling;
   }
 
   dosm() {

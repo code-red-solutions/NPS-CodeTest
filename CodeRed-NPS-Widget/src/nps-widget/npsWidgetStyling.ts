@@ -1,8 +1,8 @@
 
-export class stylingProps {
+export class npsWidgetStyling {
   private static _backgroundColour: string;
 
-  static get backgroundColour():string {
+  static get backgroundColour(): string {
     return this._backgroundColour;
   }
   static set backgroundColour(value: string) {

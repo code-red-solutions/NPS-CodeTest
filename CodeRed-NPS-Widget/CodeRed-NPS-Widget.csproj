@@ -82,8 +82,6 @@
     <Content Include="lib\dev\webcomponents-loader.js" />
     <Content Include="lib\prod\codered_nps_widget.min.js" />
     <Content Include="lib\dev\codered_nps_widget.js.map" />
-    <Content Include="conf\mocha.config.dev.json" />
-    <Content Include="conf\mocha.config.prod.json" />
     <Content Include="lib\prod\static\Capture.PNG" />
     <Content Include="lib\prod\webcomponents-loader.js" />
     <Content Include="lib\test\codered_nps_widget.js" />
@@ -99,9 +97,8 @@
     <Content Include="lib\dev\codered_nps_widget.js" />
     <Content Include="src\index-test.js" />
     <Content Include="src\nps-widget\index.js" />
-    <Content Include="src\nps-widget\template.html" />
     <Content Include="src\tsconfig.json" />
-    <TypeScriptCompile Include="src\nps-widget\stylingProps.ts" />
+    <TypeScriptCompile Include="src\nps-widget\npsWidgetProperties.ts" />
     <None Include="test\index.spec.js" />
     <Content Include="favicon.ico" />
     <None Include=".gitignore" />
@@ -133,6 +130,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="src\nps-widget\npsWidgetStyling.ts" />
     <TypeScriptCompile Include="src\welcome.ts" />
   </ItemGroup>
   <ItemGroup>

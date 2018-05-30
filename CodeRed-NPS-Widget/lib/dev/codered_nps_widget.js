@@ -20735,13 +20735,14 @@ var _index2 = _interopRequireDefault(_index);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+// TODO: Use a document.onload event handler
+var i = new _index2.default();
+
 exports.Cat = _cat2.default;
 exports.Dog = _dog2.default;
 exports.Welcome = _welcome2.default;
 
 
-//var i = document.createElement('nps-widget');
-var i = new _index2.default();
 document.getElementsByTagName('body')[0].appendChild(i);
 
 /***/ }),
@@ -20762,7 +20763,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _templateObject = _taggedTemplateLiteral(['\n      <div>This is my chosen colour: [[colour]] (Made by the app \'[[name]]\'.)</div>\n\n      <style is="custom-style">\n        paper-fab {\n          display: inline-block;\n          margin: 8px;\n          z-index: 2;\n          position: fixed;\n          bottom: 30px;\n          right: 25px;\n          --paper-fab-background: var(--smth);\n          color: var(--google-green-500);\n        }\n\n          paper-fab:hover {\n            color: var(--google-yellow-700);\n          }\n      </style>\n\n      <paper-fab icon="icons:feedback" on-click="dosm"/>\n      '], ['\n      <div>This is my chosen colour: [[colour]] (Made by the app \'[[name]]\'.)</div>\n\n      <style is="custom-style">\n        paper-fab {\n          display: inline-block;\n          margin: 8px;\n          z-index: 2;\n          position: fixed;\n          bottom: 30px;\n          right: 25px;\n          --paper-fab-background: var(--smth);\n          color: var(--google-green-500);\n        }\n\n          paper-fab:hover {\n            color: var(--google-yellow-700);\n          }\n      </style>\n\n      <paper-fab icon="icons:feedback" on-click="dosm"/>\n      ']);
+var _templateObject = _taggedTemplateLiteral(['\n      <div>This is my chosen colour: [[colour]] (Made by the app \'[[name]]\'.)</div>\n\n      <style is="custom-style">\n        paper-fab {\n          display: inline-block;\n          margin: 8px;\n          z-index: 2;\n          position: fixed;\n          bottom: 30px;\n          right: 25px;\n          --paper-fab-background: var(--smth);\n          color: var(--google-green-500);\n        }\n\n          paper-fab:hover {\n            color: var(--google-yellow-700);\n          }\n      </style>\n\n      <paper-fab icon="icons:feedback" on-click="dosm"/>\n    '], ['\n      <div>This is my chosen colour: [[colour]] (Made by the app \'[[name]]\'.)</div>\n\n      <style is="custom-style">\n        paper-fab {\n          display: inline-block;\n          margin: 8px;\n          z-index: 2;\n          position: fixed;\n          bottom: 30px;\n          right: 25px;\n          --paper-fab-background: var(--smth);\n          color: var(--google-green-500);\n        }\n\n          paper-fab:hover {\n            color: var(--google-yellow-700);\n          }\n      </style>\n\n      <paper-fab icon="icons:feedback" on-click="dosm"/>\n    ']);
 
 var _polymer = __webpack_require__(/*! @polymer/polymer */ "./node_modules/@polymer/polymer/polymer-element.js");
 
@@ -20772,9 +20773,9 @@ __webpack_require__(/*! @polymer/iron-icons/iron-icons.js */ "./node_modules/@po
 
 __webpack_require__(/*! @polymer/paper-styles/color.js */ "./node_modules/@polymer/paper-styles/color.js");
 
-var _stylingProps = __webpack_require__(/*! ./stylingProps.ts */ "./src/nps-widget/stylingProps.ts");
+var _npsWidgetStyling = __webpack_require__(/*! ./npsWidgetStyling.ts */ "./src/nps-widget/npsWidgetStyling.ts");
 
-var _stylingProps2 = _interopRequireDefault(_stylingProps);
+var _npsWidgetStyling2 = _interopRequireDefault(_npsWidgetStyling);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -20807,8 +20808,8 @@ var NpsWidget = function (_PolymerElement) {
     var _this = _possibleConstructorReturn(this, (NpsWidget.__proto__ || Object.getPrototypeOf(NpsWidget)).call(this));
 
     _this.name = 'Polymer 3.0 test';
-    _this.colour = 'purple';
-    _this.updateStyles({ '--smth': _this.colour });
+    _this.backgroundColour = 'purple';
+    _this.updateStyles({ '--smth': _this.backgroundColour });
     console.log('loaded nps-widget');
     return _this;
   }
@@ -20821,7 +20822,7 @@ var NpsWidget = function (_PolymerElement) {
   }], [{
     key: 'properties',
     get: function get() {
-      return _stylingProps2.default;
+      return _npsWidgetStyling2.default;
     }
   }]);
 
@@ -20835,20 +20836,20 @@ window.customElements.define(NpsWidget.is, NpsWidget);
 
 /***/ }),
 
-/***/ "./src/nps-widget/stylingProps.ts":
-/*!****************************************!*\
-  !*** ./src/nps-widget/stylingProps.ts ***!
-  \****************************************/
+/***/ "./src/nps-widget/npsWidgetStyling.ts":
+/*!********************************************!*\
+  !*** ./src/nps-widget/npsWidgetStyling.ts ***!
+  \********************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var stylingProps = /** @class */ (function () {
-    function stylingProps() {
+var npsWidgetStyling = /** @class */ (function () {
+    function npsWidgetStyling() {
     }
-    Object.defineProperty(stylingProps, "backgroundColour", {
+    Object.defineProperty(npsWidgetStyling, "backgroundColour", {
         get: function () {
             return this._backgroundColour;
         },
@@ -20858,9 +20859,9 @@ var stylingProps = /** @class */ (function () {
         enumerable: true,
         configurable: true
     });
-    return stylingProps;
+    return npsWidgetStyling;
 }());
-exports.stylingProps = stylingProps;
+exports.npsWidgetStyling = npsWidgetStyling;
 
 
 /***/ }),
