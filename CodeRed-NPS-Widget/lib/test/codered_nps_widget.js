@@ -172,7 +172,7 @@ exports.default = Dog;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.Welcome = exports.Dog = exports.Cat = undefined;
+exports.NpsWidgetStylingConfig = exports.NpsWidgetConfig = exports.Welcome = exports.Dog = exports.Cat = undefined;
 
 var _cat = __webpack_require__(/*! ./cat.js */ "./src/cat.js");
 
@@ -186,11 +186,175 @@ var _welcome = __webpack_require__(/*! ./welcome.ts */ "./src/welcome.ts");
 
 var _welcome2 = _interopRequireDefault(_welcome);
 
+var _NpsWidgetConfig = __webpack_require__(/*! ./nps-widget/NpsWidgetConfig */ "./src/nps-widget/NpsWidgetConfig.ts");
+
+var _NpsWidgetConfig2 = _interopRequireDefault(_NpsWidgetConfig);
+
+var _NpsWidgetStylingConfig = __webpack_require__(/*! ./nps-widget/Styling/NpsWidgetStylingConfig */ "./src/nps-widget/Styling/NpsWidgetStylingConfig.ts");
+
+var _NpsWidgetStylingConfig2 = _interopRequireDefault(_NpsWidgetStylingConfig);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 exports.Cat = _cat2.default;
 exports.Dog = _dog2.default;
 exports.Welcome = _welcome2.default;
+exports.NpsWidgetConfig = _NpsWidgetConfig2.default;
+exports.NpsWidgetStylingConfig = _NpsWidgetStylingConfig2.default;
+
+/***/ }),
+
+/***/ "./src/nps-widget/NpsWidgetConfig.ts":
+/*!*******************************************!*\
+  !*** ./src/nps-widget/NpsWidgetConfig.ts ***!
+  \*******************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var NpsWidgetStylingConfig_1 = __webpack_require__(/*! ./Styling/NpsWidgetStylingConfig */ "./src/nps-widget/Styling/NpsWidgetStylingConfig.ts");
+var NpsWidgetConfig = /** @class */ (function () {
+    function NpsWidgetConfig(npsWidgetStyling) {
+        if (npsWidgetStyling == null)
+            npsWidgetStyling = new NpsWidgetStylingConfig_1.default();
+        this._styling = npsWidgetStyling;
+    }
+    Object.defineProperty(NpsWidgetConfig.prototype, "styling", {
+        get: function () {
+            return this._styling;
+        },
+        set: function (value) {
+            this._styling = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    return NpsWidgetConfig;
+}());
+exports.default = NpsWidgetConfig;
+
+
+/***/ }),
+
+/***/ "./src/nps-widget/Styling/NpsWidgetStylingConfig.ts":
+/*!**********************************************************!*\
+  !*** ./src/nps-widget/Styling/NpsWidgetStylingConfig.ts ***!
+  \**********************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var NpsWidgetStylingConfig = /** @class */ (function () {
+    function NpsWidgetStylingConfig() {
+    }
+    Object.defineProperty(NpsWidgetStylingConfig.prototype, "zindex", {
+        get: function () {
+            return this._zindex;
+        },
+        set: function (value) {
+            this._zindex = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(NpsWidgetStylingConfig.prototype, "backgroundColour", {
+        get: function () {
+            return this._backgroundColour;
+        },
+        set: function (value) {
+            this._backgroundColour = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(NpsWidgetStylingConfig.prototype, "backgroundHoverColour", {
+        get: function () {
+            return this._backgroundHoverColour;
+        },
+        set: function (value) {
+            this._backgroundHoverColour = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(NpsWidgetStylingConfig.prototype, "foregroundColour", {
+        get: function () {
+            return this._foregroundColour;
+        },
+        set: function (value) {
+            this._foregroundColour = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(NpsWidgetStylingConfig.prototype, "foregroundHoverColour", {
+        get: function () {
+            return this._foregroundHoverColour;
+        },
+        set: function (value) {
+            this._foregroundHoverColour = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(NpsWidgetStylingConfig.prototype, "top", {
+        get: function () {
+            return this._top;
+        },
+        set: function (value) {
+            this._top = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(NpsWidgetStylingConfig.prototype, "bottom", {
+        get: function () {
+            return this._bottom;
+        },
+        set: function (value) {
+            this._bottom = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(NpsWidgetStylingConfig.prototype, "left", {
+        get: function () {
+            return this._left;
+        },
+        set: function (value) {
+            this._left = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(NpsWidgetStylingConfig.prototype, "right", {
+        get: function () {
+            return this._right;
+        },
+        set: function (value) {
+            this._right = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(NpsWidgetStylingConfig.prototype, "margin", {
+        get: function () {
+            return this._margin;
+        },
+        set: function (value) {
+            this._margin = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    return NpsWidgetStylingConfig;
+}());
+exports.default = NpsWidgetStylingConfig;
+
 
 /***/ }),
 

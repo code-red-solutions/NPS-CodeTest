@@ -1,15 +1,10 @@
 <!DOCTYPE html>
-
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
+
   <meta charset="utf-8" />
   <title></title>
-
-
-
   <script type="text/javascript">
-
-    let welcome;
 
     function injectScript(src) {
       return new Promise((resolve, reject) => {
@@ -23,40 +18,45 @@
       });
     }
 
-    injectScript('https://cdnjs.cloudflare.com/ajax/libs/systemjs/0.21.3/system-production.js')
-      .then(() => {
-        console.log('SystemJS loaded!');
-        injectScript('./lib/dev/custom-elements-es5-adapter.js')
-          .then(() => {
-            console.log('custom-elements-es5-adapter loaded!');
-            injectScript('./lib/dev/webcomponents-loader.js')
-              .then(() => {
-                console.log('Webcomponents loaded!');
-                SystemJS.import('./lib/dev/codered_nps_widget.js').then(function (modules) {
-                  console.log(modules);
-                  welcome = new (modules.Welcome)('Paul');
+    function initialzeCodeRedNpsWidget(config) {
+      injectScript('https://cdnjs.cloudflare.com/ajax/libs/systemjs/0.21.3/system-production.js')
+        .then(() => {
+          console.log('SystemJS loaded!');
+          injectScript('./lib/dev/custom-elements-es5-adapter.js')
+            .then(() => {
+              console.log('custom-elements-es5-adapter loaded!');
+              injectScript('./lib/dev/webcomponents-loader.js')
+                .then(() => {
+                  console.log('Webcomponents loaded!');
+                  SystemJS.import('./lib/dev/codered_nps_widget.js').then(function (modules) {
+                    console.log(modules);
+                    // TODO: Use a document.onload event handler
+                    var i = new (modules.NpsWidget)(config);
+                    document.getElementsByTagName('body')[0].appendChild(i);
+                  }).catch(error => {
+                    console.log(error);
+                  });
                 }).catch(error => {
                   console.log(error);
                 });
-          }).catch(error => {
-            console.log(error);
-          });
+            });
+        }).catch(error => {
+          console.log(error);
         });
-      }).catch(error => {
-        console.log(error);
-      });
-
-    function clickAndChangeName(){
-      welcome.ClickMeButton();
-      welcome.usersName = welcome.usersName + '.';
-    };
+    }
   </script>
+
+  <script type="text/javascript">
+    var npsConfig = {
+      styling: {
+        backgroundColour: 'grey'
+      }
+    };
+    initialzeCodeRedNpsWidget(npsConfig);
+  </script>
+
 </head>
+
 <body>
-  <div id="divMsg"></div>
-  <br />
-  <button type="button" class="btn btn-primary btn-md" onclick="clickAndChangeName()">
-    Show Message
-  </button>
 </body>
 </html>
