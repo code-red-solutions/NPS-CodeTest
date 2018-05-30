@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="utf-8" />
+  <title></title>
+  <script type="text/javascript" src="lib/dev/codered_nps_widget.js"></script>
+  <script type="text/javascript">
+    let welcome = new (codered_nps_widget.Welcome)('Paul');
+    function clickAndChangeName() {
+      welcome.ClickMeButton();
+      welcome.usersName = welcome.usersName + '.';
+    };
+  </script>
+</head>
+<body>
+  <div id="divMsg"></div>
+  <br />
+  <button type="button" class="btn btn-primary btn-md" onclick="clickAndChangeName()">
+    Show Message
+  </button>
+
+</body>
+</html>

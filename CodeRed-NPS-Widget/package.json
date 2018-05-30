@@ -1,0 +1,53 @@
+{
+  "name": "codered_nps_widget",
+  "version": "1.0.0",
+  "description": "Produce universal library with webpack and es6",
+  "main": "lib/CodeRed-NPS-Widget.js",
+  "flat": true,
+  "scripts": {
+    "build-prod": "webpack --config conf/webpack.config.prod.js --colors",
+    "build-dev": "webpack --config conf/webpack.config.dev.js --colors",
+    "build-test:watch": "webpack --config conf/webpack.config.test.js -w --progress --colors --watch",
+    "run-tests": "webpack --config conf/webpack.config.test.js --colors && mocha --require babel-core/register --colors --recursive ./test/**/*.spec.js",
+    "run-tests:watch": "webpack --config conf/webpack.config.test.js --colors && mocha --require babel-core/register --colors -w --recursive ./test/**/*.spec.js"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.3",
+    "babel-eslint": "^8.2.3",
+    "babel-loader": "^7.1.2",
+    "babel-plugin-add-module-exports": "^0.2.1",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
+    "chai": "^4.1.2",
+    "clean-webpack-plugin": "^0.1.19",
+    "copy-webpack-plugin": "^4.5.1",
+    "eslint": "^4.19.1",
+    "eslint-loader": "^2.0.0",
+    "express": "^4.16.3",
+    "html-webpack-plugin": "^3.2.0",
+    "mocha": "^4.0.1",
+    "polymer-analyzer": "^3.0.1",
+    "polymer-webpack-loader": "^2.0.2",
+    "text-loader": "0.0.1",
+    "ts-loader": "^4.3.0",
+    "typescript": "^2.8.3",
+    "webpack": "^4.9.1",
+    "webpack-cli": "^2.1.4"
+  },
+  "dependencies": {
+    "@polymer/iron-fit-behavior": "^3.0.0-pre.19",
+    "@polymer/iron-icons": "^3.0.0-pre.19",
+    "@polymer/lit-element": "^0.5.1",
+    "@polymer/paper-fab": "^3.0.0-pre.19",
+    "@polymer/paper-styles": "^3.0.0-pre.19",
+    "@polymer/polymer": "^3.0.2",
+    "@webcomponents/webcomponentsjs": "^2.0.0",
+    "redux": "^4.0.0"
+  },
+  "-vs-binding": {
+    "AfterBuild": [
+      "build-dev"
+    ]
+  }
+}

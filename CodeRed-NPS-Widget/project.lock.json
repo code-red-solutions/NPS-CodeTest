@@ -1,0 +1,41 @@
+{
+  "version": 3,
+  "targets": {
+    ".NETFramework,Version=v4.5.1": {}
+  },
+  "libraries": {},
+  "projectFileDependencyGroups": {
+    "": [],
+    ".NETFramework,Version=v4.5.1": []
+  },
+  "packageFolders": {
+    "C:\\Users\\Admin\\.nuget\\packages\\": {}
+  },
+  "project": {
+    "version": "1.0.0",
+    "description": "foo bar Class Library",
+    "authors": [
+      "foo bar"
+    ],
+    "restore": {
+      "projectUniqueName": "D:\\Data\\Users\\Paul\\Repositories\\Git Based Repos\\CodeRed-NPS-CodeTest\\CodeRed-NPS-Widget\\CodeRed-NPS-Widget.csproj",
+      "projectName": "CodeRed-NPS-Widget",
+      "projectPath": "D:\\Data\\Users\\Paul\\Repositories\\Git Based Repos\\CodeRed-NPS-CodeTest\\CodeRed-NPS-Widget\\CodeRed-NPS-Widget.csproj",
+      "projectJsonPath": "D:\\Data\\Users\\Paul\\Repositories\\Git Based Repos\\CodeRed-NPS-CodeTest\\CodeRed-NPS-Widget\\project.json",
+      "packagesPath": "C:\\Users\\Admin\\.nuget\\packages\\",
+      "outputPath": "D:\\Data\\Users\\Paul\\Repositories\\Git Based Repos\\CodeRed-NPS-CodeTest\\CodeRed-NPS-Widget\\obj\\",
+      "projectStyle": "ProjectJson",
+      "configFilePaths": [
+        "C:\\Users\\Admin\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+      ],
+      "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "https://api.nuget.org/v3/index.json": {}
+      }
+    },
+    "frameworks": {
+      "net451": {}
+    }
+  }
+}
