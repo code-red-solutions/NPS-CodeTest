@@ -1,4 +1,4 @@
-import NpsWidgetStylingConfig from "./Styling/NpsWidgetStylingConfig";
+import NpsWidgetStylingConfig from "./NpsWidgetStylingConfig";
 
 export default class NpsWidgetConfig {
   private _styling: NpsWidgetStylingConfig;

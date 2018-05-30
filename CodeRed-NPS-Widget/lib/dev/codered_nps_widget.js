@@ -20742,20 +20742,20 @@ exports.NpsWidget = _index2.default;
 
 /***/ }),
 
-/***/ "./src/nps-widget/NpsWidgetStyling.ts":
-/*!********************************************!*\
-  !*** ./src/nps-widget/NpsWidgetStyling.ts ***!
-  \********************************************/
+/***/ "./src/nps-widget/config/NpsWidgetStylingConfig.ts":
+/*!*********************************************************!*\
+  !*** ./src/nps-widget/config/NpsWidgetStylingConfig.ts ***!
+  \*********************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var NpsWidgetStyling = /** @class */ (function () {
-    function NpsWidgetStyling() {
+var NpsWidgetStylingConfig = /** @class */ (function () {
+    function NpsWidgetStylingConfig() {
     }
-    Object.defineProperty(NpsWidgetStyling.prototype, "zindex", {
+    Object.defineProperty(NpsWidgetStylingConfig.prototype, "zindex", {
         get: function () {
             return this._zindex;
         },
@@ -20765,7 +20765,7 @@ var NpsWidgetStyling = /** @class */ (function () {
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(NpsWidgetStyling.prototype, "backgroundColour", {
+    Object.defineProperty(NpsWidgetStylingConfig.prototype, "backgroundColour", {
         get: function () {
             return this._backgroundColour;
         },
@@ -20775,7 +20775,7 @@ var NpsWidgetStyling = /** @class */ (function () {
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(NpsWidgetStyling.prototype, "backgroundHoverColour", {
+    Object.defineProperty(NpsWidgetStylingConfig.prototype, "backgroundHoverColour", {
         get: function () {
             return this._backgroundHoverColour;
         },
@@ -20785,7 +20785,7 @@ var NpsWidgetStyling = /** @class */ (function () {
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(NpsWidgetStyling.prototype, "foregroundColour", {
+    Object.defineProperty(NpsWidgetStylingConfig.prototype, "foregroundColour", {
         get: function () {
             return this._foregroundColour;
         },
@@ -20795,7 +20795,7 @@ var NpsWidgetStyling = /** @class */ (function () {
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(NpsWidgetStyling.prototype, "foregroundHoverColour", {
+    Object.defineProperty(NpsWidgetStylingConfig.prototype, "foregroundHoverColour", {
         get: function () {
             return this._foregroundHoverColour;
         },
@@ -20805,7 +20805,7 @@ var NpsWidgetStyling = /** @class */ (function () {
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(NpsWidgetStyling.prototype, "top", {
+    Object.defineProperty(NpsWidgetStylingConfig.prototype, "top", {
         get: function () {
             return this._top;
         },
@@ -20815,7 +20815,7 @@ var NpsWidgetStyling = /** @class */ (function () {
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(NpsWidgetStyling.prototype, "bottom", {
+    Object.defineProperty(NpsWidgetStylingConfig.prototype, "bottom", {
         get: function () {
             return this._bottom;
         },
@@ -20825,7 +20825,7 @@ var NpsWidgetStyling = /** @class */ (function () {
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(NpsWidgetStyling.prototype, "left", {
+    Object.defineProperty(NpsWidgetStylingConfig.prototype, "left", {
         get: function () {
             return this._left;
         },
@@ -20835,7 +20835,7 @@ var NpsWidgetStyling = /** @class */ (function () {
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(NpsWidgetStyling.prototype, "right", {
+    Object.defineProperty(NpsWidgetStylingConfig.prototype, "right", {
         get: function () {
             return this._right;
         },
@@ -20845,7 +20845,7 @@ var NpsWidgetStyling = /** @class */ (function () {
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(NpsWidgetStyling.prototype, "margin", {
+    Object.defineProperty(NpsWidgetStylingConfig.prototype, "margin", {
         get: function () {
             return this._margin;
         },
@@ -20855,9 +20855,9 @@ var NpsWidgetStyling = /** @class */ (function () {
         enumerable: true,
         configurable: true
     });
-    return NpsWidgetStyling;
+    return NpsWidgetStylingConfig;
 }());
-exports.default = NpsWidgetStyling;
+exports.default = NpsWidgetStylingConfig;
 
 
 /***/ }),
@@ -20878,7 +20878,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _templateObject = _taggedTemplateLiteral(['\n      <div>This is my chosen colour: [[_myColour]]. (Made by the app \'[[name]]\'.)</div>\n\n      <style is="custom-style">\n\n        paper-fab {\n          display: inline-block;\n          margin: var(--nps-margin, 8px);\n          z-index: var(--nps-zindex, 99);\n          position: fixed;\n          top: var(--nps-top, );\n          bottom: var(--nps-bottom, 30px);\n          left: var(--nps-left, );\n          right: var(--nps-right, 30px);\n          --paper-fab-background: var(--nps-background-color, #fc0);\n          color: var(--nps-foreground-color, black);\n        }\n\n        paper-fab:hover {\n          --paper-fab-background: var(--nps-background-hover-colour, #FFDB4C);\n          color: var(--nps-foreground-hover-colour, grey);\n        }\n\n      </style>\n\n      <paper-fab icon="icons:feedback" on-click="dosm"/>\n    '], ['\n      <div>This is my chosen colour: [[_myColour]]. (Made by the app \'[[name]]\'.)</div>\n\n      <style is="custom-style">\n\n        paper-fab {\n          display: inline-block;\n          margin: var(--nps-margin, 8px);\n          z-index: var(--nps-zindex, 99);\n          position: fixed;\n          top: var(--nps-top, );\n          bottom: var(--nps-bottom, 30px);\n          left: var(--nps-left, );\n          right: var(--nps-right, 30px);\n          --paper-fab-background: var(--nps-background-color, #fc0);\n          color: var(--nps-foreground-color, black);\n        }\n\n        paper-fab:hover {\n          --paper-fab-background: var(--nps-background-hover-colour, #FFDB4C);\n          color: var(--nps-foreground-hover-colour, grey);\n        }\n\n      </style>\n\n      <paper-fab icon="icons:feedback" on-click="dosm"/>\n    ']);
+var _templateObject = _taggedTemplateLiteral(['\n      <div>This is my chosen colour: [[_myColour]]. (Made by the app \'[[name]]\'.)</div>\n\n      <style is="custom-style">\n\n        paper-fab {\n          display: inline-block;\n          margin: var(--nps-margin, 8px);\n          z-index: var(--nps-zindex, 99);\n          position: fixed;\n          top: var(--nps-top, );\n          bottom: var(--nps-bottom, 30px);\n          left: var(--nps-left, );\n          right: var(--nps-right, 30px);\n          --paper-fab-background: var(--nps-background-color, #FFDB4C);\n          color: var(--nps-foreground-color, darkgrey);\n        }\n\n        paper-fab:hover {\n          --paper-fab-background: var(--nps-background-hover-colour, #fc0);\n          color: var(--nps-foreground-hover-colour, black);\n        }\n\n      </style>\n\n      <paper-fab icon="icons:feedback" on-click="dosm"/>\n    '], ['\n      <div>This is my chosen colour: [[_myColour]]. (Made by the app \'[[name]]\'.)</div>\n\n      <style is="custom-style">\n\n        paper-fab {\n          display: inline-block;\n          margin: var(--nps-margin, 8px);\n          z-index: var(--nps-zindex, 99);\n          position: fixed;\n          top: var(--nps-top, );\n          bottom: var(--nps-bottom, 30px);\n          left: var(--nps-left, );\n          right: var(--nps-right, 30px);\n          --paper-fab-background: var(--nps-background-color, #FFDB4C);\n          color: var(--nps-foreground-color, darkgrey);\n        }\n\n        paper-fab:hover {\n          --paper-fab-background: var(--nps-background-hover-colour, #fc0);\n          color: var(--nps-foreground-hover-colour, black);\n        }\n\n      </style>\n\n      <paper-fab icon="icons:feedback" on-click="dosm"/>\n    ']);
 
 var _polymerElement = __webpack_require__(/*! @polymer/polymer/polymer-element.js */ "./node_modules/@polymer/polymer/polymer-element.js");
 
@@ -20888,9 +20888,9 @@ __webpack_require__(/*! @polymer/iron-icons/iron-icons.js */ "./node_modules/@po
 
 __webpack_require__(/*! @polymer/paper-styles/color.js */ "./node_modules/@polymer/paper-styles/color.js");
 
-var _NpsWidgetStyling = __webpack_require__(/*! ./NpsWidgetStyling.ts */ "./src/nps-widget/NpsWidgetStyling.ts");
+var _NpsWidgetStylingConfig = __webpack_require__(/*! ./config/NpsWidgetStylingConfig.ts */ "./src/nps-widget/config/NpsWidgetStylingConfig.ts");
 
-var _NpsWidgetStyling2 = _interopRequireDefault(_NpsWidgetStyling);
+var _NpsWidgetStylingConfig2 = _interopRequireDefault(_NpsWidgetStylingConfig);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -20921,7 +20921,7 @@ var NpsWidget = function (_PolymerElement) {
 
     _this.name = 'Polymer 3.0 test';
 
-    _this._styling = new _NpsWidgetStyling2.default();
+    _this._styling = new _NpsWidgetStylingConfig2.default();
     // create extra variable as HTML literal below can't hande properties of properties
     _this._myColour = _this.styling.backgroundColour = config.styling.backgroundColour;
 

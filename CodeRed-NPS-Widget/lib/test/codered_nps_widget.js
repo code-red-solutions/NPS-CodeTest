@@ -186,11 +186,11 @@ var _welcome = __webpack_require__(/*! ./welcome.ts */ "./src/welcome.ts");
 
 var _welcome2 = _interopRequireDefault(_welcome);
 
-var _NpsWidgetConfig = __webpack_require__(/*! ./nps-widget/NpsWidgetConfig */ "./src/nps-widget/NpsWidgetConfig.ts");
+var _NpsWidgetConfig = __webpack_require__(/*! ./nps-widget/config/NpsWidgetConfig */ "./src/nps-widget/config/NpsWidgetConfig.ts");
 
 var _NpsWidgetConfig2 = _interopRequireDefault(_NpsWidgetConfig);
 
-var _NpsWidgetStylingConfig = __webpack_require__(/*! ./nps-widget/Styling/NpsWidgetStylingConfig */ "./src/nps-widget/Styling/NpsWidgetStylingConfig.ts");
+var _NpsWidgetStylingConfig = __webpack_require__(/*! ./nps-widget/config/NpsWidgetStylingConfig */ "./src/nps-widget/config/NpsWidgetStylingConfig.ts");
 
 var _NpsWidgetStylingConfig2 = _interopRequireDefault(_NpsWidgetStylingConfig);
 
@@ -204,17 +204,17 @@ exports.NpsWidgetStylingConfig = _NpsWidgetStylingConfig2.default;
 
 /***/ }),
 
-/***/ "./src/nps-widget/NpsWidgetConfig.ts":
-/*!*******************************************!*\
-  !*** ./src/nps-widget/NpsWidgetConfig.ts ***!
-  \*******************************************/
+/***/ "./src/nps-widget/config/NpsWidgetConfig.ts":
+/*!**************************************************!*\
+  !*** ./src/nps-widget/config/NpsWidgetConfig.ts ***!
+  \**************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var NpsWidgetStylingConfig_1 = __webpack_require__(/*! ./Styling/NpsWidgetStylingConfig */ "./src/nps-widget/Styling/NpsWidgetStylingConfig.ts");
+var NpsWidgetStylingConfig_1 = __webpack_require__(/*! ./NpsWidgetStylingConfig */ "./src/nps-widget/config/NpsWidgetStylingConfig.ts");
 var NpsWidgetConfig = /** @class */ (function () {
     function NpsWidgetConfig(npsWidgetStyling) {
         if (npsWidgetStyling == null)
@@ -238,10 +238,10 @@ exports.default = NpsWidgetConfig;
 
 /***/ }),
 
-/***/ "./src/nps-widget/Styling/NpsWidgetStylingConfig.ts":
-/*!**********************************************************!*\
-  !*** ./src/nps-widget/Styling/NpsWidgetStylingConfig.ts ***!
-  \**********************************************************/
+/***/ "./src/nps-widget/config/NpsWidgetStylingConfig.ts":
+/*!*********************************************************!*\
+  !*** ./src/nps-widget/config/NpsWidgetStylingConfig.ts ***!
+  \*********************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 

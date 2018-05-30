@@ -3,7 +3,7 @@ import '@polymer/paper-fab/paper-fab.js';
 import '@polymer/iron-icons/iron-icons.js';
 import '@polymer/paper-styles/color.js';
 // import NpsWidgetProperties from './NpsWidgetProperties.ts';
-import NpsWidgetStylingConfig from './Styling/NpsWidgetStylingConfig.ts';
+import NpsWidgetStylingConfig from './config/NpsWidgetStylingConfig.ts';
 
 export default class NpsWidget extends PolymerElement {
 
