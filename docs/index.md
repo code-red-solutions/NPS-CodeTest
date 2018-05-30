@@ -1,15 +1,27 @@
-## Welcome to GitHub Pages
+## Welcome to the Code Red NPS Widget
 
-You can use the [editor on GitHub](https://github.com/code-red-solutions/NPS-CodeTest/edit/master/docs/index.md) to maintain and preview the content for your website in Markdown files.
-
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
-
-### Markdown
-
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
-
+Something happened here and it looked like this:
 ```markdown
-Syntax highlighted code block
+import NpsWidgetStylingConfig from "./NpsWidgetStylingConfig";
+
+export default class NpsWidgetConfig {
+  private _styling: NpsWidgetStylingConfig;
+
+  constructor(npsWidgetStyling: NpsWidgetStylingConfig) {
+    if (npsWidgetStyling == null) npsWidgetStyling = new NpsWidgetStylingConfig();
+    this._styling = npsWidgetStyling
+  }
+
+  get styling(): NpsWidgetStylingConfig {
+    return this._styling;
+  }
+
+  set styling(value: NpsWidgetStylingConfig) {
+    this._styling = value;
+  }
+
+}
+```
 
 # Header 1
 ## Header 2
@@ -21,10 +33,9 @@ Syntax highlighted code block
 1. Numbered
 2. List
 
-**Bold** and _Italic_ and `Code` text
+**Bold** and _Italic_ 
 
 [Link](url) and ![Image](src)
-```
 
 For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
 
