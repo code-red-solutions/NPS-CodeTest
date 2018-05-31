@@ -22,7 +22,9 @@ export default class NpsWidgetConfig {
 
 }
 ```
+
 Then there's code blocks like this:
+
 ```markdown
 # Header 1
 ## Header 2
@@ -34,7 +36,7 @@ Then there's code blocks like this:
 1. Numbered
 2. List
 
-**Bold** and _Italic_ 
+**Bold** and _Italic_
 
 [Link](url) and ![Image](src)
 ```
@@ -42,7 +44,8 @@ Then there's code blocks like this:
 For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
 
 ### Testing out raw HTML
-{% <div>test</div> %} 
+
+{% include test.html %}
 
 ### Jekyll Themes
 
