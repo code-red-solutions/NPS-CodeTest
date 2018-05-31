@@ -1,6 +1,9 @@
-## Welcome to the Code Red NPS Widget
+# Welcome to the NPS Widget
+
+## What's going on here
 
 Something happened here and it looked like this:
+
 ```markdown
 import NpsWidgetStylingConfig from "./NpsWidgetStylingConfig";
 
