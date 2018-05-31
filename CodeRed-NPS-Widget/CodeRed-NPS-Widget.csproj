@@ -130,7 +130,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <TypeScriptCompile Include="services\styleDefinitionsMapper.ts" />
+    <TypeScriptCompile Include="src\nps-widget\services\styleDefinitionsMapper.ts" />
     <TypeScriptCompile Include="src\nps-widget\config\NpsWidgetConfig.ts" />
     <TypeScriptCompile Include="src\nps-widget\config\NpsWidgetStylingConfig.ts" />
     <TypeScriptCompile Include="src\nps-widget\index.ts" />
@@ -140,7 +140,7 @@
     <TypeScriptCompile Include="src\nps-widget\store\styling\actions.ts" />
     <TypeScriptCompile Include="src\nps-widget\store\styling\reducer.ts" />
     <TypeScriptCompile Include="src\welcome.ts" />
-    <TypeScriptCompile Include="utils\Dictionary.ts" />
+    <TypeScriptCompile Include="src\utils\Dictionary.ts" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />
