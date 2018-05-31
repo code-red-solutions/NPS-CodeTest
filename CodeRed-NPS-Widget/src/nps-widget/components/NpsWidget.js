@@ -3,7 +3,7 @@ import '@polymer/paper-fab/paper-fab.js';
 import '@polymer/iron-icons/iron-icons.js';
 import '@polymer/paper-styles/color.js';
 // import NpsWidgetProperties from './NpsWidgetProperties.ts';
-import NpsWidgetStylingConfig from './config/NpsWidgetStylingConfig.ts';
+import NpsWidgetStylingConfig from '../config/NpsWidgetStylingConfig.ts';
 
 export default class NpsWidget extends PolymerElement {
 
@@ -14,11 +14,9 @@ export default class NpsWidget extends PolymerElement {
     this.name = 'Polymer 3.0 test';
 
     this._styling = new NpsWidgetStylingConfig();
-    // create extra variable as HTML literal below can't hande properties of properties
-    this._myColour = this.styling.backgroundColour = config.styling.backgroundColour;
-
-    this.updateStyles({ '--nps-background-color': (this.styling.backgroundColour || '') });
-    console.log('loaded nps-widget');
+    this.styling.backgroundColour = config.styling.backgroundColour;
+    this.render();
+    console.log(this.styling['backgroundColour']);
   }
 
   get styling() {
@@ -30,13 +28,11 @@ export default class NpsWidget extends PolymerElement {
   }
 
   render() {
-    this.updateStyles({ '--smth': this.styling.backgroundColour });
+    this.updateStyles({ '--nps-background-color': this.styling.backgroundColour });
   }
 
   static get template() {
     return html`
-      <div>This is my chosen colour: [[_myColour]]. (Made by the app '[[name]]'.)</div>
-
       <style is="custom-style">
 
         paper-fab {

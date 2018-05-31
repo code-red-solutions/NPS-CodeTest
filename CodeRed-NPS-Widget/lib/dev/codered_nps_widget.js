@@ -20729,7 +20729,7 @@ var _welcome = __webpack_require__(/*! ./welcome.ts */ "./src/welcome.ts");
 
 var _welcome2 = _interopRequireDefault(_welcome);
 
-var _index = __webpack_require__(/*! ./nps-widget/index.js */ "./src/nps-widget/index.js");
+var _index = __webpack_require__(/*! ./nps-widget/index.ts */ "./src/nps-widget/index.ts");
 
 var _index2 = _interopRequireDefault(_index);
 
@@ -20739,6 +20739,107 @@ exports.Cat = _cat2.default;
 exports.Dog = _dog2.default;
 exports.Welcome = _welcome2.default;
 exports.NpsWidget = _index2.default;
+
+/***/ }),
+
+/***/ "./src/nps-widget/components/NpsWidget.js":
+/*!************************************************!*\
+  !*** ./src/nps-widget/components/NpsWidget.js ***!
+  \************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _templateObject = _taggedTemplateLiteral(['\n      <style is="custom-style">\n\n        paper-fab {\n          display: inline-block;\n          margin: var(--nps-margin, 8px);\n          z-index: var(--nps-zindex, 99);\n          position: fixed;\n          top: var(--nps-top, );\n          bottom: var(--nps-bottom, 30px);\n          left: var(--nps-left, );\n          right: var(--nps-right, 30px);\n          --paper-fab-background: var(--nps-background-color, #FFDB4C);\n          color: var(--nps-foreground-color, darkgrey);\n        }\n\n        paper-fab:hover {\n          --paper-fab-background: var(--nps-background-hover-colour, #fc0);\n          color: var(--nps-foreground-hover-colour, black);\n        }\n\n      </style>\n\n      <paper-fab icon="icons:feedback" on-click="dosm"/>\n    '], ['\n      <style is="custom-style">\n\n        paper-fab {\n          display: inline-block;\n          margin: var(--nps-margin, 8px);\n          z-index: var(--nps-zindex, 99);\n          position: fixed;\n          top: var(--nps-top, );\n          bottom: var(--nps-bottom, 30px);\n          left: var(--nps-left, );\n          right: var(--nps-right, 30px);\n          --paper-fab-background: var(--nps-background-color, #FFDB4C);\n          color: var(--nps-foreground-color, darkgrey);\n        }\n\n        paper-fab:hover {\n          --paper-fab-background: var(--nps-background-hover-colour, #fc0);\n          color: var(--nps-foreground-hover-colour, black);\n        }\n\n      </style>\n\n      <paper-fab icon="icons:feedback" on-click="dosm"/>\n    ']);
+
+var _polymerElement = __webpack_require__(/*! @polymer/polymer/polymer-element.js */ "./node_modules/@polymer/polymer/polymer-element.js");
+
+__webpack_require__(/*! @polymer/paper-fab/paper-fab.js */ "./node_modules/@polymer/paper-fab/paper-fab.js");
+
+__webpack_require__(/*! @polymer/iron-icons/iron-icons.js */ "./node_modules/@polymer/iron-icons/iron-icons.js");
+
+__webpack_require__(/*! @polymer/paper-styles/color.js */ "./node_modules/@polymer/paper-styles/color.js");
+
+var _NpsWidgetStylingConfig = __webpack_require__(/*! ../config/NpsWidgetStylingConfig.ts */ "./src/nps-widget/config/NpsWidgetStylingConfig.ts");
+
+var _NpsWidgetStylingConfig2 = _interopRequireDefault(_NpsWidgetStylingConfig);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _taggedTemplateLiteral(strings, raw) { return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+// import NpsWidgetProperties from './NpsWidgetProperties.ts';
+
+
+var NpsWidget = function (_PolymerElement) {
+  _inherits(NpsWidget, _PolymerElement);
+
+  _createClass(NpsWidget, null, [{
+    key: 'is',
+    get: function get() {
+      return 'nps-widget';
+    }
+  }]);
+
+  function NpsWidget(config) {
+    _classCallCheck(this, NpsWidget);
+
+    var _this = _possibleConstructorReturn(this, (NpsWidget.__proto__ || Object.getPrototypeOf(NpsWidget)).call(this));
+
+    _this.name = 'Polymer 3.0 test';
+
+    _this._styling = new _NpsWidgetStylingConfig2.default();
+    _this.styling.backgroundColour = config.styling.backgroundColour;
+    _this.render();
+    console.log(_this.styling['backgroundColour']);
+    return _this;
+  }
+
+  _createClass(NpsWidget, [{
+    key: 'render',
+    value: function render() {
+      this.updateStyles({ '--nps-background-color': this.styling.backgroundColour });
+    }
+  }, {
+    key: 'dosm',
+    value: function dosm() {
+      console.log('dosm clicked');
+    }
+  }, {
+    key: 'styling',
+    get: function get() {
+      return this._styling;
+    },
+    set: function set(value) {
+      this._styling = value;
+    }
+  }], [{
+    key: 'template',
+    get: function get() {
+      return (0, _polymerElement.html)(_templateObject);
+    }
+  }]);
+
+  return NpsWidget;
+}(_polymerElement.PolymerElement);
+
+exports.default = NpsWidget;
+
+
+window.customElements.define(NpsWidget.is, NpsWidget);
 
 /***/ }),
 
@@ -20862,106 +20963,19 @@ exports.default = NpsWidgetStylingConfig;
 
 /***/ }),
 
-/***/ "./src/nps-widget/index.js":
+/***/ "./src/nps-widget/index.ts":
 /*!*********************************!*\
-  !*** ./src/nps-widget/index.js ***!
+  !*** ./src/nps-widget/index.ts ***!
   \*********************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
+Object.defineProperty(exports, "__esModule", { value: true });
+var NpsWidget_1 = __webpack_require__(/*! ./components/NpsWidget */ "./src/nps-widget/components/NpsWidget.js");
+exports.default = NpsWidget_1.default;
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _templateObject = _taggedTemplateLiteral(['\n      <div>This is my chosen colour: [[_myColour]]. (Made by the app \'[[name]]\'.)</div>\n\n      <style is="custom-style">\n\n        paper-fab {\n          display: inline-block;\n          margin: var(--nps-margin, 8px);\n          z-index: var(--nps-zindex, 99);\n          position: fixed;\n          top: var(--nps-top, );\n          bottom: var(--nps-bottom, 30px);\n          left: var(--nps-left, );\n          right: var(--nps-right, 30px);\n          --paper-fab-background: var(--nps-background-color, #FFDB4C);\n          color: var(--nps-foreground-color, darkgrey);\n        }\n\n        paper-fab:hover {\n          --paper-fab-background: var(--nps-background-hover-colour, #fc0);\n          color: var(--nps-foreground-hover-colour, black);\n        }\n\n      </style>\n\n      <paper-fab icon="icons:feedback" on-click="dosm"/>\n    '], ['\n      <div>This is my chosen colour: [[_myColour]]. (Made by the app \'[[name]]\'.)</div>\n\n      <style is="custom-style">\n\n        paper-fab {\n          display: inline-block;\n          margin: var(--nps-margin, 8px);\n          z-index: var(--nps-zindex, 99);\n          position: fixed;\n          top: var(--nps-top, );\n          bottom: var(--nps-bottom, 30px);\n          left: var(--nps-left, );\n          right: var(--nps-right, 30px);\n          --paper-fab-background: var(--nps-background-color, #FFDB4C);\n          color: var(--nps-foreground-color, darkgrey);\n        }\n\n        paper-fab:hover {\n          --paper-fab-background: var(--nps-background-hover-colour, #fc0);\n          color: var(--nps-foreground-hover-colour, black);\n        }\n\n      </style>\n\n      <paper-fab icon="icons:feedback" on-click="dosm"/>\n    ']);
-
-var _polymerElement = __webpack_require__(/*! @polymer/polymer/polymer-element.js */ "./node_modules/@polymer/polymer/polymer-element.js");
-
-__webpack_require__(/*! @polymer/paper-fab/paper-fab.js */ "./node_modules/@polymer/paper-fab/paper-fab.js");
-
-__webpack_require__(/*! @polymer/iron-icons/iron-icons.js */ "./node_modules/@polymer/iron-icons/iron-icons.js");
-
-__webpack_require__(/*! @polymer/paper-styles/color.js */ "./node_modules/@polymer/paper-styles/color.js");
-
-var _NpsWidgetStylingConfig = __webpack_require__(/*! ./config/NpsWidgetStylingConfig.ts */ "./src/nps-widget/config/NpsWidgetStylingConfig.ts");
-
-var _NpsWidgetStylingConfig2 = _interopRequireDefault(_NpsWidgetStylingConfig);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _taggedTemplateLiteral(strings, raw) { return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-// import NpsWidgetProperties from './NpsWidgetProperties.ts';
-
-
-var NpsWidget = function (_PolymerElement) {
-  _inherits(NpsWidget, _PolymerElement);
-
-  _createClass(NpsWidget, null, [{
-    key: 'is',
-    get: function get() {
-      return 'nps-widget';
-    }
-  }]);
-
-  function NpsWidget(config) {
-    _classCallCheck(this, NpsWidget);
-
-    var _this = _possibleConstructorReturn(this, (NpsWidget.__proto__ || Object.getPrototypeOf(NpsWidget)).call(this));
-
-    _this.name = 'Polymer 3.0 test';
-
-    _this._styling = new _NpsWidgetStylingConfig2.default();
-    // create extra variable as HTML literal below can't hande properties of properties
-    _this._myColour = _this.styling.backgroundColour = config.styling.backgroundColour;
-
-    _this.updateStyles({ '--nps-background-color': _this.styling.backgroundColour || '' });
-    console.log('loaded nps-widget');
-    return _this;
-  }
-
-  _createClass(NpsWidget, [{
-    key: 'render',
-    value: function render() {
-      this.updateStyles({ '--smth': this.styling.backgroundColour });
-    }
-  }, {
-    key: 'dosm',
-    value: function dosm() {
-      console.log('dosm clicked');
-    }
-  }, {
-    key: 'styling',
-    get: function get() {
-      return this._styling;
-    },
-    set: function set(value) {
-      this._styling = value;
-    }
-  }], [{
-    key: 'template',
-    get: function get() {
-      return (0, _polymerElement.html)(_templateObject);
-    }
-  }]);
-
-  return NpsWidget;
-}(_polymerElement.PolymerElement);
-
-exports.default = NpsWidget;
-
-
-window.customElements.define(NpsWidget.is, NpsWidget);
 
 /***/ }),
 
