@@ -15,9 +15,7 @@
     }
 
     function initialzeCodeRedNpsWidget(config) {
-      injectScript('./lib/dev/custom-elements-es5-adapter.js')
-        .then(() => {
-          console.log('custom-elements-es5-adapter loaded!');
+
           injectScript('./lib/dev/webcomponents-loader.js')
             .then(() => {
               console.log('Webcomponents loaded!');
@@ -27,16 +25,19 @@
                   // TODO: Use a document.onload event handler
                   var i = new (codered_nps_widget.NpsWidget)(config);
                   document.getElementsByTagName('body')[0].appendChild(i);
-                  welcome = new (codered_nps_widget.Welcome)('Paul');
                 }).catch(error => {
                   console.log(error);
-                });
+              });
             }).catch(error => {
               console.log(error);
             });
-        }).catch(error => {
-          console.log(error);
-        });
+
+        // injectScript('./lib/dev/custom-elements-es5-adapter.js')
+        // .then(() => {
+        //   console.log('custom-elements-es5-adapter loaded!');
+        // }).catch(error => {
+        //   console.log(error);
+        // });
     }
 
   </script>
@@ -49,8 +50,8 @@
         foregroundHoverColour: 'grey', 
         backgroundColour: '#1C7ACC',
         foregroundColour: 'white', 
-        bottom: '20px', 
-        right: '20px', 
+        // bottom: '20px', 
+        // right: '20px', 
         margin: '0px' 
       } 
     };
