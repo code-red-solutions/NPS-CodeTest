@@ -78,6 +78,11 @@ const config = {
       },
       {
         from: path.resolve(__dirname, '../node_modules/@webcomponents/webcomponentsjs/custom-elements-es5-adapter.js')
+      },
+      {
+        from: path.resolve(__dirname, '../node_modules/@webcomponents/webcomponentsjs/bundles/*'),
+        to: path.resolve(__dirname, '../lib/dev/bundles/'),
+        flatten: true
       }
     ])
   ]
