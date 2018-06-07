@@ -19,40 +19,70 @@
     }
 
     function initialzeCodeRedNpsWidget(config) {
-      injectScript('https://cdnjs.cloudflare.com/ajax/libs/systemjs/0.21.3/system-production.js')
+      injectScript('./lib/dev/system-production.0.21.3.js')
         .then(() => {
           console.log('SystemJS loaded!');
           injectScript('./lib/dev/custom-elements-es5-adapter.js')
             .then(() => {
-              console.log('custom-elements-es5-adapter loaded!');
+              console.log('Script \'custom-elements-es5-adapter.js\' loaded.');
               injectScript('./lib/dev/webcomponents-loader.js')
                 .then(() => {
-                  console.log('Webcomponents loaded!');
-                  SystemJS.import('./lib/dev/codered_nps_widget.js').then(function (modules) {
-                    console.log(modules);
-                    // TODO: Use a document.onload event handler
-                    var i = new (modules.NpsWidget)(config);
-                    document.getElementsByTagName('body')[0].appendChild(i);
-                  }).catch(error => {
-                    console.log(error);
+                  console.log('Script \'webcomponents-loader.js\' loaded.');
+                  document.addEventListener('WebComponentsReady', function (e) {
+                    console.log('Event WebComponentsReady fired.');
+                    SystemJS.import('./lib/dev/codered_nps_widget.js').then(function (modules) {
+                      var i = new (modules.NpsWidget)(config);
+                      document.getElementsByTagName('body')[0].appendChild(i);
+                      i.render();
+                    }).catch(error => {
+                      console.log(error);
+                    });
                   });
                 }).catch(error => {
                   console.log(error);
                 });
+            }).catch(error => {
+              console.log(error);
             });
         }).catch(error => {
           console.log(error);
         });
+
     }
+
   </script>
 
   <script type="text/javascript">
+
+    /*
+
+    Possible values are:
+      zindex
+      backgroundColour
+      backgroundHoverColour
+      foregroundColour
+      foregroundHoverColour
+      top
+      bottom
+      left
+      right
+      margin
+
+    */
+
     var npsConfig = {
       styling: {
-        backgroundColour: 'grey'
+        backgroundHoverColour: 'pink',
+        foregroundHoverColour: 'blue',
+        backgroundColour: 'blue',
+        foregroundColour: 'pink',
+        bottom: '20px',
+        left: '20px',
+        margin: '0px'
       }
     };
     initialzeCodeRedNpsWidget(npsConfig);
+
   </script>
 
 </head>

@@ -71,7 +71,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="indexBundleViaDocumentCreateElement.html" />
-    <None Include="indexBundleViaScriptTag.html" />
     <None Include="indexDirectTSDebugging.html" />
     <Content Include="conf\webpack.config.test.js" />
     <Content Include="conf\webpack.config.dev.js" />

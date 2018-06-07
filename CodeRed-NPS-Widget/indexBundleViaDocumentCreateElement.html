@@ -19,23 +19,27 @@
       });
     }
 
+
+
     function initialzeCodeRedNpsWidget(config) {
       injectScript('./lib/dev/custom-elements-es5-adapter.js')
         .then(() => {
-          console.log('custom-elements-es5-adapter loaded!');
+          console.log('Script \'custom-elements-es5-adapter.js\' loaded.');
           injectScript('./lib/dev/webcomponents-loader.js')
             .then(() => {
-              console.log('Webcomponents loaded!');
-              injectScript('./lib/dev/codered_nps_widget.js')
-                .then(() => {
-                  console.log('Script loaded!');
-                  // TODO: Use a document.onload event handler
-                  var i = new (codered_nps_widget.NpsWidget)(config);
-                  document.getElementsByTagName('body')[0].appendChild(i);
-                  welcome = new (codered_nps_widget.Welcome)('Paul');
-                }).catch(error => {
-                  console.log(error);
-                });
+              console.log('Script \'webcomponents-loader.js\' loaded.');
+              document.addEventListener('WebComponentsReady', function (e) {
+                console.log('Event WebComponentsReady fired.');
+                injectScript('./lib/dev/codered_nps_widget.js')
+                  .then(() => {
+                    console.log('Script \'codered_nps_widget.js\' loaded.');
+                    var i = new (codered_nps_widget.NpsWidget)(config);
+                    document.getElementsByTagName('body')[0].appendChild(i);
+                    i.render();
+                  }).catch(error => {
+                    console.log(error);
+                  });
+              });
             }).catch(error => {
               console.log(error);
             });
@@ -66,12 +70,12 @@
 
     var npsConfig = {
       styling: {
-        backgroundHoverColour: 'blue',
-        foregroundHoverColour: 'white',
-        backgroundColour: 'darkblue',
-        foregroundColour: 'gray',
+        backgroundHoverColour: 'pink',
+        foregroundHoverColour: 'blue',
+        backgroundColour: 'blue',
+        foregroundColour: 'pink',
         bottom: '20px',
-        right: '20px',
+        left: '20px',
         margin: '0px'
       }
     };

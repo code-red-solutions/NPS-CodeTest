@@ -3,7 +3,7 @@ import '@polymer/paper-fab/paper-fab.js';
 import '@polymer/iron-icons/iron-icons.js';
 import '@polymer/paper-styles/color.js';
 // import NpsWidgetProperties from './NpsWidgetProperties.ts';
-// import NpsWidgetStylingConfig from '../config/NpsWidgetStylingConfig.ts';
+import NpsWidgetStylingConfig from '../config/NpsWidgetStylingConfig.ts';
 import StyleDefinitionsMapper from '../services/styleDefinitionsMapper.ts';
 
 export default class NpsWidget extends PolymerElement {
@@ -16,7 +16,7 @@ export default class NpsWidget extends PolymerElement {
 
     this.name = 'Polymer 3.0 test';
 
-    this._StyleDefinitionsMapper = new StyleDefinitionsMapper();
+    // this._StyleDefinitionsMapper = new StyleDefinitionsMapper();
 
     if (config.styling.left && config.styling.right) {
       config.styling.left = '';
@@ -35,25 +35,35 @@ export default class NpsWidget extends PolymerElement {
     }
 
     /* eslint-disable */
-    for (var i = 0; i < Object.getOwnPropertyNames(config.styling).length; i++) {
+    //for (var i = 0; i < Object.getOwnPropertyNames(config.styling).length; i++) {
 
-      let key = Object.getOwnPropertyNames(config.styling)[i];
-      let variableName = this._StyleDefinitionsMapper.Definitions.get(key);
+    //  let key = Object.getOwnPropertyNames(config.styling)[i];
+    //  let variableName = this._StyleDefinitionsMapper.Definitions.get(key);
 
-      if (variableName) {
-        let value = config.styling[key];
-        let jsonVariable = {};
+    //  if (variableName) {
+    //    let value = config.styling[key];
+    //    let jsonVariable = {};
 
-        jsonVariable[variableName] = value;
-        this.updateStyles(jsonVariable);
-      }
-
-    }
+    //    jsonVariable[variableName] = value;
+    //     console.log('Called "this.updateStyles(\'' + variableName + '\': \'' + value + '\')"');
+    //    this.updateStyles(jsonVariable);
+    //  }
+    //  console.log('Calling update styles()');
+    //  this.updateStyles();
+    //}
     /* eslint-enable */
 
-    // this._styling = new NpsWidgetStylingConfig();
-    // this.styling.backgroundColour = config.styling.backgroundColour;
+    this._config = config;
+    this._styling = new NpsWidgetStylingConfig();
+    this.styling.backgroundColour = config.styling.backgroundColour;
 
+  }
+
+  get properties() {
+    var x;
+
+    x.styling = this.styling;
+    return x;
   }
 
   get styling() {
@@ -65,23 +75,44 @@ export default class NpsWidget extends PolymerElement {
   }
 
   render() {
-    this.updateStyles({ '--nps-background-color': this.styling.backgroundColour });
+    /* eslint-disable */
+    this._StyleDefinitionsMapper = new StyleDefinitionsMapper();
+
+    for (var i = 0; i < Object.getOwnPropertyNames(this._config.styling).length; i++) {
+
+      let key = Object.getOwnPropertyNames(this._config.styling)[i];
+      let variableName = this._StyleDefinitionsMapper.Definitions.get(key);
+
+      if (variableName) {
+        let value = this._config.styling[key];
+        let jsonVariable = {};
+
+        jsonVariable[variableName] = value;
+         console.log('Called "this.updateStyles(\'' + variableName + '\': \'' + value + '\')"');
+        this.updateStyles(jsonVariable);
+      }
+      console.log('Calling update styles()');
+      this.updateStyles();
+    }
+    /* eslint-enable */
   }
 
   static get template() {
     return html`
+      <dom-module>
+<custom-style>
       <style is="custom-style">
 
         paper-fab {
           display: inline-block;
-          margin: var(--nps-margin, 8px);
+          margin: var(--nps-margin, );
           z-index: var(--nps-zindex, 99);
           position: fixed;
           top: var(--nps-top);
-          bottom: var(--nps-bottom);
+          bottom: var(--nps-bottom, 10px);
           left: var(--nps-left);
-          right: var(--nps-right);
-          --paper-fab-background: var(--nps-background-color, #FFDB4C);
+          right: var(--nps-right, 10px);
+          --paper-fab-background: var(--nps-background-color);
           color: var(--nps-foreground-color, darkgrey);
         }
 
@@ -91,8 +122,9 @@ export default class NpsWidget extends PolymerElement {
         }
 
       </style>
-
+</custom-style>
       <paper-fab icon="icons:feedback" on-click="dosm"/>
+      </dom-module>
     `;
   }
 

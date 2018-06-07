@@ -20758,7 +20758,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _templateObject = _taggedTemplateLiteral(['\n      <style is="custom-style">\n\n        paper-fab {\n          display: inline-block;\n          margin: var(--nps-margin, 8px);\n          z-index: var(--nps-zindex, 99);\n          position: fixed;\n          top: var(--nps-top);\n          bottom: var(--nps-bottom);\n          left: var(--nps-left);\n          right: var(--nps-right);\n          --paper-fab-background: var(--nps-background-color, #FFDB4C);\n          color: var(--nps-foreground-color, darkgrey);\n        }\n\n        paper-fab:hover {\n          --paper-fab-background: var(--nps-background-hover-colour, #fc0);\n          color: var(--nps-foreground-hover-colour, black);\n        }\n\n      </style>\n\n      <paper-fab icon="icons:feedback" on-click="dosm"/>\n    '], ['\n      <style is="custom-style">\n\n        paper-fab {\n          display: inline-block;\n          margin: var(--nps-margin, 8px);\n          z-index: var(--nps-zindex, 99);\n          position: fixed;\n          top: var(--nps-top);\n          bottom: var(--nps-bottom);\n          left: var(--nps-left);\n          right: var(--nps-right);\n          --paper-fab-background: var(--nps-background-color, #FFDB4C);\n          color: var(--nps-foreground-color, darkgrey);\n        }\n\n        paper-fab:hover {\n          --paper-fab-background: var(--nps-background-hover-colour, #fc0);\n          color: var(--nps-foreground-hover-colour, black);\n        }\n\n      </style>\n\n      <paper-fab icon="icons:feedback" on-click="dosm"/>\n    ']);
+var _templateObject = _taggedTemplateLiteral(['\n      <dom-module>\n<custom-style>\n      <style is="custom-style">\n\n        paper-fab {\n          display: inline-block;\n          margin: var(--nps-margin, );\n          z-index: var(--nps-zindex, 99);\n          position: fixed;\n          top: var(--nps-top);\n          bottom: var(--nps-bottom, 10px);\n          left: var(--nps-left);\n          right: var(--nps-right, 10px);\n          --paper-fab-background: var(--nps-background-color);\n          color: var(--nps-foreground-color, darkgrey);\n        }\n\n        paper-fab:hover {\n          --paper-fab-background: var(--nps-background-hover-colour, #fc0);\n          color: var(--nps-foreground-hover-colour, black);\n        }\n\n      </style>\n</custom-style>\n      <paper-fab icon="icons:feedback" on-click="dosm"/>\n      </dom-module>\n    '], ['\n      <dom-module>\n<custom-style>\n      <style is="custom-style">\n\n        paper-fab {\n          display: inline-block;\n          margin: var(--nps-margin, );\n          z-index: var(--nps-zindex, 99);\n          position: fixed;\n          top: var(--nps-top);\n          bottom: var(--nps-bottom, 10px);\n          left: var(--nps-left);\n          right: var(--nps-right, 10px);\n          --paper-fab-background: var(--nps-background-color);\n          color: var(--nps-foreground-color, darkgrey);\n        }\n\n        paper-fab:hover {\n          --paper-fab-background: var(--nps-background-hover-colour, #fc0);\n          color: var(--nps-foreground-hover-colour, black);\n        }\n\n      </style>\n</custom-style>\n      <paper-fab icon="icons:feedback" on-click="dosm"/>\n      </dom-module>\n    ']);
 
 var _polymerElement = __webpack_require__(/*! @polymer/polymer/polymer-element.js */ "./node_modules/@polymer/polymer/polymer-element.js");
 
@@ -20767,6 +20767,10 @@ __webpack_require__(/*! @polymer/paper-fab/paper-fab.js */ "./node_modules/@poly
 __webpack_require__(/*! @polymer/iron-icons/iron-icons.js */ "./node_modules/@polymer/iron-icons/iron-icons.js");
 
 __webpack_require__(/*! @polymer/paper-styles/color.js */ "./node_modules/@polymer/paper-styles/color.js");
+
+var _NpsWidgetStylingConfig = __webpack_require__(/*! ../config/NpsWidgetStylingConfig.ts */ "./src/nps-widget/config/NpsWidgetStylingConfig.ts");
+
+var _NpsWidgetStylingConfig2 = _interopRequireDefault(_NpsWidgetStylingConfig);
 
 var _styleDefinitionsMapper = __webpack_require__(/*! ../services/styleDefinitionsMapper.ts */ "./src/nps-widget/services/styleDefinitionsMapper.ts");
 
@@ -20782,7 +20786,6 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 // import NpsWidgetProperties from './NpsWidgetProperties.ts';
-// import NpsWidgetStylingConfig from '../config/NpsWidgetStylingConfig.ts';
 
 
 var NpsWidget = function (_PolymerElement) {
@@ -20802,7 +20805,7 @@ var NpsWidget = function (_PolymerElement) {
 
     _this.name = 'Polymer 3.0 test';
 
-    _this._StyleDefinitionsMapper = new _styleDefinitionsMapper2.default();
+    // this._StyleDefinitionsMapper = new StyleDefinitionsMapper();
 
     if (config.styling.left && config.styling.right) {
       config.styling.left = '';
@@ -20821,23 +20824,27 @@ var NpsWidget = function (_PolymerElement) {
     }
 
     /* eslint-disable */
-    for (var i = 0; i < Object.getOwnPropertyNames(config.styling).length; i++) {
+    //for (var i = 0; i < Object.getOwnPropertyNames(config.styling).length; i++) {
 
-      var key = Object.getOwnPropertyNames(config.styling)[i];
-      var variableName = _this._StyleDefinitionsMapper.Definitions.get(key);
+    //  let key = Object.getOwnPropertyNames(config.styling)[i];
+    //  let variableName = this._StyleDefinitionsMapper.Definitions.get(key);
 
-      if (variableName) {
-        var value = config.styling[key];
-        var jsonVariable = {};
+    //  if (variableName) {
+    //    let value = config.styling[key];
+    //    let jsonVariable = {};
 
-        jsonVariable[variableName] = value;
-        _this.updateStyles(jsonVariable);
-      }
-    }
+    //    jsonVariable[variableName] = value;
+    //     console.log('Called "this.updateStyles(\'' + variableName + '\': \'' + value + '\')"');
+    //    this.updateStyles(jsonVariable);
+    //  }
+    //  console.log('Calling update styles()');
+    //  this.updateStyles();
+    //}
     /* eslint-enable */
 
-    // this._styling = new NpsWidgetStylingConfig();
-    // this.styling.backgroundColour = config.styling.backgroundColour;
+    _this._config = config;
+    _this._styling = new _NpsWidgetStylingConfig2.default();
+    _this.styling.backgroundColour = config.styling.backgroundColour;
 
     return _this;
   }
@@ -20845,12 +20852,39 @@ var NpsWidget = function (_PolymerElement) {
   _createClass(NpsWidget, [{
     key: 'render',
     value: function render() {
-      this.updateStyles({ '--nps-background-color': this.styling.backgroundColour });
+      /* eslint-disable */
+      this._StyleDefinitionsMapper = new _styleDefinitionsMapper2.default();
+
+      for (var i = 0; i < Object.getOwnPropertyNames(this._config.styling).length; i++) {
+
+        var key = Object.getOwnPropertyNames(this._config.styling)[i];
+        var variableName = this._StyleDefinitionsMapper.Definitions.get(key);
+
+        if (variableName) {
+          var value = this._config.styling[key];
+          var jsonVariable = {};
+
+          jsonVariable[variableName] = value;
+          console.log('Called "this.updateStyles(\'' + variableName + '\': \'' + value + '\')"');
+          this.updateStyles(jsonVariable);
+        }
+        console.log('Calling update styles()');
+        this.updateStyles();
+      }
+      /* eslint-enable */
     }
   }, {
     key: 'dosm',
     value: function dosm() {
       console.log('dosm clicked');
+    }
+  }, {
+    key: 'properties',
+    get: function get() {
+      var x;
+
+      x.styling = this.styling;
+      return x;
     }
   }, {
     key: 'styling',
@@ -20874,6 +20908,126 @@ exports.default = NpsWidget;
 
 
 window.customElements.define(NpsWidget.is, NpsWidget);
+
+/***/ }),
+
+/***/ "./src/nps-widget/config/NpsWidgetStylingConfig.ts":
+/*!*********************************************************!*\
+  !*** ./src/nps-widget/config/NpsWidgetStylingConfig.ts ***!
+  \*********************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var NpsWidgetStylingConfig = /** @class */ (function () {
+    function NpsWidgetStylingConfig() {
+    }
+    Object.defineProperty(NpsWidgetStylingConfig.prototype, "zindex", {
+        get: function () {
+            return this._zindex;
+        },
+        set: function (value) {
+            this._zindex = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(NpsWidgetStylingConfig.prototype, "backgroundColour", {
+        get: function () {
+            return this._backgroundColour;
+        },
+        set: function (value) {
+            this._backgroundColour = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(NpsWidgetStylingConfig.prototype, "backgroundHoverColour", {
+        get: function () {
+            return this._backgroundHoverColour;
+        },
+        set: function (value) {
+            this._backgroundHoverColour = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(NpsWidgetStylingConfig.prototype, "foregroundColour", {
+        get: function () {
+            return this._foregroundColour;
+        },
+        set: function (value) {
+            this._foregroundColour = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(NpsWidgetStylingConfig.prototype, "foregroundHoverColour", {
+        get: function () {
+            return this._foregroundHoverColour;
+        },
+        set: function (value) {
+            this._foregroundHoverColour = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(NpsWidgetStylingConfig.prototype, "top", {
+        get: function () {
+            return this._top;
+        },
+        set: function (value) {
+            this._top = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(NpsWidgetStylingConfig.prototype, "bottom", {
+        get: function () {
+            return this._bottom;
+        },
+        set: function (value) {
+            this._bottom = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(NpsWidgetStylingConfig.prototype, "left", {
+        get: function () {
+            return this._left;
+        },
+        set: function (value) {
+            this._left = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(NpsWidgetStylingConfig.prototype, "right", {
+        get: function () {
+            return this._right;
+        },
+        set: function (value) {
+            this._right = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(NpsWidgetStylingConfig.prototype, "margin", {
+        get: function () {
+            return this._margin;
+        },
+        set: function (value) {
+            this._margin = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    return NpsWidgetStylingConfig;
+}());
+exports.default = NpsWidgetStylingConfig;
+
 
 /***/ }),
 

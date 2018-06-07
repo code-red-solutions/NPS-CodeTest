@@ -15,34 +15,51 @@
     }
 
     function initialzeCodeRedNpsWidget(config) {
-
+      injectScript('./lib/dev/custom-elements-es5-adapter.js')
+        .then(() => {
+          console.log('Script \'custom-elements-es5-adapter.js\' loaded.');
           injectScript('./lib/dev/webcomponents-loader.js')
             .then(() => {
-              console.log('Webcomponents loaded!');
-              injectScript('./lib/dev/codered_nps_widget.js')
-                .then(() => {
-                  console.log('Script loaded!');
-                  // TODO: Use a document.onload event handler
-                  var i = new (codered_nps_widget.NpsWidget)(config);
-                  document.getElementsByTagName('body')[0].appendChild(i);
-                }).catch(error => {
-                  console.log(error);
+              console.log('Script \'webcomponents-loader.js\' loaded.');
+              document.addEventListener('WebComponentsReady', function (e) {
+                console.log('Event WebComponentsReady fired.');
+                injectScript('./lib/dev/codered_nps_widget.js')
+                  .then(() => {
+                    console.log('Script \'codered_nps_widget.js\' loaded.');
+                    var i = new (codered_nps_widget.NpsWidget)(config);
+                    document.getElementsByTagName('body')[0].appendChild(i);
+                    i.render();
+                  }).catch(error => {
+                    console.log(error);
+                  });
               });
             }).catch(error => {
               console.log(error);
             });
-
-        // injectScript('./lib/dev/custom-elements-es5-adapter.js')
-        // .then(() => {
-        //   console.log('custom-elements-es5-adapter loaded!');
-        // }).catch(error => {
-        //   console.log(error);
-        // });
+        }).catch(error => {
+          console.log(error);
+        });
     }
 
   </script>
 
   <script type="text/javascript">
+
+    /*
+
+    Possible values are:
+      zindex
+      backgroundColour
+      backgroundHoverColour
+      foregroundColour
+      foregroundHoverColour
+      top
+      bottom
+      left
+      right
+      margin
+
+    */
 
     var npsConfig = { 
       styling: { 
@@ -50,14 +67,11 @@
         foregroundHoverColour: 'grey', 
         backgroundColour: '#1C7ACC',
         foregroundColour: 'white', 
-        // bottom: '20px', 
-        // right: '20px', 
-        margin: '0px' 
+        bottom: '20px', 
+        right: '20px'
       } 
     };
 
     initialzeCodeRedNpsWidget(npsConfig);
-    // need to find a proper way to get window.onload
-    // window.onload = function() { initialzeCodeRedNpsWidget(npsConfig) };
-    
+
   </script>

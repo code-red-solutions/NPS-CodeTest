@@ -26,27 +26,31 @@ const config = {
       test: /\.html$/,
       use: [
         // Chained loaders are applied last to first
-        { loader: 'babel-loader' },
-        { loader: 'polymer-webpack-loader' }
+        { loader: 'babel-loader' }
+        //{ loader: 'polymer-webpack-loader' }
       ]
     },
-    {
+      {
         test: /\.js$/,
         // We need to transpile Polymer itself and other ES6 code
         // exclude: /(node_modules)/,
-        use: {
-          loader: 'babel-loader',
-          options: {
-            presets: [[
-              'env',
-              {
-                targets: { browsers: ['last 2 Chrome versions', 'Safari 10'] },
-                debug: true
-              }
-            ]],
-            plugins: [['transform-object-rest-spread', { useBuiltIns: true }]]
+        use: [
+          {
+            loader: 'babel-loader',
+            options: {
+              presets: [[
+                'env',
+                {
+                  targets: { browsers: ['last 2 Chrome versions', 'Safari 10'] },
+                  debug: true
+                }
+              ]]
+              //,
+              //plugins: [['transform-object-rest-spread', { useBuiltIns: true }]]
+            }
           }
-        }
+
+        ]
       },
       {
         test: /(\.jsx|\.js)$/,
@@ -74,7 +78,13 @@ const config = {
         ignore: ['.*']
       },
       {
+        from: path.resolve(__dirname, '../node_modules/@webcomponents/webcomponentsjs/webcomponents-bundle.js')
+      },
+      {
         from: path.resolve(__dirname, '../node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js')
+      },
+      {
+        from: path.resolve(__dirname, '../scripts/system-production.0.21.3.js')
       },
       {
         from: path.resolve(__dirname, '../node_modules/@webcomponents/webcomponentsjs/custom-elements-es5-adapter.js')

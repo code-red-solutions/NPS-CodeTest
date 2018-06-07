@@ -45,10 +45,5 @@
     "@polymer/polymer": "^3.0.2",
     "@webcomponents/webcomponentsjs": "^2.0.0",
     "redux": "^4.0.0"
-  },
-  "-vs-binding": {
-    "AfterBuild": [
-      "build-dev"
-    ]
   }
 }

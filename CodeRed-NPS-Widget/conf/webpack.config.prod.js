@@ -55,8 +55,6 @@ const config = {
     extensions: ['.ts', '.tsx', '.json', '.js']
   },
   plugins: [
-    new CleanWebpackPlugin(['lib/prod'], { verbose: true, root: path.resolve(__dirname, '..') }),
-    // copy custom static assets
     new CopyWebpackPlugin([
       {
         from: path.resolve(__dirname, '../static'),
@@ -64,7 +62,18 @@ const config = {
         ignore: ['.*']
       },
       {
+        from: path.resolve(__dirname, '../node_modules/@webcomponents/webcomponentsjs/webcomponents-bundle.js')
+      },
+      {
         from: path.resolve(__dirname, '../node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js')
+      },
+      {
+        from: path.resolve(__dirname, '../node_modules/@webcomponents/webcomponentsjs/custom-elements-es5-adapter.js')
+      },
+      {
+        from: path.resolve(__dirname, '../node_modules/@webcomponents/webcomponentsjs/bundles/*'),
+        to: path.resolve(__dirname, '../lib/prod/bundles/'),
+        flatten: true
       }
     ])
   ],
@@ -75,10 +84,11 @@ optimization: {
         cache: true,
         parallel: true,
         uglifyOptions: {
-          compress: false,
-          ecma: 6,
+          compress: true,
+          ecma: 5,
           mangle: true
-        },        sourceMap: false
+        },
+        sourceMap: false
       })
     ]
   }
