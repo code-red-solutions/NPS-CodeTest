@@ -12,3 +12,7 @@ packages/
 /source/Tests/CodeRed-NPS-API-Tests/WebJobs.ContextResolver.Tests.v3.ncrunchproject
 
 source/Tests/CodeRed-NPS-API-Tests/obj/
+
+source/Core/CodeRed-NPS-Core/obj/
+
+source/Core/CodeRed-NPS-Core/bin/

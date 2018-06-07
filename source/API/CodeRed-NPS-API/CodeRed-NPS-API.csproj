@@ -67,6 +67,9 @@
     <PackageReference Include="System.Xml.XDocument" version="4.3.0" />
     <PackageReference Include="WindowsAzure.Storage" version="7.2.1" />  </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Core\CodeRed-NPS-Core\CodeRed-NPS-Core.csproj" />
+  </ItemGroup>
+  <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
@@ -77,8 +80,5 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Functions\" />
   </ItemGroup>
 </Project>

@@ -38,7 +38,6 @@
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
@@ -50,10 +49,17 @@
       <Project>{131bcf8a-6556-4a3a-867e-55eb709f0466}</Project>
       <Name>CodeRed-NPS-API</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Core\CodeRed-NPS-Core\CodeRed-NPS-Core.csproj">
+      <Project>{69cf4161-7168-4610-8376-4dc7f316ff7d}</Project>
+      <Name>CodeRed-NPS-Core</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Moq">
       <Version>4.8.2</Version>
+    </PackageReference>
+    <PackageReference Include="Newtonsoft.Json">
+      <Version>9.0.1</Version>
     </PackageReference>
     <PackageReference Include="NUnit">
       <Version>3.10.1</Version>
