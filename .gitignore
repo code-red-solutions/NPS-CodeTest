@@ -4,3 +4,11 @@
 *.user
 
 packages/
+/source/.vs
+/source/API/CodeRed-NPS-API/bin/Debug/net461
+/source/API/CodeRed-NPS-API/obj
+/source/Tests/CodeRed-NPS-API-Tests/bin/Debug
+/source/Tests/CodeRed-NPS-API-Tests/obj/Debug
+/source/Tests/CodeRed-NPS-API-Tests/WebJobs.ContextResolver.Tests.v3.ncrunchproject
+
+source/Tests/CodeRed-NPS-API-Tests/obj/

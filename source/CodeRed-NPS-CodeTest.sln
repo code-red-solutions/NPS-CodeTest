@@ -1,0 +1,48 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27703.2018
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "API", "API", "{EBAF4811-FBF0-4686-A55E-D9E4D7C39EF9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UX", "UX", "{D3F0EBE9-0AA6-4A49-A2D3-70BD99C93DD4}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{DEA1FF50-97CD-4FD8-8EB8-FD5C859A9EDB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeRed-NPS-Widget", "UX\CodeRed-NPS-Widget\CodeRed-NPS-Widget.csproj", "{38D4B3CE-780D-4779-95C4-AAF0ACB32C52}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeRed-NPS-API", "API\CodeRed-NPS-API\CodeRed-NPS-API.csproj", "{131BCF8A-6556-4A3A-867E-55EB709F0466}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeRed-NPS-API-Tests", "Tests\CodeRed-NPS-API-Tests\CodeRed-NPS-API-Tests.csproj", "{C9EEB61E-96E4-4EB3-B040-A9ACB06C1F35}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{38D4B3CE-780D-4779-95C4-AAF0ACB32C52}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{38D4B3CE-780D-4779-95C4-AAF0ACB32C52}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{38D4B3CE-780D-4779-95C4-AAF0ACB32C52}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{38D4B3CE-780D-4779-95C4-AAF0ACB32C52}.Release|Any CPU.Build.0 = Release|Any CPU
+		{131BCF8A-6556-4A3A-867E-55EB709F0466}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{131BCF8A-6556-4A3A-867E-55EB709F0466}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{131BCF8A-6556-4A3A-867E-55EB709F0466}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{131BCF8A-6556-4A3A-867E-55EB709F0466}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C9EEB61E-96E4-4EB3-B040-A9ACB06C1F35}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C9EEB61E-96E4-4EB3-B040-A9ACB06C1F35}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C9EEB61E-96E4-4EB3-B040-A9ACB06C1F35}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C9EEB61E-96E4-4EB3-B040-A9ACB06C1F35}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{38D4B3CE-780D-4779-95C4-AAF0ACB32C52} = {D3F0EBE9-0AA6-4A49-A2D3-70BD99C93DD4}
+		{131BCF8A-6556-4A3A-867E-55EB709F0466} = {EBAF4811-FBF0-4686-A55E-D9E4D7C39EF9}
+		{C9EEB61E-96E4-4EB3-B040-A9ACB06C1F35} = {DEA1FF50-97CD-4FD8-8EB8-FD5C859A9EDB}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7DC71628-E39A-4B57-90A2-9BAD68E79491}
+	EndGlobalSection
+EndGlobal

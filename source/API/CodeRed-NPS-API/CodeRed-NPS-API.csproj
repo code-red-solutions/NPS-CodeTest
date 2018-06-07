@@ -1,0 +1,84 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net461</TargetFramework>
+    <RootNamespace>CodeRed.NPS.API</RootNamespace>
+    <AssemblyName>CodeRed.NPS.API</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <OutputPath>bin\Debug\</OutputPath>
+  </PropertyGroup>
+  <ItemGroup>    
+    <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="1.0.13" />    
+    <PackageReference Include="Unity" Version="4.0.1" />
+    <PackageReference Include="Microsoft.Azure.KeyVault.Core" version="1.0.0" />
+    <PackageReference Include="Microsoft.Azure.WebJobs" version="2.2.0" />
+    <PackageReference Include="Microsoft.Azure.WebJobs.Core" version="2.2.0" />
+    <PackageReference Include="Microsoft.Data.Edm" version="5.6.4" />
+    <PackageReference Include="Microsoft.Data.OData" version="5.6.4" />
+    <PackageReference Include="Microsoft.Data.Services.Client" version="5.6.4" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" version="1.1.1" />
+    <PackageReference Include="Microsoft.NETCore.Platforms" version="1.1.0" />
+    <PackageReference Include="Microsoft.Win32.Primitives" version="4.3.0" />
+    <PackageReference Include="NETStandard.Library" version="1.6.1" />
+    <PackageReference Include="Newtonsoft.Json" version="9.0.1" />
+    <PackageReference Include="System.AppContext" version="4.3.0" />
+    <PackageReference Include="System.Collections" version="4.3.0" />
+    <PackageReference Include="System.Collections.Concurrent" version="4.3.0" />
+    <PackageReference Include="System.Console" version="4.3.0" />
+    <PackageReference Include="System.Diagnostics.Debug" version="4.3.0" />
+    <PackageReference Include="System.Diagnostics.DiagnosticSource" version="4.3.0" />
+    <PackageReference Include="System.Diagnostics.Tools" version="4.3.0" />
+    <PackageReference Include="System.Diagnostics.Tracing" version="4.3.0" />
+    <PackageReference Include="System.Globalization" version="4.3.0" />
+    <PackageReference Include="System.Globalization.Calendars" version="4.3.0" />
+    <PackageReference Include="System.IO" version="4.3.0" />
+    <PackageReference Include="System.IO.Compression" version="4.3.0" />
+    <PackageReference Include="System.IO.Compression.ZipFile" version="4.3.0" />
+    <PackageReference Include="System.IO.FileSystem" version="4.3.0" />
+    <PackageReference Include="System.IO.FileSystem.Primitives" version="4.3.0" />
+    <PackageReference Include="System.Linq" version="4.3.0" />
+    <PackageReference Include="System.Linq.Expressions" version="4.3.0" />
+    <PackageReference Include="System.Net.Http" version="4.3.3" />
+    <PackageReference Include="System.Net.Primitives" version="4.3.0" />
+    <PackageReference Include="System.Net.Sockets" version="4.3.0" />
+    <PackageReference Include="System.ObjectModel" version="4.3.0" />
+    <PackageReference Include="System.Reflection" version="4.3.0" />
+    <PackageReference Include="System.Reflection.Extensions" version="4.3.0" />
+    <PackageReference Include="System.Reflection.Primitives" version="4.3.0" />
+    <PackageReference Include="System.Resources.ResourceManager" version="4.3.0" />
+    <PackageReference Include="System.Runtime" version="4.3.0" />
+    <PackageReference Include="System.Runtime.Extensions" version="4.3.0" />
+    <PackageReference Include="System.Runtime.Handles" version="4.3.0" />
+    <PackageReference Include="System.Runtime.InteropServices" version="4.3.0" />
+    <PackageReference Include="System.Runtime.InteropServices.RuntimeInformation" version="4.3.0" />
+    <PackageReference Include="System.Runtime.Numerics" version="4.3.0" />
+    <PackageReference Include="System.Security.Cryptography.Algorithms" version="4.3.0" />
+    <PackageReference Include="System.Security.Cryptography.Encoding" version="4.3.0" />
+    <PackageReference Include="System.Security.Cryptography.Primitives" version="4.3.0" />
+    <PackageReference Include="System.Security.Cryptography.X509Certificates" version="4.3.0" />
+    <PackageReference Include="System.Spatial" version="5.6.4" />
+    <PackageReference Include="System.Text.Encoding" version="4.3.0" />
+    <PackageReference Include="System.Text.Encoding.Extensions" version="4.3.0" />
+    <PackageReference Include="System.Text.RegularExpressions" version="4.3.0" />
+    <PackageReference Include="System.Threading" version="4.3.0" />
+    <PackageReference Include="System.Threading.Tasks" version="4.3.0" />
+    <PackageReference Include="System.Threading.Timer" version="4.3.0" />
+    <PackageReference Include="System.Xml.ReaderWriter" version="4.3.0" />
+    <PackageReference Include="System.Xml.XDocument" version="4.3.0" />
+    <PackageReference Include="WindowsAzure.Storage" version="7.2.1" />  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="host.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="local.settings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Functions\" />
+  </ItemGroup>
+</Project>
