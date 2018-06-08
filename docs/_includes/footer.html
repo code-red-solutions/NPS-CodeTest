@@ -12,6 +12,7 @@
 
 </div>
 
-{% if !(page.excludeFooterWidget and page.excludeFooterWidget != nil and page.excludeFooterWidget) == true %} 
-  {% include NpsWidgetInitialiser_Default.html %}
+{% if page.excludeFooterWidget and page.excludeFooterWidget != nil and page.excludeFooterWidget == true %} 
+{% else %} 
+{% include NpsWidgetInitialiser_Default.html %} 
 {% endif %} 
