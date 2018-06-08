@@ -18,8 +18,12 @@ export default class NpsWidget extends PolymerElement {
 
     super();
     this.iconType = 'feedback';
-    this.styling = new NpsWidgetStylingConfig(config.styling);
 
+    // Apply config
+    if (!config || !config.styling) this.styling = new NpsWidgetStylingConfig();
+    else this.styling = new NpsWidgetStylingConfig(config.styling);
+
+    this.render();
   }
 
   static get properties() {
@@ -70,12 +74,12 @@ export default class NpsWidget extends PolymerElement {
           bottom: var(--nps-bottom, 10px);
           left: var(--nps-left);
           right: var(--nps-right, 10px);
-          --paper-fab-background: var(--nps-background-color, );
+          --paper-fab-background: var(--nps-background-color, #FFE787);
           color: var(--nps-foreground-color, darkgrey);
         }
 
         paper-fab:hover {
-          --paper-fab-background: var(--nps-background-hover-colour, #fc0);
+          --paper-fab-background: var(--nps-background-hover-colour, #FFCC00);
           color: var(--nps-foreground-hover-colour, black);
         }
 

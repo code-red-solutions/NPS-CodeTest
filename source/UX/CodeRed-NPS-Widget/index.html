@@ -31,9 +31,8 @@
                   document.addEventListener('WebComponentsReady', function (e) {
                     console.log('Event WebComponentsReady fired.');
                     SystemJS.import('./lib/dev/codered_nps_widget.js').then(function (modules) {
-                      var i = new (modules.NpsWidget)(config);
-                      document.getElementsByTagName('body')[0].appendChild(i);
-                      i.render();
+                      const npsWidget = new (modules.NpsWidget)(config);
+                      document.getElementsByTagName('body')[0].appendChild(npsWidget);
                     }).catch(error => {
                       console.log(error);
                     });

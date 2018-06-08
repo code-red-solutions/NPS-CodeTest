@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 
@@ -33,9 +33,8 @@
                 injectScript('./lib/dev/codered_nps_widget.js')
                   .then(() => {
                     console.log('Script \'codered_nps_widget.js\' loaded.');
-                    var i = new (codered_nps_widget.NpsWidget)(config);
-                    document.getElementsByTagName('body')[0].appendChild(i);
-                    i.render();
+                    const npsWidget = new (codered_nps_widget.NpsWidget)(config);
+                    document.getElementsByTagName('body')[0].appendChild(npsWidget);
                   }).catch(error => {
                     console.log(error);
                   });

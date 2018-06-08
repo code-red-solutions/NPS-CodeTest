@@ -1,5 +1,3 @@
-<div>test this out</div>
-
 <script type="text/javascript">
 
     function injectScript(src) {
@@ -26,9 +24,8 @@
                 injectScript('./lib/dev/codered_nps_widget.js')
                   .then(() => {
                     console.log('Script \'codered_nps_widget.js\' loaded.');
-                    var i = new (codered_nps_widget.NpsWidget)(config);
-                    document.getElementsByTagName('body')[0].appendChild(i);
-                    i.render();
+                    var npsWidget = new (codered_nps_widget.NpsWidget)(config);
+                    document.getElementsByTagName('body')[0].appendChild(npsWidget);
                   }).catch(error => {
                     console.log(error);
                   });

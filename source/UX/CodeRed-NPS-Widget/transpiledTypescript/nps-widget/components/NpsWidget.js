@@ -18,45 +18,23 @@ var polymer_element_js_1 = require("@polymer/polymer/polymer-element.js");
 require("@polymer/paper-fab/paper-fab.js");
 require("@polymer/iron-icons/iron-icons.js");
 require("@polymer/paper-styles/color.js");
-// import NpsWidgetProperties from './NpsWidgetProperties.ts';
+// ReSharper disable InconsistentNaming
 var NpsWidgetStylingConfig_ts_1 = require("../config/NpsWidgetStylingConfig.ts");
 var styleDefinitionsMapper_ts_1 = require("../services/styleDefinitionsMapper.ts");
+// import NpsWidgetProperties from './NpsWidgetProperties.ts';
+// ReSharper restore InconsistentNaming
+// ReSharper disable once InconsistentNaming
 var NpsWidget = /** @class */ (function (_super) {
     __extends(NpsWidget, _super);
     function NpsWidget(config) {
         var _this = _super.call(this) || this;
-        _this.name = 'Polymer 3.0 test';
-        // this._StyleDefinitionsMapper = new StyleDefinitionsMapper();
-        if (config.styling.left && config.styling.right) {
-            config.styling.left = '';
-        }
-        if (config.styling.top && config.styling.bottom) {
-            config.styling.top = '';
-        }
-        if (!config.styling.left && !config.styling.right) {
-            config.styling.right = '30px';
-        }
-        if (!config.styling.top && !config.styling.bottom) {
-            config.styling.bottom = '30px';
-        }
-        /* eslint-disable */
-        //for (var i = 0; i < Object.getOwnPropertyNames(config.styling).length; i++) {
-        //  let key = Object.getOwnPropertyNames(config.styling)[i];
-        //  let variableName = this._StyleDefinitionsMapper.Definitions.get(key);
-        //  if (variableName) {
-        //    let value = config.styling[key];
-        //    let jsonVariable = {};
-        //    jsonVariable[variableName] = value;
-        //     console.log('Called "this.updateStyles(\'' + variableName + '\': \'' + value + '\')"');
-        //    this.updateStyles(jsonVariable);
-        //  }
-        //  console.log('Calling update styles()');
-        //  this.updateStyles();
-        //}
-        /* eslint-enable */
-        _this._config = config;
-        _this._styling = new NpsWidgetStylingConfig_ts_1.default();
-        _this.styling.backgroundColour = config.styling.backgroundColour;
+        _this.iconType = 'feedback';
+        // Apply config
+        if (!config || !config.styling)
+            _this.styling = new NpsWidgetStylingConfig_ts_1.default();
+        else
+            _this.styling = new NpsWidgetStylingConfig_ts_1.default(config.styling);
+        _this.render();
         return _this;
     }
     Object.defineProperty(NpsWidget, "is", {
@@ -64,46 +42,38 @@ var NpsWidget = /** @class */ (function (_super) {
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(NpsWidget.prototype, "properties", {
+    Object.defineProperty(NpsWidget, "properties", {
         get: function () {
             return {
-                styling: this._styling
+                iconType: {
+                    type: String,
+                    value: this.iconType
+                }
             };
         },
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(NpsWidget.prototype, "styling", {
-        get: function () {
-            return this._styling;
-        },
-        set: function (value) {
-            this._styling = value;
-        },
-        enumerable: true,
-        configurable: true
-    });
     NpsWidget.prototype.render = function () {
+        // TODO: Extract this out to seperate class for proper unit testing
+        var styleDefinitionsMapper = new styleDefinitionsMapper_ts_1.default();
         /* eslint-disable */
-        this._StyleDefinitionsMapper = new styleDefinitionsMapper_ts_1.default();
-        for (var i = 0; i < Object.getOwnPropertyNames(this._config.styling).length; i++) {
-            var key = Object.getOwnPropertyNames(this._config.styling)[i];
-            var variableName = this._StyleDefinitionsMapper.Definitions.get(key);
+        for (var i = 0; i < styleDefinitionsMapper.definitions.getKeys().length; i++) {
+            var key = styleDefinitionsMapper.definitions.getKeys()[i];
+            var variableName = styleDefinitionsMapper.definitions.get(key);
             if (variableName) {
-                var value = this._config.styling[key];
+                var value = this.styling[key];
                 var jsonVariable = {};
                 jsonVariable[variableName] = value;
-                console.log('Called "this.updateStyles(\'' + variableName + '\': \'' + value + '\')"');
+                console.log("Called \"this.updateStyles('" + variableName + "': '" + value + "')\"");
                 this.updateStyles(jsonVariable);
             }
-            console.log('Calling update styles()');
-            this.updateStyles();
         }
         /* eslint-enable */
     };
     Object.defineProperty(NpsWidget, "template", {
         get: function () {
-            return polymer_element_js_1.html(templateObject_1 || (templateObject_1 = __makeTemplateObject(["\n<custom-style>\n      <style is=\"custom-style\">\n\n        paper-fab {\n          display: inline-block;\n          margin: var(--nps-margin, );\n          z-index: var(--nps-zindex, 99);\n          position: fixed;\n          top: var(--nps-top);\n          bottom: var(--nps-bottom, 10px);\n          left: var(--nps-left);\n          right: var(--nps-right, 10px);\n          --paper-fab-background: var(--nps-background-color);\n          color: var(--nps-foreground-color, darkgrey);\n        }\n\n        paper-fab:hover {\n          --paper-fab-background: var(--nps-background-hover-colour, #fc0);\n          color: var(--nps-foreground-hover-colour, black);\n        }\n\n      </style>\n</custom-style>\n      <paper-fab icon=\"icons:feedback\" on-click=\"dosm\"/>\n<div>[[styling.backgroundColour]]</div>\n    "], ["\n<custom-style>\n      <style is=\"custom-style\">\n\n        paper-fab {\n          display: inline-block;\n          margin: var(--nps-margin, );\n          z-index: var(--nps-zindex, 99);\n          position: fixed;\n          top: var(--nps-top);\n          bottom: var(--nps-bottom, 10px);\n          left: var(--nps-left);\n          right: var(--nps-right, 10px);\n          --paper-fab-background: var(--nps-background-color);\n          color: var(--nps-foreground-color, darkgrey);\n        }\n\n        paper-fab:hover {\n          --paper-fab-background: var(--nps-background-hover-colour, #fc0);\n          color: var(--nps-foreground-hover-colour, black);\n        }\n\n      </style>\n</custom-style>\n      <paper-fab icon=\"icons:feedback\" on-click=\"dosm\"/>\n<div>[[styling.backgroundColour]]</div>\n    "])));
+            return polymer_element_js_1.html(templateObject_1 || (templateObject_1 = __makeTemplateObject(["\n\n      <style is=\"custom-style\">\n\n        paper-fab {\n          display: inline-block;\n          margin: var(--nps-margin, );\n          z-index: var(--nps-zindex, 99);\n          position: fixed;\n          top: var(--nps-top);\n          bottom: var(--nps-bottom, 10px);\n          left: var(--nps-left);\n          right: var(--nps-right, 10px);\n          --paper-fab-background: var(--nps-background-color, #FFE787);\n          color: var(--nps-foreground-color, darkgrey);\n        }\n\n        paper-fab:hover {\n          --paper-fab-background: var(--nps-background-hover-colour, #FFCC00);\n          color: var(--nps-foreground-hover-colour, black);\n        }\n\n      </style>\n\n      <paper-fab icon=\"icons:[[iconType]]\" on-click=\"dosm\"/>\n    "], ["\n\n      <style is=\"custom-style\">\n\n        paper-fab {\n          display: inline-block;\n          margin: var(--nps-margin, );\n          z-index: var(--nps-zindex, 99);\n          position: fixed;\n          top: var(--nps-top);\n          bottom: var(--nps-bottom, 10px);\n          left: var(--nps-left);\n          right: var(--nps-right, 10px);\n          --paper-fab-background: var(--nps-background-color, #FFE787);\n          color: var(--nps-foreground-color, darkgrey);\n        }\n\n        paper-fab:hover {\n          --paper-fab-background: var(--nps-background-hover-colour, #FFCC00);\n          color: var(--nps-foreground-hover-colour, black);\n        }\n\n      </style>\n\n      <paper-fab icon=\"icons:[[iconType]]\" on-click=\"dosm\"/>\n    "])));
         },
         enumerable: true,
         configurable: true

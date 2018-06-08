@@ -12,28 +12,15 @@ export default class NpsWidgetStylingConfig {
 
     if (!styling) return;
 
-    if (!styling.left && !styling.right) {
-      styling.right = '30px';
-    }
-
-    if (!styling.top && !styling.bottom) {
-      styling.bottom = '30px';
-    }
+    // Clear contradicting styles
+    // Will fallback to default styles specified in the template
 
     if (styling.left && styling.right) {
-      styling.left = null;
+      styling.left = styling.right = null;
     }
 
     if (styling.top && styling.bottom) {
-      styling.top = null;
-    }
-
-    if (styling.left && styling.right) {
-      styling.left = null;
-    }
-
-    if (styling.top && styling.bottom) {
-      styling.top = null;
+      styling.top = styling.bottom = null;
     }
 
     this.assing(styling);
@@ -50,11 +37,7 @@ export default class NpsWidgetStylingConfig {
     }
   }
 
-  get getPropertyNames(): string[] {
-    return Object.getOwnPropertyNames(this);
-  }
-
-  private _zindex: number = 99;
+  private _zindex: number = null;
   get zindex(): number {
     return this._zindex;
   }
