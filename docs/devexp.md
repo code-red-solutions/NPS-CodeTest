@@ -31,12 +31,12 @@ onlyRawContent: true
 
     var npsConfig = { 
       styling: { 
-        backgroundHoverColour: '#1765A5', 
-        foregroundHoverColour: 'grey', 
-        backgroundColour: '#1C7ACC',
+        backgroundHoverColour: 'DarkMagenta', 
+        foregroundHoverColour: 'white', 
+        backgroundColour: 'DarkOrchid',
         foregroundColour: 'white', 
-        bottom: '20px', 
-        right: '20px'
+        bottom: '40px', 
+        left: '40px'
       } 
     };
 
