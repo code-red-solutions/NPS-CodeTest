@@ -47,7 +47,10 @@
 
   {% include includeCodeRedNpsWidgetLoader.html %}
   {% if !(page.excludeDefaultWidget and page.excludeDefaultWidget != nil and page.excludeDefaultWidget == true) %}
-  {% include includeCodeRedNpsWidgetInitialiser_Default.html %}
+    <meta name="Widget" content="included" />
+    {% include includeCodeRedNpsWidgetInitialiser_Default.html %}
+  {% else %}
+    <meta name="Widget" content="excluded" />
   {% endif %}
 
 </head>
