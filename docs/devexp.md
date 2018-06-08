@@ -8,6 +8,7 @@ category: devexp
 icon: fa-home
 excludeDefaultWidget: true
 order: 2
+onlyRawContent: true
 ---
 
 <script type="text/javascript">

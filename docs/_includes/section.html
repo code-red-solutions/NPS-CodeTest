@@ -8,7 +8,7 @@
 	content
 {%- endcomment -%}
 
-{%- assign _title = include.title | default: 'Untitled' -%}
+{%- assign _title = include.title | default: 'untitled' -%}
 {%- assign _slug = include.title | strip_html | slugify | default: 'untitled' -%}
 
 {%- if include.photo and include.photo-alt -%}
