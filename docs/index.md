@@ -2,9 +2,9 @@
 
 ## What's going on here
 
-Something happened here and it looked like this:
+Something happened here:
 
-```markdown
+```typescript
 import NpsWidgetStylingConfig from "./NpsWidgetStylingConfig";
 
 export default class NpsWidgetConfig {
