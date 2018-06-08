@@ -1,9 +1,9 @@
 ---
 layout: home
 title: Tech Debt
-category: single-top-level-page-1
+category: devexp
 icon: fa-pencil
-order: 4
+order: 2
 ---
 
 # Enhancements
