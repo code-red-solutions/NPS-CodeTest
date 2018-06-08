@@ -8,7 +8,13 @@
     {% endif %}
     <li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
     <li>Jekyll integration: <a href="https://chrisbobbe.github.io/">Chris Bobbe</a></li>
-    <li>{{- page.title -}}</li>
   </ul>
-  
+
+  {% if page.excludeFooterWidget and page.excludeFooterWidget != nil and page.excludeFooterWidget == true %}
+    <li>Excluding</li>
+  {% else %}
+    <li>Including</li>
+  {% include includeCodeRedNpsWidget.html %}
+  {% endif %}
+
 </div>
