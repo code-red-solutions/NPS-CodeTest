@@ -135,7 +135,7 @@
 		outline: 0;
 
 		&:hover {
-			color: #FFE787;
+			color: rgb(242, 196, 14);
 			border-bottom-color: rgba(255, 255, 255, 0);
 		}
 	}
@@ -609,7 +609,7 @@
 						color: #fff;
 
 						span:before {
-							color: #FFE787;
+							color: rgb(242, 196, 14);
 						}
 					}
 				}
@@ -652,7 +652,7 @@
 	#main {
 		margin-left: 375px;
 		> section {
-			text-align: center;
+			text-align: left;
 		}
 		> article {
 			text-align: left;
