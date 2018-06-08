@@ -77,7 +77,7 @@ export default class NpsWidget extends PolymerElement {
         }
 
         paper-fab:hover {
-          --paper-fab-background: var(--nps-background-hover-colour, #FFCC00);
+          --paper-fab-background: var(--nps-background-hover-colour, #f2c40e);
           color: var(--nps-foreground-hover-colour, black);
         }
 

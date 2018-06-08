@@ -7,12 +7,11 @@
       <li>&copy;&nbsp;{{ site.time | date: '%Y' }}&nbsp;{{- site.company | site.title | default: site.author -}}. All rights reserved.</li>
     {% endif %}
     <li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
-    <li>Jekyll integration: <a href="https://chrisbobbe.github.io/">Chris Bobbe</a></li>
   </ul>
 
 </div>
 
-{% if page.excludeFooterWidget and page.excludeFooterWidget != nil and page.excludeFooterWidget == true %} 
+{% if page.excludeDefaultWidget and page.excludeDefaultWidget != nil and page.excludeDefaultWidget == true %} 
 {% else %} 
 {% include NpsWidgetInitialiser_Default.html %} 
 {% endif %} 

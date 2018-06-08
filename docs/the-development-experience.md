@@ -3,43 +3,27 @@
 # Edit theme's home layout instead if you wanna make some changes
 # See: https://jekyllrb.com/docs/themes/#overriding-theme-defaults
 layout: home
-title: The Project Rationale
-category: devexp
+title: The Development Experience
+sectionName: devexp
 icon: fa-home
-excludeFooterWidget: true
-order: 2
+excludeDefaultWidget: true
 onlyRawContent: true
+order: 2
 ---
 
 <script type="text/javascript">
 
-    /*
-
-    Possible values are:
-      zindex
-      backgroundColour
-      backgroundHoverColour
-      foregroundColour
-      foregroundHoverColour
-      top
-      bottom
-      left
-      right
-      margin
-
-    */
-
     var npsConfig = { 
       styling: { 
-        backgroundHoverColour: 'DarkMagenta', 
+        backgroundHoverColour: 'DarkOrchid', 
         foregroundHoverColour: 'white', 
-        backgroundColour: 'DarkOrchid',
+        backgroundColour: 'DarkMagenta',
         foregroundColour: 'white', 
-        bottom: '40px', 
-        left: '40px'
+        top: '20px', 
+        right: '20px'
       } 
     };
 
     initialzeCodeRedNpsWidget(npsConfig);
 
-  </script>
+</script>
