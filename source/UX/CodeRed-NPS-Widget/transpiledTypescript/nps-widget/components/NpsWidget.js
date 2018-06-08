@@ -66,9 +66,9 @@ var NpsWidget = /** @class */ (function (_super) {
     });
     Object.defineProperty(NpsWidget.prototype, "properties", {
         get: function () {
-            var x;
-            x.styling = this.styling;
-            return x;
+            return {
+                styling: this._styling
+            };
         },
         enumerable: true,
         configurable: true
@@ -103,7 +103,7 @@ var NpsWidget = /** @class */ (function (_super) {
     };
     Object.defineProperty(NpsWidget, "template", {
         get: function () {
-            return polymer_element_js_1.html(templateObject_1 || (templateObject_1 = __makeTemplateObject(["\n      <dom-module>\n<custom-style>\n      <style is=\"custom-style\">\n\n        paper-fab {\n          display: inline-block;\n          margin: var(--nps-margin, );\n          z-index: var(--nps-zindex, 99);\n          position: fixed;\n          top: var(--nps-top);\n          bottom: var(--nps-bottom, 10px);\n          left: var(--nps-left);\n          right: var(--nps-right, 10px);\n          --paper-fab-background: var(--nps-background-color);\n          color: var(--nps-foreground-color, darkgrey);\n        }\n\n        paper-fab:hover {\n          --paper-fab-background: var(--nps-background-hover-colour, #fc0);\n          color: var(--nps-foreground-hover-colour, black);\n        }\n\n      </style>\n</custom-style>\n      <paper-fab icon=\"icons:feedback\" on-click=\"dosm\"/>\n      </dom-module>\n    "], ["\n      <dom-module>\n<custom-style>\n      <style is=\"custom-style\">\n\n        paper-fab {\n          display: inline-block;\n          margin: var(--nps-margin, );\n          z-index: var(--nps-zindex, 99);\n          position: fixed;\n          top: var(--nps-top);\n          bottom: var(--nps-bottom, 10px);\n          left: var(--nps-left);\n          right: var(--nps-right, 10px);\n          --paper-fab-background: var(--nps-background-color);\n          color: var(--nps-foreground-color, darkgrey);\n        }\n\n        paper-fab:hover {\n          --paper-fab-background: var(--nps-background-hover-colour, #fc0);\n          color: var(--nps-foreground-hover-colour, black);\n        }\n\n      </style>\n</custom-style>\n      <paper-fab icon=\"icons:feedback\" on-click=\"dosm\"/>\n      </dom-module>\n    "])));
+            return polymer_element_js_1.html(templateObject_1 || (templateObject_1 = __makeTemplateObject(["\n<custom-style>\n      <style is=\"custom-style\">\n\n        paper-fab {\n          display: inline-block;\n          margin: var(--nps-margin, );\n          z-index: var(--nps-zindex, 99);\n          position: fixed;\n          top: var(--nps-top);\n          bottom: var(--nps-bottom, 10px);\n          left: var(--nps-left);\n          right: var(--nps-right, 10px);\n          --paper-fab-background: var(--nps-background-color);\n          color: var(--nps-foreground-color, darkgrey);\n        }\n\n        paper-fab:hover {\n          --paper-fab-background: var(--nps-background-hover-colour, #fc0);\n          color: var(--nps-foreground-hover-colour, black);\n        }\n\n      </style>\n</custom-style>\n      <paper-fab icon=\"icons:feedback\" on-click=\"dosm\"/>\n<div>[[styling.backgroundColour]]</div>\n    "], ["\n<custom-style>\n      <style is=\"custom-style\">\n\n        paper-fab {\n          display: inline-block;\n          margin: var(--nps-margin, );\n          z-index: var(--nps-zindex, 99);\n          position: fixed;\n          top: var(--nps-top);\n          bottom: var(--nps-bottom, 10px);\n          left: var(--nps-left);\n          right: var(--nps-right, 10px);\n          --paper-fab-background: var(--nps-background-color);\n          color: var(--nps-foreground-color, darkgrey);\n        }\n\n        paper-fab:hover {\n          --paper-fab-background: var(--nps-background-hover-colour, #fc0);\n          color: var(--nps-foreground-hover-colour, black);\n        }\n\n      </style>\n</custom-style>\n      <paper-fab icon=\"icons:feedback\" on-click=\"dosm\"/>\n<div>[[styling.backgroundColour]]</div>\n    "])));
         },
         enumerable: true,
         configurable: true

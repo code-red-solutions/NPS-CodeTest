@@ -1,7 +1,60 @@
 
 export default class NpsWidgetStylingConfig {
 
-  private _zindex: number;
+  // ReSharper disable StatementTermination
+  constructor()
+  constructor(styling: any)
+  constructor(styling?: any)
+  // ReSharper restore StatementTermination
+  {
+
+    // TODO: Extract out logic in the constructor for testability and to make it pure POCO
+
+    if (!styling) return;
+
+    if (!styling.left && !styling.right) {
+      styling.right = '30px';
+    }
+
+    if (!styling.top && !styling.bottom) {
+      styling.bottom = '30px';
+    }
+
+    if (styling.left && styling.right) {
+      styling.left = null;
+    }
+
+    if (styling.top && styling.bottom) {
+      styling.top = null;
+    }
+
+    if (styling.left && styling.right) {
+      styling.left = null;
+    }
+
+    if (styling.top && styling.bottom) {
+      styling.top = null;
+    }
+
+    this.assing(styling);
+  }
+
+  assing(o: any): void {
+    let that = (<any>this);
+    for (let key in o) {
+      if (o.hasOwnProperty(key)) {
+        let value = o[key];
+        if (typeof value !== "undefined" && typeof that[key] !== "undefined")
+          that[key] = value;
+      }
+    }
+  }
+
+  get getPropertyNames(): string[] {
+    return Object.getOwnPropertyNames(this);
+  }
+
+  private _zindex: number = 99;
   get zindex(): number {
     return this._zindex;
   }
@@ -9,7 +62,7 @@ export default class NpsWidgetStylingConfig {
     this._zindex = value;
   }
 
-  private _backgroundColour: string;
+  private _backgroundColour: string = null;
   get backgroundColour(): string {
     return this._backgroundColour;
   }
@@ -17,31 +70,31 @@ export default class NpsWidgetStylingConfig {
     this._backgroundColour = value;
   }
 
-  private _backgroundHoverColour: number;
-  get backgroundHoverColour(): number {
+  private _backgroundHoverColour: string = null;
+  get backgroundHoverColour(): string {
     return this._backgroundHoverColour;
   }
-  set backgroundHoverColour(value: number) {
+  set backgroundHoverColour(value: string) {
     this._backgroundHoverColour = value;
   }
 
-  private _foregroundColour: number;
-  get foregroundColour(): number {
+  private _foregroundColour: string = null;
+  get foregroundColour(): string {
     return this._foregroundColour;
   }
-  set foregroundColour(value: number) {
+  set foregroundColour(value: string) {
     this._foregroundColour = value;
   }
 
-  private _foregroundHoverColour: number;
-  get foregroundHoverColour(): number {
+  private _foregroundHoverColour: string = null;
+  get foregroundHoverColour(): string {
     return this._foregroundHoverColour;
   }
-  set foregroundHoverColour(value: number) {
+  set foregroundHoverColour(value: string) {
     this._foregroundHoverColour = value;
   }
 
-  private _top: number;
+  private _top: number = null;
   get top(): number {
     return this._top;
   }
@@ -49,7 +102,7 @@ export default class NpsWidgetStylingConfig {
     this._top = value;
   }
 
-  private _bottom: number;
+  private _bottom: number = null;
   get bottom(): number {
     return this._bottom;
   }
@@ -57,7 +110,7 @@ export default class NpsWidgetStylingConfig {
     this._bottom = value;
   }
 
-  private _left: number;
+  private _left: number = null;
   get left(): number {
     return this._left;
   }
@@ -65,7 +118,7 @@ export default class NpsWidgetStylingConfig {
     this._left = value;
   }
 
-  private _right: number;
+  private _right: number = null;
   get right(): number {
     return this._right;
   }
@@ -73,7 +126,7 @@ export default class NpsWidgetStylingConfig {
     this._right = value;
   }
 
-  private _margin: number;
+  private _margin: number = null;
   get margin(): number {
     return this._margin;
   }
