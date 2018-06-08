@@ -7,7 +7,7 @@ layout: default
 <div id="main">
 	{%- if page.content != "" -%}
 		{%- if page.onlyRawContent and page.onlyRawContent == true -%}
-			{%- page.content -%}
+			{%- include rawContent.html content=page.content -%}
 		{%- else -%}
 			{%- include section.html title=page.title photo=page.cover-photo photo-alt=page.cover-photo-alt auto-header=page.auto-header content=page.content -%}
 		{%- endif -%}
