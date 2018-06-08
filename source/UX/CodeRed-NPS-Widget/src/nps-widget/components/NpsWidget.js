@@ -23,7 +23,6 @@ export default class NpsWidget extends PolymerElement {
     if (!config || !config.styling) this.styling = new NpsWidgetStylingConfig();
     else this.styling = new NpsWidgetStylingConfig(config.styling);
 
-    this.render();
   }
 
   static get properties() {
@@ -66,7 +65,6 @@ export default class NpsWidget extends PolymerElement {
       <style is="custom-style">
 
         paper-fab {
-          display: inline-block;
           margin: var(--nps-margin, );
           z-index: var(--nps-zindex, 99);
           position: fixed;
