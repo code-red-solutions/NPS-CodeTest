@@ -1,6 +1,7 @@
 ---
-layout: default
+layout: home
 title: Tech Debt
+category: single-top-level-page-1
 icon: fa-pencil
 order: 4
 ---
