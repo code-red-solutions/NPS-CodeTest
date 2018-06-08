@@ -1,5 +1,5 @@
 ---
-layout: page
+layout: default
 title: Tech Debt
 icon: fa-pencil
 order: 4
