@@ -10,10 +10,7 @@
     <li>Jekyll integration: <a href="https://chrisbobbe.github.io/">Chris Bobbe</a></li>
   </ul>
 
-  {% if page.excludeFooterWidget and page.excludeFooterWidget != nil and page.excludeFooterWidget == true %}
-    <li>Excluding</li>
-  {% else %}
-    <li>Including</li>
+  {% if !(page.excludeFooterWidget and page.excludeFooterWidget != nil and page.excludeFooterWidget == true) %}
   {% include includeCodeRedNpsWidget.html %}
   {% endif %}
 
