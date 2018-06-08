@@ -45,12 +45,6 @@
   <!--[if lte IE 8]><script src="{{- 'assets/js/ie/respond.min.js' | relative_url -}}" defer></script><![endif]-->
   <script src="{{- 'assets/js/main.js' | relative_url -}}" defer></script>
 
-  {% include includeCodeRedNpsWidgetLoader.html %}
-  {% if !(page.excludeDefaultWidget and page.excludeDefaultWidget != nil and page.excludeDefaultWidget == true) %}
-    <meta name="Widget" content="included" />
-    {% include includeCodeRedNpsWidgetInitialiser_Default.html %}
-  {% else %}
-    <meta name="Widget" content="excluded" />
-  {% endif %}
+  {% include NpsWidgetLoader.html %}
 
 </head>

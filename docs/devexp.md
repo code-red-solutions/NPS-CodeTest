@@ -6,7 +6,7 @@ layout: home
 title: The Project Rationale
 category: devexp
 icon: fa-home
-excludeDefaultWidget: true
+excludeFooterWidget: true
 order: 2
 onlyRawContent: true
 ---

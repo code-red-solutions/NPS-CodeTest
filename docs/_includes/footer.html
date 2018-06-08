@@ -11,3 +11,10 @@
   </ul>
 
 </div>
+
+{% if page.excludeFooterWidget and page.excludeFooterWidget != nil and page.excludeFooterWidget == true %} 
+<li>Excluding</li> 
+{% else %} 
+<li>Including</li> 
+{% include NpsWidgetInitialiser_Default.html %} 
+{% endif %} 
