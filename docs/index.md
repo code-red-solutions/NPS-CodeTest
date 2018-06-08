@@ -4,6 +4,7 @@
 # See: https://jekyllrb.com/docs/themes/#overriding-theme-defaults
 layout: home
 title: My Great Homepage
+category: home
 icon: fa-home
 order: 1
 ---
