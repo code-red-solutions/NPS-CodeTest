@@ -2,7 +2,7 @@
 layout: home
 title: Tech Debt
 sectionName: devexp
-icon: fa-pencil
+icon: fa-exclamation-triangle
 order: 2
 ---
 
