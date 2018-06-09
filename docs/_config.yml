@@ -55,7 +55,7 @@ kramdown:
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
 title: Code Red NPS Widget
-subtitle: The little widget that can
+subtitle: The little widget that can!
 description: >- # this means to ignore newlines until "baseurl:"
   This is the demo and documentation site for Code Red Solutions' NPS Widget 
   (done as a code test for a job application).
