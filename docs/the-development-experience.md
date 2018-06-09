@@ -5,7 +5,7 @@
 layout: home
 title: The Development Experience
 sectionName: devexp
-icon: fa-code-branch
+icon: fa-child
 excludeDefaultWidget: true
 onlyRawContent: true
 order: 2
