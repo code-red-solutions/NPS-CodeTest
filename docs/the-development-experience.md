@@ -5,7 +5,7 @@
 layout: home
 title: The Development Experience
 sectionName: devexp
-icon: fa-child
+icon: fa-road
 excludeDefaultWidget: true
 onlyRawContent: true
 order: 2
