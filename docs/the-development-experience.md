@@ -5,7 +5,7 @@
 layout: home
 title: The Development Experience
 sectionName: devexp
-icon: fa-home
+icon: fa-user-cog
 excludeDefaultWidget: true
 onlyRawContent: true
 order: 2
