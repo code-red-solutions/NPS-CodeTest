@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 
@@ -35,6 +35,7 @@
                     console.log('Script \'codered_nps_widget.js\' loaded.');
                     const npsWidget = new (codered_nps_widget.NpsWidget)(config);
                     document.getElementsByTagName('body')[0].appendChild(npsWidget);
+                    npsWidget.render();
                   }).catch(error => {
                     console.log(error);
                   });

@@ -6,6 +6,9 @@ import '@polymer/paper-styles/color.js';
 // ReSharper disable InconsistentNaming
 import NpsWidgetStylingConfig from '../config/NpsWidgetStylingConfig.ts';
 import StyleDefinitionsMapper from '../services/styleDefinitionsMapper.ts';
+import configureStore from '../store/configurestore.ts';
+import { addStyle } from '../store/styling/actions.ts'; // , subtractStyle, clearStyles
+import { StyleProperty } from '../store/styling/types.ts';
 // import NpsWidgetProperties from './NpsWidgetProperties.ts';
 // ReSharper restore InconsistentNaming
 
@@ -20,9 +23,29 @@ export default class NpsWidget extends PolymerElement {
     this.iconType = 'feedback';
 
     // Apply config
-    if (!config || !config.styling) this.styling = new NpsWidgetStylingConfig();
-    else this.styling = new NpsWidgetStylingConfig(config.styling);
 
+    this.setStyling(config);
+
+    this.appState = configureStore();
+
+    let x = new StyleProperty();
+
+    x.id = 'poo';
+    x.styleVariableName = 'nps-widget-back';
+    x.value = 'green';
+
+    this.appState.dispatch(addStyle(x));
+
+    console.log(this.appState.getState());
+
+  }
+
+  setStyling(config) {
+    if (!config || !config.styling) {
+      this.styling = new NpsWidgetStylingConfig();
+    } else {
+      this.styling = new NpsWidgetStylingConfig(config.styling);
+    }
   }
 
   static get properties() {
@@ -73,7 +96,7 @@ export default class NpsWidget extends PolymerElement {
           left: var(--nps-left);
           right: var(--nps-right, 10px);
           --paper-fab-background: var(--nps-background-color, #FFE787);
-          color: var(--nps-foreground-color, darkgrey);
+          color: var(--nps-foreground-color, lightgrey);
         }
 
         paper-fab:hover {

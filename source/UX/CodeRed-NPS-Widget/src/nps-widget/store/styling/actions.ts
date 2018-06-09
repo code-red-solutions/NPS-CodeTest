@@ -1,3 +1,6 @@
+import { ActionCreator } from 'redux';
+import { StyleProperty, StylePropertiesState } from './types'
+
 export enum StylingActionTypeKeys {
   CLEAR_ALL = "CLEAR_ALL",
   ADD = "ADD",
@@ -11,14 +14,12 @@ export interface ClearAllAction {
 
 export interface AddAction {
   type: StylingActionTypeKeys.ADD;
-  id: string,
-  styleVariableName: string,
-  value: string
+  styleProperty: StyleProperty;
 }
 
 export interface SubtractAction {
   type: StylingActionTypeKeys.SUBTRACT;
-  id: string
+  id: string;
 }
 
 export interface OtherAction {
@@ -28,4 +29,20 @@ export interface OtherAction {
 export type ActionTypes =
   | ClearAllAction
   | AddAction
-  | SubtractAction;
+  | SubtractAction
+  | OtherAction;
+
+
+export const addStyle: ActionCreator<AddAction> = (styleProperty: StyleProperty) => ({
+  type: StylingActionTypeKeys.ADD,
+  styleProperty: styleProperty
+});
+
+export const subtractStyle: ActionCreator<SubtractAction> = (id: string) => ({
+  type: StylingActionTypeKeys.SUBTRACT,
+  id: id
+});
+
+export const clearStyles: ActionCreator<ClearAllAction> = () => ({
+  type: StylingActionTypeKeys.CLEAR_ALL
+});

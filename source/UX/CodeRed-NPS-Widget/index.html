@@ -33,6 +33,7 @@
                     SystemJS.import('./lib/dev/codered_nps_widget.js').then(function (modules) {
                       const npsWidget = new (modules.NpsWidget)(config);
                       document.getElementsByTagName('body')[0].appendChild(npsWidget);
+                      npsWidget.render();
                     }).catch(error => {
                       console.log(error);
                     });

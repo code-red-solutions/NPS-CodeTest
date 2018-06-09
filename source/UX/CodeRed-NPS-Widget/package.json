@@ -30,6 +30,7 @@
     "mocha": "^4.0.1",
     "polymer-analyzer": "^3.0.1",
     "polymer-webpack-loader": "^2.0.2",
+    "redux-devtools-extension": "^2.13.2",
     "text-loader": "0.0.1",
     "ts-loader": "^4.3.0",
     "typescript": "^2.8.3",
