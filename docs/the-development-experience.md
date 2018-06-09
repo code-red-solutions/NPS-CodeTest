@@ -5,7 +5,7 @@
 layout: home
 title: The Development Experience
 sectionName: devexp
-icon: fa-heartbeat
+icon: fa-code-branch
 excludeDefaultWidget: true
 onlyRawContent: true
 order: 2
