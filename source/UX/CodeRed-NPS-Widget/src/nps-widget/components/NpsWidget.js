@@ -1,21 +1,15 @@
+// external libraries
 import { PolymerElement, html } from '@polymer/polymer/polymer-element.js';
 import '@polymer/paper-fab/paper-fab.js';
 import '@polymer/iron-icons/iron-icons.js';
 import '@polymer/paper-styles/color.js';
-// import { dispatch, Store } from 'redux';
+import * as _ from 'lodash';
 
-// ReSharper disable InconsistentNaming
-import NpsWidgetStylingConfig from '../config/NpsWidgetStylingConfig.ts';
-import StyleDefinitionsMapper from '../services/styleDefinitionsMapper.ts';
-
+// local source
 import { configureStore } from '../store/store';
-import { addStyle } from '../store/styling/actions'; // clearStyles
-import { StyleProperty } from '../store/styling/types';
+import StylingDispatcher from '../services/StylingDispatcher.ts';
+import StyleDefinitionsMapper from '../services/StyleDefinitionsMapper.ts';
 
-// import NpsWidgetProperties from './NpsWidgetProperties.ts';
-// ReSharper restore InconsistentNaming
-
-// ReSharper disable once InconsistentNaming
 export default class NpsWidget extends PolymerElement {
 
   static get is() { return 'nps-widget'; }
@@ -24,33 +18,16 @@ export default class NpsWidget extends PolymerElement {
 
     super();
     this.iconType = 'feedback';
-
-    // Apply config
-
-    this.setStyling(config);
-
     this.store = configureStore();
 
-    let x = new StyleProperty();
+    if (config != null && config.styling != null) {
 
-    x.id = 'poo';
-    x.styleVariableName = 'nps-widget-back';
-    x.value = 'green';
+      const stylingDispatcher = new StylingDispatcher(this.store, new StyleDefinitionsMapper());
 
-    this.store.dispatch(addStyle(x));
+      stylingDispatcher.dispatchStyles(config.styling);
 
-    console.log(this.store.getState());
-
-    // const boundAddStyle = stylePropery => dispatch(addStyle(styleProperty));
-    // boundAddStyle(x);
-  }
-
-  setStyling(config) {
-    if (!config || !config.styling) {
-      this.styling = new NpsWidgetStylingConfig();
-    } else {
-      this.styling = new NpsWidgetStylingConfig(config.styling);
     }
+
   }
 
   static get properties() {
@@ -64,26 +41,18 @@ export default class NpsWidget extends PolymerElement {
 
   render() {
 
-    // TODO: Extract this out to seperate class for proper unit testing
-    const styleDefinitionsMapper = new StyleDefinitionsMapper();
+    const stylingConfig = this.store.getState().styling;
+    const widget = this;
 
-    /* eslint-disable */
-     for (let i = 0; i < styleDefinitionsMapper.definitions.getKeys().length; i++) {
+    _.forEach(stylingConfig, function (styleProperty) {
 
-      const key = styleDefinitionsMapper.definitions.getKeys()[i];
-       const variableName = styleDefinitionsMapper.definitions.get(key);
+      const jsonVariable = {};
 
-      if (variableName) {
-        const value = this.styling[key];
-        const jsonVariable = {};
+      jsonVariable[styleProperty.styleVariableName] = styleProperty.value;
+      widget.updateStyles(jsonVariable);
+      console.log(`Called "this.updateStyles(${styleProperty.styleVariableName}: ${styleProperty.value})"`);
 
-        jsonVariable[variableName] = value;
-        console.log(`Called "this.updateStyles('${variableName}': '${value}')"`);
-        this.updateStyles(jsonVariable);
-      }
-
-     }
-    /* eslint-enable */
+    });
 
   }
 

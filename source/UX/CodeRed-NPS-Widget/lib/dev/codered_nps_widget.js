@@ -30515,21 +30515,23 @@ __webpack_require__(/*! @polymer/iron-icons/iron-icons.js */ "./node_modules/@po
 
 __webpack_require__(/*! @polymer/paper-styles/color.js */ "./node_modules/@polymer/paper-styles/color.js");
 
-var _NpsWidgetStylingConfig = __webpack_require__(/*! ../config/NpsWidgetStylingConfig.ts */ "./src/nps-widget/config/NpsWidgetStylingConfig.ts");
+var _lodash = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
 
-var _NpsWidgetStylingConfig2 = _interopRequireDefault(_NpsWidgetStylingConfig);
-
-var _styleDefinitionsMapper = __webpack_require__(/*! ../services/styleDefinitionsMapper.ts */ "./src/nps-widget/services/styleDefinitionsMapper.ts");
-
-var _styleDefinitionsMapper2 = _interopRequireDefault(_styleDefinitionsMapper);
+var _ = _interopRequireWildcard(_lodash);
 
 var _store = __webpack_require__(/*! ../store/store */ "./src/nps-widget/store/store.ts");
 
-var _actions = __webpack_require__(/*! ../store/styling/actions */ "./src/nps-widget/store/styling/actions.ts");
+var _StylingDispatcher = __webpack_require__(/*! ../services/StylingDispatcher.ts */ "./src/nps-widget/services/StylingDispatcher.ts");
 
-var _types = __webpack_require__(/*! ../store/styling/types */ "./src/nps-widget/store/styling/types.ts");
+var _StylingDispatcher2 = _interopRequireDefault(_StylingDispatcher);
+
+var _StyleDefinitionsMapper = __webpack_require__(/*! ../services/StyleDefinitionsMapper.ts */ "./src/nps-widget/services/StyleDefinitionsMapper.ts");
+
+var _StyleDefinitionsMapper2 = _interopRequireDefault(_StyleDefinitionsMapper);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _taggedTemplateLiteral(strings, raw) { return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); }
 
@@ -30537,17 +30539,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-// import { dispatch, Store } from 'redux';
-
-// ReSharper disable InconsistentNaming
-// clearStyles
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } // external libraries
 
 
-// import NpsWidgetProperties from './NpsWidgetProperties.ts';
-// ReSharper restore InconsistentNaming
+// local source
 
-// ReSharper disable once InconsistentNaming
+
 var NpsWidget = function (_PolymerElement) {
   _inherits(NpsWidget, _PolymerElement);
 
@@ -30564,60 +30561,33 @@ var NpsWidget = function (_PolymerElement) {
     var _this = _possibleConstructorReturn(this, (NpsWidget.__proto__ || Object.getPrototypeOf(NpsWidget)).call(this));
 
     _this.iconType = 'feedback';
-
-    // Apply config
-
-    _this.setStyling(config);
-
     _this.store = (0, _store.configureStore)();
 
-    var x = new _types.StyleProperty();
+    if (config != null && config.styling != null) {
 
-    x.id = 'poo';
-    x.styleVariableName = 'nps-widget-back';
-    x.value = 'green';
+      var stylingDispatcher = new _StylingDispatcher2.default(_this.store, new _StyleDefinitionsMapper2.default());
 
-    _this.store.dispatch((0, _actions.addStyle)(x));
+      stylingDispatcher.dispatchStyles(config.styling);
+    }
 
-    console.log(_this.store.getState());
-
-    // const boundAddStyle = stylePropery => dispatch(addStyle(styleProperty));
-    // boundAddStyle(x);
     return _this;
   }
 
   _createClass(NpsWidget, [{
-    key: 'setStyling',
-    value: function setStyling(config) {
-      if (!config || !config.styling) {
-        this.styling = new _NpsWidgetStylingConfig2.default();
-      } else {
-        this.styling = new _NpsWidgetStylingConfig2.default(config.styling);
-      }
-    }
-  }, {
     key: 'render',
     value: function render() {
 
-      // TODO: Extract this out to seperate class for proper unit testing
-      var styleDefinitionsMapper = new _styleDefinitionsMapper2.default();
+      var stylingConfig = this.store.getState().styling;
+      var widget = this;
 
-      /* eslint-disable */
-      for (var i = 0; i < styleDefinitionsMapper.definitions.getKeys().length; i++) {
+      _.forEach(stylingConfig, function (styleProperty) {
 
-        var key = styleDefinitionsMapper.definitions.getKeys()[i];
-        var variableName = styleDefinitionsMapper.definitions.get(key);
+        var jsonVariable = {};
 
-        if (variableName) {
-          var value = this.styling[key];
-          var jsonVariable = {};
-
-          jsonVariable[variableName] = value;
-          console.log('Called "this.updateStyles(\'' + variableName + '\': \'' + value + '\')"');
-          this.updateStyles(jsonVariable);
-        }
-      }
-      /* eslint-enable */
+        jsonVariable[styleProperty.styleVariableName] = styleProperty.value;
+        widget.updateStyles(jsonVariable);
+        console.log('Called "this.updateStyles(' + styleProperty.styleVariableName + ': ' + styleProperty.value + ')"');
+      });
     }
   }, {
     key: 'dosm',
@@ -30651,158 +30621,6 @@ window.customElements.define(NpsWidget.is, NpsWidget);
 
 /***/ }),
 
-/***/ "./src/nps-widget/config/NpsWidgetStylingConfig.ts":
-/*!*********************************************************!*\
-  !*** ./src/nps-widget/config/NpsWidgetStylingConfig.ts ***!
-  \*********************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var NpsWidgetStylingConfig = /** @class */ (function () {
-    function NpsWidgetStylingConfig(styling) {
-        // TODO: Extract out logic in the constructor for testability and to make it pure POCO
-        this._zindex = null;
-        this._backgroundColour = null;
-        this._backgroundHoverColour = null;
-        this._foregroundColour = null;
-        this._foregroundHoverColour = null;
-        this._top = null;
-        this._bottom = null;
-        this._left = null;
-        this._right = null;
-        this._margin = null;
-        if (!styling)
-            return;
-        // Clear contradicting styles
-        // Will fallback to default styles specified in the template
-        if (styling.left && styling.right) {
-            styling.left = styling.right = null;
-        }
-        if (styling.top && styling.bottom) {
-            styling.top = styling.bottom = null;
-        }
-        this.assing(styling);
-    }
-    NpsWidgetStylingConfig.prototype.assing = function (o) {
-        var that = this;
-        for (var key in o) {
-            if (o.hasOwnProperty(key)) {
-                var value = o[key];
-                if (typeof value !== "undefined" && typeof that[key] !== "undefined")
-                    that[key] = value;
-            }
-        }
-    };
-    Object.defineProperty(NpsWidgetStylingConfig.prototype, "zindex", {
-        get: function () {
-            return this._zindex;
-        },
-        set: function (value) {
-            this._zindex = value;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(NpsWidgetStylingConfig.prototype, "backgroundColour", {
-        get: function () {
-            return this._backgroundColour;
-        },
-        set: function (value) {
-            this._backgroundColour = value;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(NpsWidgetStylingConfig.prototype, "backgroundHoverColour", {
-        get: function () {
-            return this._backgroundHoverColour;
-        },
-        set: function (value) {
-            this._backgroundHoverColour = value;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(NpsWidgetStylingConfig.prototype, "foregroundColour", {
-        get: function () {
-            return this._foregroundColour;
-        },
-        set: function (value) {
-            this._foregroundColour = value;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(NpsWidgetStylingConfig.prototype, "foregroundHoverColour", {
-        get: function () {
-            return this._foregroundHoverColour;
-        },
-        set: function (value) {
-            this._foregroundHoverColour = value;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(NpsWidgetStylingConfig.prototype, "top", {
-        get: function () {
-            return this._top;
-        },
-        set: function (value) {
-            this._top = value;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(NpsWidgetStylingConfig.prototype, "bottom", {
-        get: function () {
-            return this._bottom;
-        },
-        set: function (value) {
-            this._bottom = value;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(NpsWidgetStylingConfig.prototype, "left", {
-        get: function () {
-            return this._left;
-        },
-        set: function (value) {
-            this._left = value;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(NpsWidgetStylingConfig.prototype, "right", {
-        get: function () {
-            return this._right;
-        },
-        set: function (value) {
-            this._right = value;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(NpsWidgetStylingConfig.prototype, "margin", {
-        get: function () {
-            return this._margin;
-        },
-        set: function (value) {
-            this._margin = value;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    return NpsWidgetStylingConfig;
-}());
-exports.default = NpsWidgetStylingConfig;
-
-
-/***/ }),
-
 /***/ "./src/nps-widget/index.ts":
 /*!*********************************!*\
   !*** ./src/nps-widget/index.ts ***!
@@ -30819,9 +30637,9 @@ exports.default = NpsWidget_1.default;
 
 /***/ }),
 
-/***/ "./src/nps-widget/services/styleDefinitionsMapper.ts":
+/***/ "./src/nps-widget/services/StyleDefinitionsMapper.ts":
 /*!***********************************************************!*\
-  !*** ./src/nps-widget/services/styleDefinitionsMapper.ts ***!
+  !*** ./src/nps-widget/services/StyleDefinitionsMapper.ts ***!
   \***********************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
@@ -30854,6 +30672,39 @@ var StyleDefinitionsMapper = /** @class */ (function () {
     return StyleDefinitionsMapper;
 }());
 exports.default = StyleDefinitionsMapper;
+
+
+/***/ }),
+
+/***/ "./src/nps-widget/services/StylingDispatcher.ts":
+/*!******************************************************!*\
+  !*** ./src/nps-widget/services/StylingDispatcher.ts ***!
+  \******************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var actions_1 = __webpack_require__(/*! ../store/styling/actions */ "./src/nps-widget/store/styling/actions.ts");
+var types_1 = __webpack_require__(/*! ../store/styling/types */ "./src/nps-widget/store/styling/types.ts");
+var StylingDispatcher = /** @class */ (function () {
+    function StylingDispatcher(store, styleDefinitionsMapper) {
+        this.styleDefinitionsMapper = styleDefinitionsMapper;
+        this.store = store;
+    }
+    StylingDispatcher.prototype.dispatchStyles = function (styling) {
+        for (var i = 0; i < this.styleDefinitionsMapper.definitions.getKeys().length; i++) {
+            var id = this.styleDefinitionsMapper.definitions.getKeys()[i];
+            var styleVariableName = this.styleDefinitionsMapper.definitions.get(id);
+            var value = styling[id] || null;
+            var styleProperty = new types_1.StyleProperty(id, styleVariableName, value);
+            this.store.dispatch(actions_1.addStyle(styleProperty));
+        }
+    };
+    return StylingDispatcher;
+}());
+exports.default = StylingDispatcher;
 
 
 /***/ }),
@@ -30911,17 +30762,26 @@ exports.configureStore = configureStore;
 Object.defineProperty(exports, "__esModule", { value: true });
 var StylingActionTypeKeys;
 (function (StylingActionTypeKeys) {
-    StylingActionTypeKeys["CLEAR_ALL"] = "CLEAR_ALL";
-    StylingActionTypeKeys["ADD"] = "ADD";
-    StylingActionTypeKeys["OTHER_ACTION"] = "___other_action____";
+    StylingActionTypeKeys["ClearAll"] = "CLEAR_ALL";
+    StylingActionTypeKeys["Add"] = "ADD";
+    StylingActionTypeKeys["OtherAction"] = "___other_action____";
 })(StylingActionTypeKeys = exports.StylingActionTypeKeys || (exports.StylingActionTypeKeys = {}));
+exports.clearStyles = function () { return ({
+    type: StylingActionTypeKeys.ClearAll
+}); };
 exports.addStyle = function (styleProperty) { return ({
-    type: StylingActionTypeKeys.ADD,
+    type: StylingActionTypeKeys.Add,
     styleProperty: styleProperty
 }); };
-exports.clearStyles = function () { return ({
-    type: StylingActionTypeKeys.CLEAR_ALL
-}); };
+//const addStyleThunk: ActionCreator<ThunkResult<Action>> = (styleProperty: StyleProperty) => {
+//  return (dispatch: Dispatch<IAddAction>): Action  => {
+//    // side effects here
+//    return dispatch({
+//      type: StylingActionTypeKeys.Add,
+//      styleProperty: styleProperty
+//    });
+//  };
+//};
 
 
 /***/ }),
@@ -30943,12 +30803,10 @@ exports.initialState = new Array();
 var StylingReducer = function (state, action) {
     if (state === void 0) { state = exports.initialState; }
     switch (action.type) {
-        case StlyingAction.StylingActionTypeKeys.ADD:
-            state.push(action.styleProperty);
-            // ReSharper disable once TsResolvedFromInaccessibleModule
-            return _.assign({}, state);
-        case StlyingAction.StylingActionTypeKeys.CLEAR_ALL:
-            return exports.initialState;
+        case StlyingAction.StylingActionTypeKeys.Add:
+            return _.assign([], _.concat(state, action.styleProperty));
+        case StlyingAction.StylingActionTypeKeys.ClearAll:
+            return new Array();
         default:
             return state;
     }
@@ -30970,7 +30828,10 @@ exports.default = StylingReducer;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var StyleProperty = /** @class */ (function () {
-    function StyleProperty() {
+    function StyleProperty(id, styleVariableName, value) {
+        this.id = id;
+        this.styleVariableName = styleVariableName;
+        this.value = value;
     }
     return StyleProperty;
 }());

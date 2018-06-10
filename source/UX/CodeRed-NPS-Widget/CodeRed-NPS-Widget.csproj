@@ -126,9 +126,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="src\nps-widget\services\styleDefinitionsMapper.ts" />
-    <None Include="src\nps-widget\config\NpsWidgetConfig.ts" />
-    <None Include="src\nps-widget\config\NpsWidgetStylingConfig.ts" />
+    <None Include="src\nps-widget\services\StyleDefinitionsMapper.ts" />
     <None Include="src\nps-widget\index.ts" />
     <None Include="src\nps-widget\store\store.ts" />
     <None Include="src\nps-widget\store\styling\types.ts" />
@@ -141,6 +139,7 @@
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />
   </ItemGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="src\nps-widget\services\StylingDispatcher.ts" />
     <TypeScriptCompile Include="src\nps-widget\store\reducers.ts" />
   </ItemGroup>
   <PropertyGroup>

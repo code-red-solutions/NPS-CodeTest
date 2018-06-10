@@ -1,39 +1,49 @@
-import { Action, ActionCreator, Dispatch } from 'redux';
+import { Action, ActionCreator } from 'redux';
 import { StyleProperty } from './types'
-import NpsWidget from '../../components/NpsWidget.js';
-import StyleDefinitionsMapper from '../../services/styleDefinitionsMapper';
+import { IApplicationState } from '../store';
 import { ThunkAction } from 'redux-thunk';
 
+type ThunkResult<TR> = ThunkAction<TR, IApplicationState, undefined, ActionTypes>;
+
 export enum StylingActionTypeKeys {
-  CLEAR_ALL = "CLEAR_ALL",
-  ADD = "ADD",
-  OTHER_ACTION = "___other_action____"
+  ClearAll = 'CLEAR_ALL',
+  Add = 'ADD',
+  OtherAction = '___other_action____'
 }
 
-export interface ClearAllAction {
-  type: StylingActionTypeKeys.CLEAR_ALL;
+export interface IClearAllAction extends Action {
+  type: StylingActionTypeKeys.ClearAll;
 }
 
-export interface AddAction {
-  type: StylingActionTypeKeys.ADD;
+export interface IAddAction extends Action {
+  type: StylingActionTypeKeys.Add;
   styleProperty: StyleProperty;
 }
 
-export interface OtherAction {
-  type: StylingActionTypeKeys.OTHER_ACTION;
+export interface IOtherAction extends Action {
+  type: StylingActionTypeKeys.OtherAction;
 }
 
 export type ActionTypes =
-  | ClearAllAction
-  | AddAction
-  | OtherAction;
+  | IClearAllAction
+  | IAddAction
+  | IOtherAction;
 
-
-export const addStyle: ActionCreator<AddAction> = (styleProperty: StyleProperty) => ({
-  type: StylingActionTypeKeys.ADD,
-  styleProperty: styleProperty
+export const clearStyles: ActionCreator<IClearAllAction> = () => ({
+  type: StylingActionTypeKeys.ClearAll
 });
 
-export const clearStyles: ActionCreator<ClearAllAction> = () => ({
-  type: StylingActionTypeKeys.CLEAR_ALL
+export const addStyle: ActionCreator<IAddAction> = (styleProperty: StyleProperty) => ({
+  type: StylingActionTypeKeys.Add,
+  styleProperty
 });
+
+//const addStyleThunk: ActionCreator<ThunkResult<Action>> = (styleProperty: StyleProperty) => {
+//  return (dispatch: Dispatch<IAddAction>): Action  => {
+//    // side effects here
+//    return dispatch({
+//      type: StylingActionTypeKeys.Add,
+//      styleProperty: styleProperty
+//    });
+//  };
+//};
