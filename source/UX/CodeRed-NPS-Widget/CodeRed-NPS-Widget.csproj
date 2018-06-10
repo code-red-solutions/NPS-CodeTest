@@ -71,36 +71,36 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="indexBundleViaDocumentCreateElement.html" />
-    <Content Include="conf\webpack.config.test.js" />
-    <Content Include="conf\webpack.config.dev.js" />
-    <Content Include="conf\webpack.config.prod.js" />
+    <None Include="conf\webpack.config.test.js" />
+    <None Include="conf\webpack.config.dev.js" />
+    <None Include="conf\webpack.config.prod.js" />
     <Content Include="index.html" />
-    <Content Include="lib\dev\custom-elements-es5-adapter.js" />
-    <Content Include="lib\dev\static\Capture.PNG" />
-    <Content Include="lib\dev\webcomponents-loader.js" />
-    <Content Include="lib\prod\codered_nps_widget.min.js" />
-    <Content Include="lib\dev\codered_nps_widget.js.map" />
-    <Content Include="lib\prod\static\Capture.PNG" />
-    <Content Include="lib\prod\webcomponents-loader.js" />
-    <Content Include="lib\test\codered_nps_widget.js" />
-    <Content Include="lib\test\custom-elements-es5-adapter.js" />
-    <Content Include="lib\test\static\Capture.PNG" />
-    <Content Include="lib\test\webcomponents-loader.js" />
-    <Content Include="package-lock.json" />
-    <Content Include="lib\test\codered_nps_widget.js.map" />
+    <None Include="lib\dev\custom-elements-es5-adapter.js" />
+    <None Include="lib\dev\static\Capture.PNG" />
+    <None Include="lib\dev\webcomponents-loader.js" />
+    <None Include="lib\prod\codered_nps_widget.min.js" />
+    <None Include="lib\dev\codered_nps_widget.js.map" />
+    <None Include="lib\prod\static\Capture.PNG" />
+    <None Include="lib\prod\webcomponents-loader.js" />
+    <None Include="lib\test\codered_nps_widget.js" />
+    <None Include="lib\test\custom-elements-es5-adapter.js" />
+    <None Include="lib\test\static\Capture.PNG" />
+    <None Include="lib\test\webcomponents-loader.js" />
+    <None Include="package-lock.json" />
+    <None Include="lib\test\codered_nps_widget.js.map" />
     <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
     <None Include="src\cat.js" />
     <None Include="src\dog.js" />
-    <Content Include="lib\dev\codered_nps_widget.js" />
-    <Content Include="src\index-test.js" />
-    <Content Include="src\index.js" />
-    <Content Include="src\nps-widget\components\NpsWidget.js" />
-    <Content Include="src\tsconfig.json" />
+    <None Include="lib\dev\codered_nps_widget.js" />
+    <None Include="src\index-test.js" />
+    <None Include="src\index.js" />
+    <None Include="src\nps-widget\components\NpsWidget.js" />
+    <None Include="src\tsconfig.json" />
     <None Include="test\index.spec.js" />
-    <Content Include="favicon.ico" />
+    <None Include="favicon.ico" />
     <None Include=".gitignore" />
-    <Content Include="static\Capture.PNG" />
-    <Content Include="test\nps-widget\index.spec.js" />
+    <None Include="static\Capture.PNG" />
+    <None Include="test\nps-widget\index.spec.js" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
@@ -126,22 +126,23 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <TypeScriptCompile Include="src\nps-widget\services\styleDefinitionsMapper.ts" />
-    <TypeScriptCompile Include="src\nps-widget\config\NpsWidgetConfig.ts" />
-    <TypeScriptCompile Include="src\nps-widget\config\NpsWidgetStylingConfig.ts" />
-    <TypeScriptCompile Include="src\nps-widget\index.ts" />
-    <TypeScriptCompile Include="src\nps-widget\store\configureStore.ts" />
-    <TypeScriptCompile Include="src\nps-widget\store\index.ts" />
-    <TypeScriptCompile Include="src\nps-widget\store\styling\types.ts" />
-    <TypeScriptCompile Include="src\nps-widget\store\styling\actions.ts" />
-    <TypeScriptCompile Include="src\nps-widget\store\styling\reducer.ts" />
-    <TypeScriptCompile Include="src\welcome.ts" />
-    <TypeScriptCompile Include="src\utils\Dictionary.ts" />
+    <None Include="src\nps-widget\services\styleDefinitionsMapper.ts" />
+    <None Include="src\nps-widget\config\NpsWidgetConfig.ts" />
+    <None Include="src\nps-widget\config\NpsWidgetStylingConfig.ts" />
+    <None Include="src\nps-widget\index.ts" />
+    <None Include="src\nps-widget\store\store.ts" />
+    <None Include="src\nps-widget\store\styling\types.ts" />
+    <None Include="src\nps-widget\store\styling\actions.ts" />
+    <None Include="src\nps-widget\store\styling\reducer.ts" />
+    <None Include="src\welcome.ts" />
+    <None Include="src\utils\Dictionary.ts" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <TypeScriptCompile Include="src\nps-widget\store\reducers.ts" />
+  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>

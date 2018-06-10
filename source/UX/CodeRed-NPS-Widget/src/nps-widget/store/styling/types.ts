@@ -4,7 +4,3 @@ export class StyleProperty {
   styleVariableName: string;
   value: string;
 }
-
-export class StylePropertiesState {
-  styles: StyleProperty[]
-}

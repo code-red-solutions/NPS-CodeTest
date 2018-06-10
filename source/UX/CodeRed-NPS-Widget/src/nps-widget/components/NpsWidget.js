@@ -2,13 +2,16 @@ import { PolymerElement, html } from '@polymer/polymer/polymer-element.js';
 import '@polymer/paper-fab/paper-fab.js';
 import '@polymer/iron-icons/iron-icons.js';
 import '@polymer/paper-styles/color.js';
+// import { dispatch, Store } from 'redux';
 
 // ReSharper disable InconsistentNaming
 import NpsWidgetStylingConfig from '../config/NpsWidgetStylingConfig.ts';
 import StyleDefinitionsMapper from '../services/styleDefinitionsMapper.ts';
-import configureStore from '../store/configurestore.ts';
-import { addStyle } from '../store/styling/actions.ts'; // , subtractStyle, clearStyles
-import { StyleProperty } from '../store/styling/types.ts';
+
+import { configureStore } from '../store/store';
+import { addStyle } from '../store/styling/actions'; // clearStyles
+import { StyleProperty } from '../store/styling/types';
+
 // import NpsWidgetProperties from './NpsWidgetProperties.ts';
 // ReSharper restore InconsistentNaming
 
@@ -26,7 +29,7 @@ export default class NpsWidget extends PolymerElement {
 
     this.setStyling(config);
 
-    this.appState = configureStore();
+    this.store = configureStore();
 
     let x = new StyleProperty();
 
@@ -34,10 +37,12 @@ export default class NpsWidget extends PolymerElement {
     x.styleVariableName = 'nps-widget-back';
     x.value = 'green';
 
-    this.appState.dispatch(addStyle(x));
+    this.store.dispatch(addStyle(x));
 
-    console.log(this.appState.getState());
+    console.log(this.store.getState());
 
+    // const boundAddStyle = stylePropery => dispatch(addStyle(styleProperty));
+    // boundAddStyle(x);
   }
 
   setStyling(config) {

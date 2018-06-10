@@ -1,10 +1,12 @@
-import { ActionCreator } from 'redux';
-import { StyleProperty, StylePropertiesState } from './types'
+import { Action, ActionCreator, Dispatch } from 'redux';
+import { StyleProperty } from './types'
+import NpsWidget from '../../components/NpsWidget.js';
+import StyleDefinitionsMapper from '../../services/styleDefinitionsMapper';
+import { ThunkAction } from 'redux-thunk';
 
 export enum StylingActionTypeKeys {
   CLEAR_ALL = "CLEAR_ALL",
   ADD = "ADD",
-  SUBTRACT = "SUBTRACT",
   OTHER_ACTION = "___other_action____"
 }
 
@@ -17,11 +19,6 @@ export interface AddAction {
   styleProperty: StyleProperty;
 }
 
-export interface SubtractAction {
-  type: StylingActionTypeKeys.SUBTRACT;
-  id: string;
-}
-
 export interface OtherAction {
   type: StylingActionTypeKeys.OTHER_ACTION;
 }
@@ -29,18 +26,12 @@ export interface OtherAction {
 export type ActionTypes =
   | ClearAllAction
   | AddAction
-  | SubtractAction
   | OtherAction;
 
 
 export const addStyle: ActionCreator<AddAction> = (styleProperty: StyleProperty) => ({
   type: StylingActionTypeKeys.ADD,
   styleProperty: styleProperty
-});
-
-export const subtractStyle: ActionCreator<SubtractAction> = (id: string) => ({
-  type: StylingActionTypeKeys.SUBTRACT,
-  id: id
 });
 
 export const clearStyles: ActionCreator<ClearAllAction> = () => ({
