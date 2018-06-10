@@ -82,16 +82,16 @@ export default class NpsWidget extends PolymerElement {
 
       </style>
 
-      <paper-fab icon="icons:{{iconType}}" on-click="dosm"/>
+      <paper-fab icon="icons:{{iconType}}" on-click="dosm"></paper-fab>
 
-    <paper-dialog id="modal" modal>
-      <h2>Header</h2>
-        Lorem ipsum...
-      <div class="buttons">
-        <paper-button dialog-dismiss>Cancel</paper-button>
-        <paper-button dialog-confirm autofocus>Accept</paper-button>
-      </div>
-    </paper-dialog>
+      <paper-dialog id="modal" modal>
+        <h2>Header</h2>
+          Lorem ipsum...
+        <div class="buttons">
+          <paper-button dialog-dismiss>Cancel</paper-button>
+          <paper-button dialog-confirm autofocus>Accept</paper-button>
+        </div>
+      </paper-dialog>
     `;
 
   }
