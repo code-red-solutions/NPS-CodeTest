@@ -46,17 +46,32 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// define getter function for harmony exports
 /******/ 	__webpack_require__.d = function(exports, name, getter) {
 /******/ 		if(!__webpack_require__.o(exports, name)) {
-/******/ 			Object.defineProperty(exports, name, {
-/******/ 				configurable: false,
-/******/ 				enumerable: true,
-/******/ 				get: getter
-/******/ 			});
+/******/ 			Object.defineProperty(exports, name, { enumerable: true, get: getter });
 /******/ 		}
 /******/ 	};
 /******/
 /******/ 	// define __esModule on exports
 /******/ 	__webpack_require__.r = function(exports) {
+/******/ 		if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 			Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 		}
 /******/ 		Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 	};
+/******/
+/******/ 	// create a fake namespace object
+/******/ 	// mode & 1: value is a module id, require it
+/******/ 	// mode & 2: merge all properties of value into the ns
+/******/ 	// mode & 4: return value when already ns object
+/******/ 	// mode & 8|1: behave like require
+/******/ 	__webpack_require__.t = function(value, mode) {
+/******/ 		if(mode & 1) value = __webpack_require__(value);
+/******/ 		if(mode & 8) return value;
+/******/ 		if((mode & 4) && typeof value === 'object' && value && value.__esModule) return value;
+/******/ 		var ns = Object.create(null);
+/******/ 		__webpack_require__.r(ns);
+/******/ 		Object.defineProperty(ns, 'default', { enumerable: true, value: value });
+/******/ 		if(mode & 2 && typeof value != 'string') for(var key in value) __webpack_require__.d(ns, key, function(key) { return value[key]; }.bind(null, key));
+/******/ 		return ns;
 /******/ 	};
 /******/
 /******/ 	// getDefaultExport function for compatibility with non-harmony modules
@@ -81,84 +96,6 @@ return /******/ (function(modules) { // webpackBootstrap
 /************************************************************************/
 /******/ ({
 
-/***/ "./src/cat.js":
-/*!********************!*\
-  !*** ./src/cat.js ***!
-  \********************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var Cat = function () {
-  function Cat() {
-    _classCallCheck(this, Cat);
-
-    this._name = 'Cat';
-  }
-
-  _createClass(Cat, [{
-    key: 'name',
-    get: function get() {
-      return this._name;
-    }
-  }]);
-
-  return Cat;
-}();
-
-exports.default = Cat;
-
-/***/ }),
-
-/***/ "./src/dog.js":
-/*!********************!*\
-  !*** ./src/dog.js ***!
-  \********************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var Dog = function () {
-  function Dog() {
-    _classCallCheck(this, Dog);
-
-    this._name = 'Dog';
-  }
-
-  _createClass(Dog, [{
-    key: 'name',
-    get: function get() {
-      return this._name;
-    }
-  }]);
-
-  return Dog;
-}();
-
-exports.default = Dog;
-
-/***/ }),
-
 /***/ "./src/index-test.js":
 /*!***************************!*\
   !*** ./src/index-test.js ***!
@@ -168,262 +105,13 @@ exports.default = Dog;
 
 "use strict";
 
+//import Cat from './cat.js';
+//import Dog from './dog.js';
+//import Welcome from './welcome.ts';
+//import NpsWidgetConfig from './nps-widget/config/NpsWidgetConfig';
+//import NpsWidgetStylingConfig from './nps-widget/config/NpsWidgetStylingConfig';
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.NpsWidgetStylingConfig = exports.NpsWidgetConfig = exports.Welcome = exports.Dog = exports.Cat = undefined;
-
-var _cat = __webpack_require__(/*! ./cat.js */ "./src/cat.js");
-
-var _cat2 = _interopRequireDefault(_cat);
-
-var _dog = __webpack_require__(/*! ./dog.js */ "./src/dog.js");
-
-var _dog2 = _interopRequireDefault(_dog);
-
-var _welcome = __webpack_require__(/*! ./welcome.ts */ "./src/welcome.ts");
-
-var _welcome2 = _interopRequireDefault(_welcome);
-
-var _NpsWidgetConfig = __webpack_require__(/*! ./nps-widget/config/NpsWidgetConfig */ "./src/nps-widget/config/NpsWidgetConfig.ts");
-
-var _NpsWidgetConfig2 = _interopRequireDefault(_NpsWidgetConfig);
-
-var _NpsWidgetStylingConfig = __webpack_require__(/*! ./nps-widget/config/NpsWidgetStylingConfig */ "./src/nps-widget/config/NpsWidgetStylingConfig.ts");
-
-var _NpsWidgetStylingConfig2 = _interopRequireDefault(_NpsWidgetStylingConfig);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-exports.Cat = _cat2.default;
-exports.Dog = _dog2.default;
-exports.Welcome = _welcome2.default;
-exports.NpsWidgetConfig = _NpsWidgetConfig2.default;
-exports.NpsWidgetStylingConfig = _NpsWidgetStylingConfig2.default;
-
-/***/ }),
-
-/***/ "./src/nps-widget/config/NpsWidgetConfig.ts":
-/*!**************************************************!*\
-  !*** ./src/nps-widget/config/NpsWidgetConfig.ts ***!
-  \**************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var NpsWidgetStylingConfig_1 = __webpack_require__(/*! ./NpsWidgetStylingConfig */ "./src/nps-widget/config/NpsWidgetStylingConfig.ts");
-var NpsWidgetConfig = /** @class */ (function () {
-    function NpsWidgetConfig(npsWidgetStyling) {
-        if (npsWidgetStyling == null)
-            npsWidgetStyling = new NpsWidgetStylingConfig_1.default();
-        this._styling = npsWidgetStyling;
-    }
-    Object.defineProperty(NpsWidgetConfig.prototype, "styling", {
-        get: function () {
-            return this._styling;
-        },
-        set: function (value) {
-            this._styling = value;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    return NpsWidgetConfig;
-}());
-exports.default = NpsWidgetConfig;
-
-
-/***/ }),
-
-/***/ "./src/nps-widget/config/NpsWidgetStylingConfig.ts":
-/*!*********************************************************!*\
-  !*** ./src/nps-widget/config/NpsWidgetStylingConfig.ts ***!
-  \*********************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var NpsWidgetStylingConfig = /** @class */ (function () {
-    function NpsWidgetStylingConfig(styling) {
-        // TODO: Extract out logic in the constructor for testability and to make it pure POCO
-        this._zindex = null;
-        this._backgroundColour = null;
-        this._backgroundHoverColour = null;
-        this._foregroundColour = null;
-        this._foregroundHoverColour = null;
-        this._top = null;
-        this._bottom = null;
-        this._left = null;
-        this._right = null;
-        this._margin = null;
-        if (!styling)
-            return;
-        // Clear contradicting styles
-        // Will fallback to default styles specified in the template
-        if (styling.left && styling.right) {
-            styling.left = styling.right = null;
-        }
-        if (styling.top && styling.bottom) {
-            styling.top = styling.bottom = null;
-        }
-        this.assing(styling);
-    }
-    NpsWidgetStylingConfig.prototype.assing = function (o) {
-        var that = this;
-        for (var key in o) {
-            if (o.hasOwnProperty(key)) {
-                var value = o[key];
-                if (typeof value !== "undefined" && typeof that[key] !== "undefined")
-                    that[key] = value;
-            }
-        }
-    };
-    Object.defineProperty(NpsWidgetStylingConfig.prototype, "zindex", {
-        get: function () {
-            return this._zindex;
-        },
-        set: function (value) {
-            this._zindex = value;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(NpsWidgetStylingConfig.prototype, "backgroundColour", {
-        get: function () {
-            return this._backgroundColour;
-        },
-        set: function (value) {
-            this._backgroundColour = value;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(NpsWidgetStylingConfig.prototype, "backgroundHoverColour", {
-        get: function () {
-            return this._backgroundHoverColour;
-        },
-        set: function (value) {
-            this._backgroundHoverColour = value;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(NpsWidgetStylingConfig.prototype, "foregroundColour", {
-        get: function () {
-            return this._foregroundColour;
-        },
-        set: function (value) {
-            this._foregroundColour = value;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(NpsWidgetStylingConfig.prototype, "foregroundHoverColour", {
-        get: function () {
-            return this._foregroundHoverColour;
-        },
-        set: function (value) {
-            this._foregroundHoverColour = value;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(NpsWidgetStylingConfig.prototype, "top", {
-        get: function () {
-            return this._top;
-        },
-        set: function (value) {
-            this._top = value;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(NpsWidgetStylingConfig.prototype, "bottom", {
-        get: function () {
-            return this._bottom;
-        },
-        set: function (value) {
-            this._bottom = value;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(NpsWidgetStylingConfig.prototype, "left", {
-        get: function () {
-            return this._left;
-        },
-        set: function (value) {
-            this._left = value;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(NpsWidgetStylingConfig.prototype, "right", {
-        get: function () {
-            return this._right;
-        },
-        set: function (value) {
-            this._right = value;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(NpsWidgetStylingConfig.prototype, "margin", {
-        get: function () {
-            return this._margin;
-        },
-        set: function (value) {
-            this._margin = value;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    return NpsWidgetStylingConfig;
-}());
-exports.default = NpsWidgetStylingConfig;
-
-
-/***/ }),
-
-/***/ "./src/welcome.ts":
-/*!************************!*\
-  !*** ./src/welcome.ts ***!
-  \************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var Welcome = /** @class */ (function () {
-    function Welcome(usersName) {
-        this._name = usersName;
-    }
-    ;
-    Object.defineProperty(Welcome.prototype, "usersName", {
-        get: function () {
-            return this._name;
-        },
-        set: function (value) {
-            this._name = value;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Welcome.prototype.GetWelcomeMessage = function () {
-        return "<h2>Hello there " + this._name + ", Let's learn TypeScript</h2>";
-    };
-    Welcome.prototype.ClickMeButton = function () {
-        document.getElementById("divMsg").innerHTML = this.GetWelcomeMessage();
-    };
-    return Welcome;
-}());
-exports.default = Welcome;
+//export { Cat, Dog, Welcome, NpsWidgetConfig, NpsWidgetStylingConfig };
 
 
 /***/ })

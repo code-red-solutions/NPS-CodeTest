@@ -89,8 +89,6 @@
     <None Include="package-lock.json" />
     <None Include="lib\test\codered_nps_widget.js.map" />
     <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
-    <None Include="src\cat.js" />
-    <None Include="src\dog.js" />
     <None Include="lib\dev\codered_nps_widget.js" />
     <None Include="src\index-test.js" />
     <None Include="src\index.js" />

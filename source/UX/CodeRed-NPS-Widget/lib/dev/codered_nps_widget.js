@@ -30371,84 +30371,6 @@ module.exports = function (module) {
 
 /***/ }),
 
-/***/ "./src/cat.js":
-/*!********************!*\
-  !*** ./src/cat.js ***!
-  \********************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var Cat = function () {
-  function Cat() {
-    _classCallCheck(this, Cat);
-
-    this._name = 'Cat';
-  }
-
-  _createClass(Cat, [{
-    key: 'name',
-    get: function get() {
-      return this._name;
-    }
-  }]);
-
-  return Cat;
-}();
-
-exports.default = Cat;
-
-/***/ }),
-
-/***/ "./src/dog.js":
-/*!********************!*\
-  !*** ./src/dog.js ***!
-  \********************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var Dog = function () {
-  function Dog() {
-    _classCallCheck(this, Dog);
-
-    this._name = 'Dog';
-  }
-
-  _createClass(Dog, [{
-    key: 'name',
-    get: function get() {
-      return this._name;
-    }
-  }]);
-
-  return Dog;
-}();
-
-exports.default = Dog;
-
-/***/ }),
-
 /***/ "./src/index.js":
 /*!**********************!*\
   !*** ./src/index.js ***!
@@ -30462,19 +30384,7 @@ exports.default = Dog;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.NpsWidget = exports.Welcome = exports.Dog = exports.Cat = undefined;
-
-var _cat = __webpack_require__(/*! ./cat.js */ "./src/cat.js");
-
-var _cat2 = _interopRequireDefault(_cat);
-
-var _dog = __webpack_require__(/*! ./dog.js */ "./src/dog.js");
-
-var _dog2 = _interopRequireDefault(_dog);
-
-var _welcome = __webpack_require__(/*! ./welcome.ts */ "./src/welcome.ts");
-
-var _welcome2 = _interopRequireDefault(_welcome);
+exports.NpsWidget = undefined;
 
 var _index = __webpack_require__(/*! ./nps-widget/index.ts */ "./src/nps-widget/index.ts");
 
@@ -30482,9 +30392,6 @@ var _index2 = _interopRequireDefault(_index);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-exports.Cat = _cat2.default;
-exports.Dog = _dog2.default;
-exports.Welcome = _welcome2.default;
 exports.NpsWidget = _index2.default;
 
 /***/ }),
@@ -30877,44 +30784,6 @@ var Dictionary = /** @class */ (function () {
     return Dictionary;
 }());
 exports.Dictionary = Dictionary;
-
-
-/***/ }),
-
-/***/ "./src/welcome.ts":
-/*!************************!*\
-  !*** ./src/welcome.ts ***!
-  \************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var Welcome = /** @class */ (function () {
-    function Welcome(usersName) {
-        this._name = usersName;
-    }
-    ;
-    Object.defineProperty(Welcome.prototype, "usersName", {
-        get: function () {
-            return this._name;
-        },
-        set: function (value) {
-            this._name = value;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Welcome.prototype.GetWelcomeMessage = function () {
-        return "<h2>Hello there " + this._name + ", Let's learn TypeScript</h2>";
-    };
-    Welcome.prototype.ClickMeButton = function () {
-        document.getElementById("divMsg").innerHTML = this.GetWelcomeMessage();
-    };
-    return Welcome;
-}());
-exports.default = Welcome;
 
 
 /***/ })
