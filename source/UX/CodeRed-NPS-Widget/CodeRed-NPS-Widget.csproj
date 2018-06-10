@@ -4,6 +4,7 @@
   <Import Project="..\..\packages\Microsoft.Net.Compilers.2.6.1\build\Microsoft.Net.Compilers.props" Condition="Exists('..\..\packages\Microsoft.Net.Compilers.2.6.1\build\Microsoft.Net.Compilers.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
+    <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>
@@ -93,7 +94,6 @@
     <None Include="src\index-test.js" />
     <None Include="src\index.js" />
     <None Include="src\nps-widget\components\NpsWidget.js" />
-    <None Include="src\tsconfig.json" />
     <None Include="test\index.spec.js" />
     <None Include="favicon.ico" />
     <None Include=".gitignore" />
@@ -115,7 +115,7 @@
     <None Include="packages.config" />
     <None Include="project.lock.json" />
     <None Include="README-webpack-library-starter.md" />
-    <None Include="tsconfig.json" />
+    <Content Include="tsconfig.json" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -130,7 +130,6 @@
     <None Include="src\nps-widget\store\styling\types.ts" />
     <None Include="src\nps-widget\store\styling\actions.ts" />
     <None Include="src\nps-widget\store\styling\reducer.ts" />
-    <None Include="src\welcome.ts" />
     <None Include="src\utils\Dictionary.ts" />
   </ItemGroup>
   <ItemGroup>

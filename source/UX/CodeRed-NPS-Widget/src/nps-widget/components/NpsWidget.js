@@ -3,6 +3,8 @@ import { PolymerElement, html } from '@polymer/polymer/polymer-element.js';
 import '@polymer/paper-fab/paper-fab.js';
 import '@polymer/iron-icons/iron-icons.js';
 import '@polymer/paper-styles/color.js';
+import '@polymer/paper-dialog/paper-dialog.js';
+import '@polymer/paper-button/paper-button.js';
 import * as _ from 'lodash';
 
 // local source
@@ -80,12 +82,28 @@ export default class NpsWidget extends PolymerElement {
 
       </style>
 
-      <paper-fab icon="icons:[[iconType]]" on-click="dosm"/>
+      <paper-fab icon="icons:{{iconType}}" on-click="dosm"/>
+
+    <paper-dialog id="modal" modal>
+      <h2>Header</h2>
+        Lorem ipsum...
+      <div class="buttons">
+        <paper-button dialog-dismiss>Cancel</paper-button>
+        <paper-button dialog-confirm autofocus>Accept</paper-button>
+      </div>
+    </paper-dialog>
     `;
+
+  }
+
+  ready() {
+    super.ready();
   }
 
   dosm() {
     console.log('dosm clicked');
+    this.$.modal.open();
+    this.iconType = this.iconType === 'help' ? 'feedback' : 'help';
   }
 }
 
