@@ -98,7 +98,7 @@
     <None Include="favicon.ico" />
     <None Include=".gitignore" />
     <None Include="static\Capture.PNG" />
-    <None Include="test\nps-widget\services\index.spec.js" />
+    <TypeScriptCompile Include="test\nps-widget\services\index.spec.ts" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>

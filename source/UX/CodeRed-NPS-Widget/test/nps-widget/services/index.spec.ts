@@ -1,13 +1,8 @@
 /* global describe, it, before */
+// ReSharper disable TsResolvedFromInaccessibleModule
 
 import * as Services from '../../../lib/test/codered_nps_widget.js';
-
-
-import chai from 'chai';
-
-chai.expect();
-
-const expect = chai.expect;
+import { expect } from 'chai';
 
 // let dispatcher;
 let mapper;
@@ -38,3 +33,5 @@ describe('Given an instance of the StyleDefinitionsMapper class', () => {
 //    });
 //  });
 //});
+
+// ReSharper restore TsResolvedFromInaccessibleModule
