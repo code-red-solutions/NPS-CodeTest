@@ -9,9 +9,13 @@ import * as _ from 'lodash';
 
 // local source
 import { configureStore } from '../store/store';
+// import SettingsAnswerRangeDispatcher from '../services/SettingsAnswerRangeDispatcher.ts';
 import StylingDispatcher from '../services/StylingDispatcher.ts';
 import StyleDefinitionsMapper from '../services/StyleDefinitionsMapper.ts';
 import StyleDefinitionsDataHelper from '../data/StyleDefinitionsDataHelper.ts';
+import AnswerValuesCreator from '../services/AnswerValuesCreator.ts';
+import { MiscSettings } from '../store/settings/types.ts';
+import { addMiscSettings, setAnswerRangesThunk } from '../store/settings/actions.ts';
 
 export default class NpsWidget extends PolymerElement {
 
@@ -23,16 +27,52 @@ export default class NpsWidget extends PolymerElement {
     this.iconType = 'feedback';
     this.store = configureStore();
 
-    if (config != null && config.styling != null) {
+    // log the state
+    console.log(this.store.getState());
 
-      const stylingDispatcher = new StylingDispatcher(
-        this.store,
-        new StyleDefinitionsMapper(StyleDefinitionsDataHelper.GetData())
-      );
+    // Check to see if there's custom config to apply
+    if (config != null) {
 
-      stylingDispatcher.dispatchStyles(config.styling);
+      // Apply any styling config
+      if (config.styling != null) {
+        const stylingDispatcher = new StylingDispatcher(
+          this.store,
+          new StyleDefinitionsMapper(StyleDefinitionsDataHelper.GetData())
+        );
+
+        stylingDispatcher.dispatchStyles(config.styling);
+      }
+
+      // Check to see if there's any settings config
+      if (config.settings != null) {
+
+        // Apply any answer settings config
+        if (config.settings.answerRanges != null) {
+
+          this.store.dispatch(
+            setAnswerRangesThunk(config.settings.answerRanges, new AnswerValuesCreator())
+          );
+
+        }
+
+        const miscSettings = _.assign(
+          new MiscSettings(),
+          {
+            widgetName: config.settings.widgetName,
+            timeOutOnAnswer: config.settings.timeOutOnAnswer,
+            mainQuestion: config.settings.mainQuestion,
+            introductionStatement: config.settings.introductionStatement
+          }
+        );
+
+        this.store.dispatch(addMiscSettings(miscSettings));
+
+      }
 
     }
+
+    // log the state
+    console.log(this.store.getState());
 
   }
 

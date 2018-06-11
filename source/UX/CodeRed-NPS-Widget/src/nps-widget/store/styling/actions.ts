@@ -1,9 +1,9 @@
 import { Action, ActionCreator } from 'redux';
 import { StyleProperty } from './types'
 import { IApplicationState } from '../store';
-import { ThunkAction } from 'redux-thunk';
+// import { ThunkAction } from 'redux-thunk';
 
-type ThunkResult<TR> = ThunkAction<TR, IApplicationState, undefined, ActionTypes>;
+// type ThunkResult<TR> = ThunkAction<TR, IApplicationState, undefined, ActionTypes>;
 
 export enum StylingActionTypeKeys {
   ClearAll = 'CLEAR_ALL',

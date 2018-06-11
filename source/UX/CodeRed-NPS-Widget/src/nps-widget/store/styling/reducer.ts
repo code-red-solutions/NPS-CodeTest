@@ -1,5 +1,5 @@
 import { Reducer } from 'redux';
-import * as StlyingAction from './actions'
+import * as Actions from './actions'
 import { StyleProperty } from './types';
 import * as _ from 'lodash';
 
@@ -8,10 +8,12 @@ export const initialState = <Array<StyleProperty>>new Array();
 
 const StylingReducer: Reducer<Array<StyleProperty>> = (state: StyleProperty[] = initialState, action: any) =>
 {
-  switch ((action as StlyingAction.ActionTypes).type) {
-    case StlyingAction.StylingActionTypeKeys.Add:
+  switch ((action as Actions.ActionTypes).type) {
+    case Actions.StylingActionTypeKeys.Add:
+      // ReSharper disable TsResolvedFromInaccessibleModule
       return _.assign([], _.concat(state, action.styleProperty));
-    case StlyingAction.StylingActionTypeKeys.ClearAll:
+      // ReSharper restore TsResolvedFromInaccessibleModule
+    case Actions.StylingActionTypeKeys.ClearAll:
       return <Array<StyleProperty>>new Array();
     default:
       return state;

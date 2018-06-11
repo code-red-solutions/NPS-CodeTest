@@ -34218,6 +34218,14 @@ var _StyleDefinitionsDataHelper = __webpack_require__(/*! ../data/StyleDefinitio
 
 var _StyleDefinitionsDataHelper2 = _interopRequireDefault(_StyleDefinitionsDataHelper);
 
+var _AnswerValuesCreator = __webpack_require__(/*! ../services/AnswerValuesCreator.ts */ "./src/nps-widget/services/AnswerValuesCreator.ts");
+
+var _AnswerValuesCreator2 = _interopRequireDefault(_AnswerValuesCreator);
+
+var _types = __webpack_require__(/*! ../store/settings/types.ts */ "./src/nps-widget/store/settings/types.ts");
+
+var _actions = __webpack_require__(/*! ../store/settings/actions.ts */ "./src/nps-widget/store/settings/actions.ts");
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
@@ -34232,6 +34240,8 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 
 // local source
+
+// import SettingsAnswerRangeDispatcher from '../services/SettingsAnswerRangeDispatcher.ts';
 
 
 var NpsWidget = function (_PolymerElement) {
@@ -34252,12 +34262,41 @@ var NpsWidget = function (_PolymerElement) {
     _this.iconType = 'feedback';
     _this.store = (0, _store.configureStore)();
 
-    if (config != null && config.styling != null) {
+    // log the state
+    console.log(_this.store.getState());
 
-      var stylingDispatcher = new _StylingDispatcher2.default(_this.store, new _StyleDefinitionsMapper2.default(_StyleDefinitionsDataHelper2.default.GetData()));
+    // Check to see if there's custom config to apply
+    if (config != null) {
 
-      stylingDispatcher.dispatchStyles(config.styling);
+      // Apply any styling config
+      if (config.styling != null) {
+        var stylingDispatcher = new _StylingDispatcher2.default(_this.store, new _StyleDefinitionsMapper2.default(_StyleDefinitionsDataHelper2.default.GetData()));
+
+        stylingDispatcher.dispatchStyles(config.styling);
+      }
+
+      // Check to see if there's any settings config
+      if (config.settings != null) {
+
+        // Apply any answer settings config
+        if (config.settings.answerRanges != null) {
+
+          _this.store.dispatch((0, _actions.setAnswerRangesThunk)(config.settings.answerRanges, new _AnswerValuesCreator2.default()));
+        }
+
+        var miscSettings = _.assign(new _types.MiscSettings(), {
+          widgetName: config.settings.widgetName,
+          timeOutOnAnswer: config.settings.timeOutOnAnswer,
+          mainQuestion: config.settings.mainQuestion,
+          introductionStatement: config.settings.introductionStatement
+        });
+
+        _this.store.dispatch((0, _actions.addMiscSettings)(miscSettings));
+      }
     }
+
+    // log the state
+    console.log(_this.store.getState());
 
     return _this;
   }
@@ -34369,6 +34408,33 @@ exports.default = NpsWidget_1.default;
 
 /***/ }),
 
+/***/ "./src/nps-widget/services/AnswerValuesCreator.ts":
+/*!********************************************************!*\
+  !*** ./src/nps-widget/services/AnswerValuesCreator.ts ***!
+  \********************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var AnswerValuesCreator = /** @class */ (function () {
+    function AnswerValuesCreator() {
+    }
+    AnswerValuesCreator.prototype.getValues = function (start, end) {
+        var answerValues = new Array();
+        for (var i = start; i < end + 1; i++) {
+            answerValues.push(i);
+        }
+        return answerValues;
+    };
+    return AnswerValuesCreator;
+}());
+exports.default = AnswerValuesCreator;
+
+
+/***/ }),
+
 /***/ "./src/nps-widget/services/StyleDefinitionsMapper.ts":
 /*!***********************************************************!*\
   !*** ./src/nps-widget/services/StyleDefinitionsMapper.ts ***!
@@ -34442,10 +34508,149 @@ exports.default = StylingDispatcher;
 Object.defineProperty(exports, "__esModule", { value: true });
 var redux_1 = __webpack_require__(/*! redux */ "./node_modules/redux/es/redux.js");
 var reducer_1 = __webpack_require__(/*! ./styling/reducer */ "./src/nps-widget/store/styling/reducer.ts");
+var reducer_2 = __webpack_require__(/*! ./settings/reducer */ "./src/nps-widget/store/settings/reducer.ts");
 var reducers = redux_1.combineReducers({
-    styling: reducer_1.default
+    styling: reducer_1.default,
+    settings: reducer_2.default
 });
 exports.default = reducers;
+
+
+/***/ }),
+
+/***/ "./src/nps-widget/store/settings/actions.ts":
+/*!**************************************************!*\
+  !*** ./src/nps-widget/store/settings/actions.ts ***!
+  \**************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var _ = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
+var SettingActionTypeKeys;
+(function (SettingActionTypeKeys) {
+    SettingActionTypeKeys["SetRange"] = "SET_RANGE";
+    SettingActionTypeKeys["SetAnswerValues"] = "SET_ANSWER_VALUES";
+    SettingActionTypeKeys["AddMiscSettings"] = "ADD_MISC_SETTINGS";
+    SettingActionTypeKeys["OtherAction"] = "___other_action____";
+})(SettingActionTypeKeys = exports.SettingActionTypeKeys || (exports.SettingActionTypeKeys = {}));
+exports.setAnswerValues = function (values) { return ({
+    type: SettingActionTypeKeys.SetAnswerValues,
+    answerValues: values
+}); };
+exports.addMiscSettings = function (miscSettings) { return ({
+    type: SettingActionTypeKeys.AddMiscSettings,
+    miscSettings: miscSettings
+}); };
+exports.setAnswerRangesThunk = function (answerRanges, answerValuesCreator, answerValueValidator) {
+    return function (dispatch) {
+        // side effects here
+        if (answerValueValidator) {
+            // TODO: invoke the validator here but it's NOT IMPLEMENTED
+        }
+        var answerValues = new Array();
+        // ReSharper disable once TsResolvedFromInaccessibleModule
+        _.forEach(answerRanges, function (item) {
+            // ReSharper disable once TsResolvedFromInaccessibleModule
+            answerValues = _.concat(answerValues, answerValuesCreator.getValues(item.start, item.end));
+        });
+        dispatch(exports.setAnswerValues(answerValues));
+        return dispatch({
+            type: SettingActionTypeKeys.SetRange,
+            answerRanges: answerRanges
+        });
+    };
+};
+
+
+/***/ }),
+
+/***/ "./src/nps-widget/store/settings/reducer.ts":
+/*!**************************************************!*\
+  !*** ./src/nps-widget/store/settings/reducer.ts ***!
+  \**************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var Types = __webpack_require__(/*! ./types */ "./src/nps-widget/store/settings/types.ts");
+var Settings = Types.Settings;
+var AnswerRange = Types.AnswerRange;
+var MiscSettings = Types.MiscSettings;
+var Actions = __webpack_require__(/*! ./actions */ "./src/nps-widget/store/settings/actions.ts");
+var _ = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
+// Type-safe initialState!
+exports.initialState = new Settings(new Array(new AnswerRange(0, 10, 'Is there anything we can do to improve our service?')), new Array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10), new MiscSettings('Default widget', 'Hi there! We value your feedback on this service so we can better serve you. Cpuld you please take a moment to answer this question?', 'On a scale of 0 - 10, how likely would you be to use this service again?', 90));
+var SettingsReducer = function (state, action) {
+    if (state === void 0) { state = exports.initialState; }
+    switch (action.type) {
+        case Actions.SettingActionTypeKeys.SetRange:
+            state.answerRanges = action.answerRanges;
+            // ReSharper disable once TsResolvedFromInaccessibleModule
+            return _.assign({}, state);
+        case Actions.SettingActionTypeKeys.SetAnswerValues:
+            state.answerValues = action.answerValues;
+            // ReSharper disable once TsResolvedFromInaccessibleModule
+            return _.assign({}, state);
+        case Actions.SettingActionTypeKeys.AddMiscSettings:
+            state.miscSettings.widgetName = action.miscSettings.widgetName || state.miscSettings.widgetName;
+            state.miscSettings.introductionStatement = action.miscSettings.introductionStatement || state.miscSettings.introductionStatement;
+            state.miscSettings.mainQuestion = action.miscSettings.mainQuestion || state.miscSettings.mainQuestion;
+            state.miscSettings.timeOutOnAnswer = action.miscSettings.timeOutOnAnswer || state.miscSettings.timeOutOnAnswer;
+            // ReSharper disable once TsResolvedFromInaccessibleModule
+            return _.assign({}, state);
+        default:
+            return state;
+    }
+    ;
+};
+exports.default = SettingsReducer;
+
+
+/***/ }),
+
+/***/ "./src/nps-widget/store/settings/types.ts":
+/*!************************************************!*\
+  !*** ./src/nps-widget/store/settings/types.ts ***!
+  \************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var AnswerRange = /** @class */ (function () {
+    function AnswerRange(start, end, question) {
+        this.question = question;
+        this.end = end;
+        this.start = start;
+    }
+    return AnswerRange;
+}());
+exports.AnswerRange = AnswerRange;
+var MiscSettings = /** @class */ (function () {
+    function MiscSettings(widgetName, introductionStatement, mainQuestion, timeOutOnAnswer) {
+        this.widgetName = widgetName;
+        this.timeOutOnAnswer = timeOutOnAnswer;
+        this.mainQuestion = mainQuestion;
+        this.introductionStatement = introductionStatement;
+    }
+    return MiscSettings;
+}());
+exports.MiscSettings = MiscSettings;
+var Settings = /** @class */ (function () {
+    function Settings(answerRanges, answerValues, miscSettings) {
+        this.miscSettings = miscSettings;
+        this.answerValues = answerValues;
+        this.answerRanges = answerRanges;
+    }
+    return Settings;
+}());
+exports.Settings = Settings;
 
 
 /***/ }),
@@ -34481,6 +34686,8 @@ exports.configureStore = configureStore;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
+// import { ThunkAction } from 'redux-thunk';
+// type ThunkResult<TR> = ThunkAction<TR, IApplicationState, undefined, ActionTypes>;
 var StylingActionTypeKeys;
 (function (StylingActionTypeKeys) {
     StylingActionTypeKeys["ClearAll"] = "CLEAR_ALL";
@@ -34517,16 +34724,18 @@ exports.addStyle = function (styleProperty) { return ({
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var StlyingAction = __webpack_require__(/*! ./actions */ "./src/nps-widget/store/styling/actions.ts");
+var Actions = __webpack_require__(/*! ./actions */ "./src/nps-widget/store/styling/actions.ts");
 var _ = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
 // Type-safe initialState!
 exports.initialState = new Array();
 var StylingReducer = function (state, action) {
     if (state === void 0) { state = exports.initialState; }
     switch (action.type) {
-        case StlyingAction.StylingActionTypeKeys.Add:
+        case Actions.StylingActionTypeKeys.Add:
+            // ReSharper disable TsResolvedFromInaccessibleModule
             return _.assign([], _.concat(state, action.styleProperty));
-        case StlyingAction.StylingActionTypeKeys.ClearAll:
+        // ReSharper restore TsResolvedFromInaccessibleModule
+        case Actions.StylingActionTypeKeys.ClearAll:
             return new Array();
         default:
             return state;
