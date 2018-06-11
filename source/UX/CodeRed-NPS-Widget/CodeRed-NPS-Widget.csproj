@@ -72,7 +72,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="indexBundleViaDocumentCreateElement.html" />
-    <None Include="conf\webpack.config.test.js" />
     <None Include="conf\webpack.config.dev.js" />
     <None Include="conf\webpack.config.prod.js" />
     <Content Include="index.html" />
@@ -91,7 +90,6 @@
     <None Include="lib\test\codered_nps_widget.js.map" />
     <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
     <None Include="lib\dev\codered_nps_widget.js" />
-    <None Include="src\index-test.js" />
     <None Include="src\index.js" />
     <None Include="src\nps-widget\components\NpsWidget.js" />
     <None Include="test\index.spec.js" />
