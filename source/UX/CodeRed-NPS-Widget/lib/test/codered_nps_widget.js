@@ -105,13 +105,153 @@ return /******/ (function(modules) { // webpackBootstrap
 
 "use strict";
 
-//import Cat from './cat.js';
-//import Dog from './dog.js';
-//import Welcome from './welcome.ts';
-//import NpsWidgetConfig from './nps-widget/config/NpsWidgetConfig';
-//import NpsWidgetStylingConfig from './nps-widget/config/NpsWidgetStylingConfig';
 
-//export { Cat, Dog, Welcome, NpsWidgetConfig, NpsWidgetStylingConfig };
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _StyleDefinitionsMapper = __webpack_require__(/*! ./nps-widget/services/StyleDefinitionsMapper.ts */ "./src/nps-widget/services/StyleDefinitionsMapper.ts");
+
+Object.keys(_StyleDefinitionsMapper).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _StyleDefinitionsMapper[key];
+    }
+  });
+});
+
+var _StylingDispatcher = __webpack_require__(/*! ./nps-widget/services/StylingDispatcher.ts */ "./src/nps-widget/services/StylingDispatcher.ts");
+
+Object.keys(_StylingDispatcher).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _StylingDispatcher[key];
+    }
+  });
+});
+
+/***/ }),
+
+/***/ "./src/nps-widget/services/StyleDefinitionsMapper.ts":
+/*!***********************************************************!*\
+  !*** ./src/nps-widget/services/StyleDefinitionsMapper.ts ***!
+  \***********************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var StyleDefinitionsMapper = /** @class */ (function () {
+    function StyleDefinitionsMapper(definitions) {
+        this._definitions = definitions;
+    }
+    Object.defineProperty(StyleDefinitionsMapper.prototype, "definitions", {
+        get: function () {
+            return this._definitions;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    return StyleDefinitionsMapper;
+}());
+exports.default = StyleDefinitionsMapper;
+
+
+/***/ }),
+
+/***/ "./src/nps-widget/services/StylingDispatcher.ts":
+/*!******************************************************!*\
+  !*** ./src/nps-widget/services/StylingDispatcher.ts ***!
+  \******************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var actions_1 = __webpack_require__(/*! ../store/styling/actions */ "./src/nps-widget/store/styling/actions.ts");
+var types_1 = __webpack_require__(/*! ../store/styling/types */ "./src/nps-widget/store/styling/types.ts");
+var StylingDispatcher = /** @class */ (function () {
+    function StylingDispatcher(store, styleDefinitionsMapper) {
+        this.styleDefinitionsMapper = styleDefinitionsMapper;
+        this.store = store;
+    }
+    StylingDispatcher.prototype.dispatchStyles = function (styling) {
+        for (var i = 0; i < this.styleDefinitionsMapper.definitions.getKeys().length; i++) {
+            var id = this.styleDefinitionsMapper.definitions.getKeys()[i];
+            var styleVariableName = this.styleDefinitionsMapper.definitions.get(id);
+            var value = styling[id] || null;
+            var styleProperty = new types_1.StyleProperty(id, styleVariableName, value);
+            this.store.dispatch(actions_1.addStyle(styleProperty));
+        }
+    };
+    return StylingDispatcher;
+}());
+exports.default = StylingDispatcher;
+
+
+/***/ }),
+
+/***/ "./src/nps-widget/store/styling/actions.ts":
+/*!*************************************************!*\
+  !*** ./src/nps-widget/store/styling/actions.ts ***!
+  \*************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var StylingActionTypeKeys;
+(function (StylingActionTypeKeys) {
+    StylingActionTypeKeys["ClearAll"] = "CLEAR_ALL";
+    StylingActionTypeKeys["Add"] = "ADD";
+    StylingActionTypeKeys["OtherAction"] = "___other_action____";
+})(StylingActionTypeKeys = exports.StylingActionTypeKeys || (exports.StylingActionTypeKeys = {}));
+exports.clearStyles = function () { return ({
+    type: StylingActionTypeKeys.ClearAll
+}); };
+exports.addStyle = function (styleProperty) { return ({
+    type: StylingActionTypeKeys.Add,
+    styleProperty: styleProperty
+}); };
+//const addStyleThunk: ActionCreator<ThunkResult<Action>> = (styleProperty: StyleProperty) => {
+//  return (dispatch: Dispatch<IAddAction>): Action  => {
+//    // side effects here
+//    return dispatch({
+//      type: StylingActionTypeKeys.Add,
+//      styleProperty: styleProperty
+//    });
+//  };
+//};
+
+
+/***/ }),
+
+/***/ "./src/nps-widget/store/styling/types.ts":
+/*!***********************************************!*\
+  !*** ./src/nps-widget/store/styling/types.ts ***!
+  \***********************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var StyleProperty = /** @class */ (function () {
+    function StyleProperty(id, styleVariableName, value) {
+        this.id = id;
+        this.styleVariableName = styleVariableName;
+        this.value = value;
+    }
+    return StyleProperty;
+}());
+exports.StyleProperty = StyleProperty;
 
 
 /***/ })
