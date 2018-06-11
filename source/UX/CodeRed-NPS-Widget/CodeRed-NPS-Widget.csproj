@@ -98,7 +98,7 @@
     <None Include="favicon.ico" />
     <None Include=".gitignore" />
     <None Include="static\Capture.PNG" />
-    <None Include="test\nps-widget\index.spec.js" />
+    <None Include="test\nps-widget\services\index.spec.js" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
@@ -136,6 +136,7 @@
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />
   </ItemGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="src\nps-widget\data\StyleDefinitionsDataHelper.ts" />
     <TypeScriptCompile Include="src\nps-widget\services\StylingDispatcher.ts" />
     <TypeScriptCompile Include="src\nps-widget\store\reducers.ts" />
   </ItemGroup>

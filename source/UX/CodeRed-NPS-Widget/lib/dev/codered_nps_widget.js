@@ -34214,6 +34214,10 @@ var _StyleDefinitionsMapper = __webpack_require__(/*! ../services/StyleDefinitio
 
 var _StyleDefinitionsMapper2 = _interopRequireDefault(_StyleDefinitionsMapper);
 
+var _StyleDefinitionsDataHelper = __webpack_require__(/*! ../data/StyleDefinitionsDataHelper.ts */ "./src/nps-widget/data/StyleDefinitionsDataHelper.ts");
+
+var _StyleDefinitionsDataHelper2 = _interopRequireDefault(_StyleDefinitionsDataHelper);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
@@ -34250,7 +34254,7 @@ var NpsWidget = function (_PolymerElement) {
 
     if (config != null && config.styling != null) {
 
-      var stylingDispatcher = new _StylingDispatcher2.default(_this.store, new _StyleDefinitionsMapper2.default());
+      var stylingDispatcher = new _StylingDispatcher2.default(_this.store, new _StyleDefinitionsMapper2.default(_StyleDefinitionsDataHelper2.default.GetData()));
 
       stylingDispatcher.dispatchStyles(config.styling);
     }
@@ -34313,6 +34317,42 @@ window.customElements.define(NpsWidget.is, NpsWidget);
 
 /***/ }),
 
+/***/ "./src/nps-widget/data/StyleDefinitionsDataHelper.ts":
+/*!***********************************************************!*\
+  !*** ./src/nps-widget/data/StyleDefinitionsDataHelper.ts ***!
+  \***********************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var Utils = __webpack_require__(/*! ../../utils/Dictionary */ "./src/utils/Dictionary.ts");
+var Dictionary = Utils.Dictionary;
+var StyleDefinitionsDataHelper = /** @class */ (function () {
+    function StyleDefinitionsDataHelper() {
+    }
+    StyleDefinitionsDataHelper.GetData = function () {
+        var data = new Dictionary();
+        data.put('top', '--nps-top');
+        data.put('bottom', '--nps-bottom');
+        data.put('left', '--nps-left');
+        data.put('right', '--nps-right');
+        data.put('margin', '--nps-margin');
+        data.put('zindex', '--nps-zindex');
+        data.put('backgroundColour', '--nps-background-color');
+        data.put('foregroundColour', '--nps-foreground-color');
+        data.put('backgroundHoverColour', '--nps-background-hover-colour');
+        data.put('foregroundHoverColour', '--nps-foreground-hover-colour');
+        return data;
+    };
+    return StyleDefinitionsDataHelper;
+}());
+exports.default = StyleDefinitionsDataHelper;
+
+
+/***/ }),
+
 /***/ "./src/nps-widget/index.ts":
 /*!*********************************!*\
   !*** ./src/nps-widget/index.ts ***!
@@ -34339,20 +34379,9 @@ exports.default = NpsWidget_1.default;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var Dictionary_1 = __webpack_require__(/*! ../../utils/Dictionary */ "./src/utils/Dictionary.ts");
 var StyleDefinitionsMapper = /** @class */ (function () {
-    function StyleDefinitionsMapper() {
-        this._definitions = new Dictionary_1.Dictionary();
-        this._definitions.put('top', '--nps-top');
-        this._definitions.put('bottom', '--nps-bottom');
-        this._definitions.put('left', '--nps-left');
-        this._definitions.put('right', '--nps-right');
-        this._definitions.put('margin', '--nps-margin');
-        this._definitions.put('zindex', '--nps-zindex');
-        this._definitions.put('backgroundColour', '--nps-background-color');
-        this._definitions.put('foregroundColour', '--nps-foreground-color');
-        this._definitions.put('backgroundHoverColour', '--nps-background-hover-colour');
-        this._definitions.put('foregroundHoverColour', '--nps-foreground-hover-colour');
+    function StyleDefinitionsMapper(definitions) {
+        this._definitions = definitions;
     }
     Object.defineProperty(StyleDefinitionsMapper.prototype, "definitions", {
         get: function () {

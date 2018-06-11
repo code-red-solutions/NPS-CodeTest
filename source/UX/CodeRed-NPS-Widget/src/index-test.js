@@ -1,8 +1,12 @@
+import StyleDefinitionsMapper, { IStyleDefinitionsMapper } from './nps-widget/services/StyleDefinitionsMapper.ts';
+import StylingDispatcher, { IStylingDispatcher } from './nps-widget/services/StylingDispatcher.ts';
+import StyleDefinitionsDataHelper, { IStyleDefinitionsDataHelper } from './nps-widget/data/StyleDefinitionsDataHelper.ts';
 
-//import Cat from './cat.js';
-//import Dog from './dog.js';
-//import Welcome from './welcome.ts';
-//import NpsWidgetConfig from './nps-widget/config/NpsWidgetConfig';
-//import NpsWidgetStylingConfig from './nps-widget/config/NpsWidgetStylingConfig';
-
-//export { Cat, Dog, Welcome, NpsWidgetConfig, NpsWidgetStylingConfig };
+export {
+  IStyleDefinitionsMapper,
+  StyleDefinitionsMapper,
+  IStylingDispatcher,
+  StylingDispatcher,
+  IStyleDefinitionsDataHelper,
+  StyleDefinitionsDataHelper
+}

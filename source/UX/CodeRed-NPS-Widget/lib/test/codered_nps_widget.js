@@ -109,30 +109,64 @@ return /******/ (function(modules) { // webpackBootstrap
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.StyleDefinitionsDataHelper = exports.IStyleDefinitionsDataHelper = exports.StylingDispatcher = exports.IStylingDispatcher = exports.StyleDefinitionsMapper = exports.IStyleDefinitionsMapper = undefined;
 
 var _StyleDefinitionsMapper = __webpack_require__(/*! ./nps-widget/services/StyleDefinitionsMapper.ts */ "./src/nps-widget/services/StyleDefinitionsMapper.ts");
 
-Object.keys(_StyleDefinitionsMapper).forEach(function (key) {
-  if (key === "default" || key === "__esModule") return;
-  Object.defineProperty(exports, key, {
-    enumerable: true,
-    get: function get() {
-      return _StyleDefinitionsMapper[key];
-    }
-  });
-});
+var _StyleDefinitionsMapper2 = _interopRequireDefault(_StyleDefinitionsMapper);
 
 var _StylingDispatcher = __webpack_require__(/*! ./nps-widget/services/StylingDispatcher.ts */ "./src/nps-widget/services/StylingDispatcher.ts");
 
-Object.keys(_StylingDispatcher).forEach(function (key) {
-  if (key === "default" || key === "__esModule") return;
-  Object.defineProperty(exports, key, {
-    enumerable: true,
-    get: function get() {
-      return _StylingDispatcher[key];
+var _StylingDispatcher2 = _interopRequireDefault(_StylingDispatcher);
+
+var _StyleDefinitionsDataHelper = __webpack_require__(/*! ./nps-widget/data/StyleDefinitionsDataHelper.ts */ "./src/nps-widget/data/StyleDefinitionsDataHelper.ts");
+
+var _StyleDefinitionsDataHelper2 = _interopRequireDefault(_StyleDefinitionsDataHelper);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+exports.IStyleDefinitionsMapper = _StyleDefinitionsMapper.IStyleDefinitionsMapper;
+exports.StyleDefinitionsMapper = _StyleDefinitionsMapper2.default;
+exports.IStylingDispatcher = _StylingDispatcher.IStylingDispatcher;
+exports.StylingDispatcher = _StylingDispatcher2.default;
+exports.IStyleDefinitionsDataHelper = _StyleDefinitionsDataHelper.IStyleDefinitionsDataHelper;
+exports.StyleDefinitionsDataHelper = _StyleDefinitionsDataHelper2.default;
+
+/***/ }),
+
+/***/ "./src/nps-widget/data/StyleDefinitionsDataHelper.ts":
+/*!***********************************************************!*\
+  !*** ./src/nps-widget/data/StyleDefinitionsDataHelper.ts ***!
+  \***********************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var Utils = __webpack_require__(/*! ../../utils/Dictionary */ "./src/utils/Dictionary.ts");
+var Dictionary = Utils.Dictionary;
+var StyleDefinitionsDataHelper = /** @class */ (function () {
+    function StyleDefinitionsDataHelper() {
     }
-  });
-});
+    StyleDefinitionsDataHelper.GetData = function () {
+        var data = new Dictionary();
+        data.put('top', '--nps-top');
+        data.put('bottom', '--nps-bottom');
+        data.put('left', '--nps-left');
+        data.put('right', '--nps-right');
+        data.put('margin', '--nps-margin');
+        data.put('zindex', '--nps-zindex');
+        data.put('backgroundColour', '--nps-background-color');
+        data.put('foregroundColour', '--nps-foreground-color');
+        data.put('backgroundHoverColour', '--nps-background-hover-colour');
+        data.put('foregroundHoverColour', '--nps-foreground-hover-colour');
+        return data;
+    };
+    return StyleDefinitionsDataHelper;
+}());
+exports.default = StyleDefinitionsDataHelper;
+
 
 /***/ }),
 
@@ -252,6 +286,47 @@ var StyleProperty = /** @class */ (function () {
     return StyleProperty;
 }());
 exports.StyleProperty = StyleProperty;
+
+
+/***/ }),
+
+/***/ "./src/utils/Dictionary.ts":
+/*!*********************************!*\
+  !*** ./src/utils/Dictionary.ts ***!
+  \*********************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var Dictionary = /** @class */ (function () {
+    function Dictionary() {
+        this.internalDict = {};
+    }
+    Dictionary.prototype.getKeys = function () {
+        var keys = [];
+        for (var key in this.internalDict) {
+            keys.push(key);
+        }
+        return keys;
+    };
+    Dictionary.prototype.getValues = function () {
+        var vals = [];
+        for (var key in this.internalDict) {
+            vals.push(this.internalDict[key]);
+        }
+        return vals;
+    };
+    Dictionary.prototype.get = function (key) {
+        return this.internalDict[key];
+    };
+    Dictionary.prototype.put = function (key, val) {
+        this.internalDict[key] = val;
+    };
+    return Dictionary;
+}());
+exports.Dictionary = Dictionary;
 
 
 /***/ })

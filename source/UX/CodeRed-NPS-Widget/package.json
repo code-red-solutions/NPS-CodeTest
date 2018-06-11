@@ -9,8 +9,8 @@
     "build-dev": "webpack --config conf/webpack.config.dev.js --colors",
     "build-dev:watch": "webpack --config conf/webpack.config.dev.js -w --colors",
     "build-test:watch": "webpack --config conf/webpack.config.test.js -w --progress --colors --watch",
-    "run-tests": "webpack --config conf/webpack.config.test.js --colors && mocha --require babel-core/register --colors --recursive ./test/**/*.spec.js",
-    "run-tests:watch": "webpack --config conf/webpack.config.test.js --colors && mocha --require babel-core/register --colors -w --recursive ./test/**/*.spec.js"
+    "run-tests": "mocha --require babel-core/register --colors --recursive ./test/**/*.spec.js",
+    "run-tests:watch": "mocha --require babel-core/register --colors -w --recursive ./test/**/*.spec.js"
   },
   "devDependencies": {
     "@types/lodash": "^4.14.109",

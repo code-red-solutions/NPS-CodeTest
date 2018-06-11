@@ -1,4 +1,4 @@
-import StyleDefinitionsMapper from './StyleDefinitionsMapper'
+import { IStyleDefinitionsMapper } from './StyleDefinitionsMapper'
 import { addStyle } from '../store/styling/actions';
 import { Store } from 'redux';
 import { StyleProperty } from '../store/styling/types';
@@ -9,10 +9,10 @@ export interface IStylingDispatcher {
 
 export default class StylingDispatcher implements IStylingDispatcher {
 
-  private readonly styleDefinitionsMapper: StyleDefinitionsMapper;
+  private readonly styleDefinitionsMapper: IStyleDefinitionsMapper;
   private readonly store;
 
-  constructor(store: Store, styleDefinitionsMapper: StyleDefinitionsMapper) {
+  constructor(store: Store, styleDefinitionsMapper: IStyleDefinitionsMapper) {
     this.styleDefinitionsMapper = styleDefinitionsMapper;
     this.store = store;
   }

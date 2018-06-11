@@ -11,6 +11,7 @@ import * as _ from 'lodash';
 import { configureStore } from '../store/store';
 import StylingDispatcher from '../services/StylingDispatcher.ts';
 import StyleDefinitionsMapper from '../services/StyleDefinitionsMapper.ts';
+import StyleDefinitionsDataHelper from '../data/StyleDefinitionsDataHelper.ts';
 
 export default class NpsWidget extends PolymerElement {
 
@@ -24,7 +25,10 @@ export default class NpsWidget extends PolymerElement {
 
     if (config != null && config.styling != null) {
 
-      const stylingDispatcher = new StylingDispatcher(this.store, new StyleDefinitionsMapper());
+      const stylingDispatcher = new StylingDispatcher(
+        this.store,
+        new StyleDefinitionsMapper(StyleDefinitionsDataHelper.GetData())
+      );
 
       stylingDispatcher.dispatchStyles(config.styling);
 
