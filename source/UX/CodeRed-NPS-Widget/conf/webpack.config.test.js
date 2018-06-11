@@ -12,7 +12,7 @@ let libraryName = pkg.name;
 
 const config = {
   mode: 'development',
-  entry: path.resolve(__dirname, '../src/index-test.js'),
+  entry: path.resolve(__dirname, '../src/index-test.ts'),
   devtool: 'source-map',
   output: {
     globalObject: 'typeof self !== \'undefined\' ? self : this',
