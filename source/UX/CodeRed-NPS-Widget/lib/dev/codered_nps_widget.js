@@ -34241,8 +34241,6 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 // local source
 
-// import SettingsAnswerRangeDispatcher from '../services/SettingsAnswerRangeDispatcher.ts';
-
 
 var NpsWidget = function (_PolymerElement) {
   _inherits(NpsWidget, _PolymerElement);

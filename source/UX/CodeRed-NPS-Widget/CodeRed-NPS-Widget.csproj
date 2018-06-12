@@ -99,7 +99,6 @@
     <TypeScriptCompile Include="src\nps-widget\services\AnswerValueValidator.ts" />
     <TypeScriptCompile Include="src\nps-widget\services\AnswerValuesCreator.ts" />
     <Content Include="src\nps-widget\store\settings\reducer.ts" />
-    <TypeScriptCompile Include="src\nps-widget\services\SettingsAnswerRangeDispatcher.ts" />
     <TypeScriptCompile Include="src\nps-widget\store\settings\types.ts" />
     <TypeScriptCompile Include="test\nps-widget\services\index.spec.ts" />
     <Content Include="Web.config" />

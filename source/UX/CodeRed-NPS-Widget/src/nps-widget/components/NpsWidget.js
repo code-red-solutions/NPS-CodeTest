@@ -9,7 +9,6 @@ import * as _ from 'lodash';
 
 // local source
 import { configureStore } from '../store/store';
-// import SettingsAnswerRangeDispatcher from '../services/SettingsAnswerRangeDispatcher.ts';
 import StylingDispatcher from '../services/StylingDispatcher.ts';
 import StyleDefinitionsMapper from '../services/StyleDefinitionsMapper.ts';
 import StyleDefinitionsDataHelper from '../data/StyleDefinitionsDataHelper.ts';
