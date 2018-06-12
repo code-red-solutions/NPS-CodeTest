@@ -124,6 +124,134 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 /***/ }),
 
+/***/ "./node_modules/@polymer/iron-a11y-announcer/iron-a11y-announcer.js":
+/*!**************************************************************************!*\
+  !*** ./node_modules/@polymer/iron-a11y-announcer/iron-a11y-announcer.js ***!
+  \**************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.IronA11yAnnouncer = undefined;
+
+var _templateObject = _taggedTemplateLiteral(['\n    <style>\n      :host {\n        display: inline-block;\n        position: fixed;\n        clip: rect(0px,0px,0px,0px);\n      }\n    </style>\n    <div aria-live$="[[mode]]">[[_text]]</div>\n'], ['\n    <style>\n      :host {\n        display: inline-block;\n        position: fixed;\n        clip: rect(0px,0px,0px,0px);\n      }\n    </style>\n    <div aria-live\\$="[[mode]]">[[_text]]</div>\n']);
+
+__webpack_require__(/*! @polymer/polymer/polymer-legacy.js */ "./node_modules/@polymer/polymer/polymer-legacy.js");
+
+var _polymerFn = __webpack_require__(/*! @polymer/polymer/lib/legacy/polymer-fn.js */ "./node_modules/@polymer/polymer/lib/legacy/polymer-fn.js");
+
+var _htmlTag = __webpack_require__(/*! @polymer/polymer/lib/utils/html-tag.js */ "./node_modules/@polymer/polymer/lib/utils/html-tag.js");
+
+function _taggedTemplateLiteral(strings, raw) { return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); } /**
+                                                                                                                                                  @license
+                                                                                                                                                  Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+                                                                                                                                                  This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+                                                                                                                                                  The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+                                                                                                                                                  The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+                                                                                                                                                  Code distributed by Google as part of the polymer project is also
+                                                                                                                                                  subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+                                                                                                                                                  */
+/**
+`iron-a11y-announcer` is a singleton element that is intended to add a11y
+to features that require on-demand announcement from screen readers. In
+order to make use of the announcer, it is best to request its availability
+in the announcing element.
+
+Example:
+
+    Polymer({
+
+      is: 'x-chatty',
+
+      attached: function() {
+        // This will create the singleton element if it has not
+        // been created yet:
+        Polymer.IronA11yAnnouncer.requestAvailability();
+      }
+    });
+
+After the `iron-a11y-announcer` has been made available, elements can
+make announces by firing bubbling `iron-announce` events.
+
+Example:
+
+    this.fire('iron-announce', {
+      text: 'This is an announcement!'
+    }, { bubbles: true });
+
+Note: announcements are only audible if you have a screen reader enabled.
+
+@group Iron Elements
+@demo demo/index.html
+*/
+/*
+  FIXME(polymer-modulizer): the above comments were extracted
+  from HTML and may be out of place here. Review them and
+  then delete this comment!
+*/
+
+
+var IronA11yAnnouncer = exports.IronA11yAnnouncer = (0, _polymerFn.Polymer)({
+  _template: (0, _htmlTag.html)(_templateObject),
+
+  is: 'iron-a11y-announcer',
+
+  properties: {
+
+    /**
+     * The value of mode is used to set the `aria-live` attribute
+     * for the element that will be announced. Valid values are: `off`,
+     * `polite` and `assertive`.
+     */
+    mode: { type: String, value: 'polite' },
+
+    _text: { type: String, value: '' }
+  },
+
+  created: function created() {
+    if (!IronA11yAnnouncer.instance) {
+      IronA11yAnnouncer.instance = this;
+    }
+
+    document.body.addEventListener('iron-announce', this._onIronAnnounce.bind(this));
+  },
+
+  /**
+   * Cause a text string to be announced by screen readers.
+   *
+   * @param {string} text The text that should be announced.
+   */
+  announce: function announce(text) {
+    this._text = '';
+    this.async(function () {
+      this._text = text;
+    }, 100);
+  },
+
+  _onIronAnnounce: function _onIronAnnounce(event) {
+    if (event.detail && event.detail.text) {
+      this.announce(event.detail.text);
+    }
+  }
+});
+
+IronA11yAnnouncer.instance = null;
+
+IronA11yAnnouncer.requestAvailability = function () {
+  if (!IronA11yAnnouncer.instance) {
+    IronA11yAnnouncer.instance = document.createElement('iron-a11y-announcer');
+  }
+
+  document.body.appendChild(IronA11yAnnouncer.instance);
+};
+
+/***/ }),
+
 /***/ "./node_modules/@polymer/iron-a11y-keys-behavior/iron-a11y-keys-behavior.js":
 /*!**********************************************************************************!*\
   !*** ./node_modules/@polymer/iron-a11y-keys-behavior/iron-a11y-keys-behavior.js ***!
@@ -1728,6 +1856,102 @@ document.head.appendChild(style);
 
 /***/ }),
 
+/***/ "./node_modules/@polymer/iron-form-element-behavior/iron-form-element-behavior.js":
+/*!****************************************************************************************!*\
+  !*** ./node_modules/@polymer/iron-form-element-behavior/iron-form-element-behavior.js ***!
+  \****************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.IronFormElementBehavior = undefined;
+
+__webpack_require__(/*! @polymer/polymer/polymer-legacy.js */ "./node_modules/@polymer/polymer/polymer-legacy.js");
+
+var _polymerElement = __webpack_require__(/*! @polymer/polymer/polymer-element.js */ "./node_modules/@polymer/polymer/polymer-element.js");
+
+/**
+  Polymer.IronFormElementBehavior enables a custom element to be included
+  in an `iron-form`.
+
+  Events `iron-form-element-register` and `iron-form-element-unregister` are not
+  fired on Polymer 2.0.
+
+  @demo demo/index.html
+  @polymerBehavior
+ */
+/**
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+*/
+var IronFormElementBehavior = exports.IronFormElementBehavior = {
+
+  properties: {
+    /**
+     * Fired when the element is added to an `iron-form`.
+     *
+     * @event iron-form-element-register
+     */
+
+    /**
+     * Fired when the element is removed from an `iron-form`.
+     *
+     * @event iron-form-element-unregister
+     */
+
+    /**
+     * The name of this element.
+     */
+    name: { type: String },
+
+    /**
+     * The value for this element.
+     * @type {string|number|null|undefined}
+     */
+    value: { notify: true, type: String },
+
+    /**
+     * Set to true to mark the input as required. If used in a form, a
+     * custom element that uses this behavior should also use
+     * Polymer.IronValidatableBehavior and define a custom validation method.
+     * Otherwise, a `required` element will always be considered valid.
+     * It's also strongly recommended to provide a visual style for the element
+     * when its value is invalid.
+     */
+    required: { type: Boolean, value: false },
+
+    /**
+     * The form that the element is registered to.
+     */
+    _parentForm: { type: Object }
+  },
+
+  attached: function attached() {
+    if (!_polymerElement.PolymerElement) {
+      // Note: the iron-form that this element belongs to will set this
+      // element's _parentForm property when handling this event.
+      this.fire('iron-form-element-register');
+    }
+  },
+  detached: function detached() {
+    if (!_polymerElement.PolymerElement && this._parentForm) {
+      this._parentForm.fire('iron-form-element-unregister', { target: this });
+    }
+  }
+};
+
+/***/ }),
+
 /***/ "./node_modules/@polymer/iron-icon/iron-icon.js":
 /*!******************************************************!*\
   !*** ./node_modules/@polymer/iron-icon/iron-icon.js ***!
@@ -2254,6 +2478,384 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     return null;
   }
 
+});
+
+/***/ }),
+
+/***/ "./node_modules/@polymer/iron-input/iron-input.js":
+/*!********************************************************!*\
+  !*** ./node_modules/@polymer/iron-input/iron-input.js ***!
+  \********************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _templateObject = _taggedTemplateLiteral(['\n    <style>\n      :host {\n        display: inline-block;\n      }\n    </style>\n    <slot id="content"></slot>\n'], ['\n    <style>\n      :host {\n        display: inline-block;\n      }\n    </style>\n    <slot id="content"></slot>\n']);
+
+__webpack_require__(/*! @polymer/polymer/polymer-legacy.js */ "./node_modules/@polymer/polymer/polymer-legacy.js");
+
+var _ironA11yAnnouncer = __webpack_require__(/*! @polymer/iron-a11y-announcer/iron-a11y-announcer.js */ "./node_modules/@polymer/iron-a11y-announcer/iron-a11y-announcer.js");
+
+var _ironValidatableBehavior = __webpack_require__(/*! @polymer/iron-validatable-behavior/iron-validatable-behavior.js */ "./node_modules/@polymer/iron-validatable-behavior/iron-validatable-behavior.js");
+
+var _polymerFn = __webpack_require__(/*! @polymer/polymer/lib/legacy/polymer-fn.js */ "./node_modules/@polymer/polymer/lib/legacy/polymer-fn.js");
+
+var _htmlTag = __webpack_require__(/*! @polymer/polymer/lib/utils/html-tag.js */ "./node_modules/@polymer/polymer/lib/utils/html-tag.js");
+
+var _polymerDom = __webpack_require__(/*! @polymer/polymer/lib/legacy/polymer.dom.js */ "./node_modules/@polymer/polymer/lib/legacy/polymer.dom.js");
+
+function _taggedTemplateLiteral(strings, raw) { return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); } /**
+                                                                                                                                                  @license
+                                                                                                                                                  Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+                                                                                                                                                  This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+                                                                                                                                                  The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+                                                                                                                                                  The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+                                                                                                                                                  Code distributed by Google as part of the polymer project is also
+                                                                                                                                                  subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+                                                                                                                                                  */
+/**
+`<iron-input>` is a wrapper to a native `<input>` element, that adds two-way binding
+and prevention of invalid input. To use it, you must distribute a native `<input>`
+yourself. You can continue to use the native `input` as you would normally:
+
+    <iron-input>
+      <input>
+    </iron-input>
+
+    <iron-input>
+      <input type="email" disabled>
+    </iron-input>
+
+### Two-way binding
+
+By default you can only get notified of changes to a native `<input>`'s `value`
+due to user input:
+
+    <input value="{{myValue::input}}">
+
+This means that if you imperatively set the value (i.e. `someNativeInput.value = 'foo'`),
+no events will be fired and this change cannot be observed.
+
+`iron-input` adds the `bind-value` property that mirrors the native `input`'s '`value` property; this
+property can be used for two-way data binding.
+`bind-value` will notify if it is changed either by user input or by script.
+
+    <iron-input bind-value="{{myValue}}">
+      <input>
+    </iron-input>
+
+Note: this means that if you want to imperatively set the native `input`'s, you _must_
+set `bind-value` instead, so that the wrapper `iron-input` can be notified.
+
+### Validation
+
+`iron-input` uses the native `input`'s validation. For simplicity, `iron-input`
+has a `validate()` method (which internally just checks the distributed `input`'s
+validity), which sets an `invalid` attribute that can also be used for styling.
+
+To validate automatically as you type, you can use the `auto-validate` attribute.
+
+`iron-input` also fires an `iron-input-validate` event after `validate()` is
+called. You can use it to implement a custom validator:
+
+    var CatsOnlyValidator = {
+      validate: function(ironInput) {
+        var valid = !ironInput.bindValue || ironInput.bindValue === 'cat';
+        ironInput.invalid = !valid;
+        return valid;
+      }
+    }
+    ironInput.addEventListener('iron-input-validate', function() {
+      CatsOnly.validate(input2);
+    });
+
+You can also use an element implementing an [`IronValidatorBehavior`](/element/PolymerElements/iron-validatable-behavior).
+This example can also be found in the demo for this element:
+
+    <iron-input validator="cats-only">
+      <input>
+    </iron-input>
+
+### Preventing invalid input
+
+It may be desirable to only allow users to enter certain characters. You can use the
+`allowed-pattern` attribute to accomplish this. This feature
+is separate from validation, and `allowed-pattern` does not affect how the input is validated.
+
+    // Only allow typing digits, but a valid input has exactly 5 digits.
+    <iron-input allowed-pattern="[0-9]">
+      <input pattern="\d{5}">
+    </iron-input>
+
+@hero hero.svg
+@demo demo/index.html
+*/
+/*
+  FIXME(polymer-modulizer): the above comments were extracted
+  from HTML and may be out of place here. Review them and
+  then delete this comment!
+*/
+
+
+(0, _polymerFn.Polymer)({
+  _template: (0, _htmlTag.html)(_templateObject),
+
+  is: 'iron-input',
+  behaviors: [_ironValidatableBehavior.IronValidatableBehavior],
+
+  /**
+   * Fired whenever `validate()` is called.
+   *
+   * @event iron-input-validate
+   */
+
+  properties: {
+
+    /**
+     * Use this property instead of `value` for two-way data binding, or to
+     * set a default value for the input. **Do not** use the distributed
+     * input's `value` property to set a default value.
+     */
+    bindValue: { type: String, value: '' },
+
+    /**
+     * Computed property that echoes `bindValue` (mostly used for Polymer 1.0
+     * backcompatibility, if you were one-way binding to the Polymer 1.0
+     * `input is="iron-input"` value attribute).
+     */
+    value: { type: String, computed: '_computeValue(bindValue)' },
+
+    /**
+     * Regex-like list of characters allowed as input; all characters not in the
+     * list will be rejected. The recommended format should be a list of allowed
+     * characters, for example, `[a-zA-Z0-9.+-!;:]`.
+     *
+     * This pattern represents the allowed characters for the field; as the user
+     * inputs text, each individual character will be checked against the
+     * pattern (rather than checking the entire value as a whole). If a
+     * character is not a match, it will be rejected.
+     *
+     * Pasted input will have each character checked individually; if any
+     * character doesn't match `allowedPattern`, the entire pasted string will
+     * be rejected.
+     *
+     * Note: if you were using `iron-input` in 1.0, you were also required to
+     * set `prevent-invalid-input`. This is no longer needed as of Polymer 2.0,
+     * and will be set automatically for you if an `allowedPattern` is provided.
+     *
+     */
+    allowedPattern: { type: String },
+
+    /**
+     * Set to true to auto-validate the input value as you type.
+     */
+    autoValidate: { type: Boolean, value: false },
+
+    /**
+     * The native input element.
+     */
+    _inputElement: Object
+  },
+
+  observers: ['_bindValueChanged(bindValue, _inputElement)'],
+  listeners: { 'input': '_onInput', 'keypress': '_onKeypress' },
+
+  created: function created() {
+    _ironA11yAnnouncer.IronA11yAnnouncer.requestAvailability();
+    this._previousValidInput = '';
+    this._patternAlreadyChecked = false;
+  },
+
+  attached: function attached() {
+    // If the input is added at a later time, update the internal reference.
+    this._observer = (0, _polymerDom.dom)(this).observeNodes(function (info) {
+      this._initSlottedInput();
+    }.bind(this));
+  },
+
+  detached: function detached() {
+    if (this._observer) {
+      (0, _polymerDom.dom)(this).unobserveNodes(this._observer);
+      this._observer = null;
+    }
+  },
+
+  /**
+   * Returns the distributed input element.
+   */
+  get inputElement() {
+    return this._inputElement;
+  },
+
+  _initSlottedInput: function _initSlottedInput() {
+    this._inputElement = this.getEffectiveChildren()[0];
+
+    if (this.inputElement && this.inputElement.value) {
+      this.bindValue = this.inputElement.value;
+    }
+
+    this.fire('iron-input-ready');
+  },
+
+  get _patternRegExp() {
+    var pattern;
+    if (this.allowedPattern) {
+      pattern = new RegExp(this.allowedPattern);
+    } else {
+      switch (this.inputElement.type) {
+        case 'number':
+          pattern = /[0-9.,e-]/;
+          break;
+      }
+    }
+    return pattern;
+  },
+
+  /**
+   * @suppress {checkTypes}
+   */
+  _bindValueChanged: function _bindValueChanged(bindValue, inputElement) {
+    // The observer could have run before attached() when we have actually
+    // initialized this property.
+    if (!inputElement) {
+      return;
+    }
+
+    if (bindValue === undefined) {
+      inputElement.value = null;
+    } else if (bindValue !== inputElement.value) {
+      this.inputElement.value = bindValue;
+    }
+
+    if (this.autoValidate) {
+      this.validate();
+    }
+
+    // manually notify because we don't want to notify until after setting value
+    this.fire('bind-value-changed', { value: bindValue });
+  },
+
+  _onInput: function _onInput() {
+    // Need to validate each of the characters pasted if they haven't
+    // been validated inside `_onKeypress` already.
+    if (this.allowedPattern && !this._patternAlreadyChecked) {
+      var valid = this._checkPatternValidity();
+      if (!valid) {
+        this._announceInvalidCharacter('Invalid string of characters not entered.');
+        this.inputElement.value = this._previousValidInput;
+      }
+    }
+    this.bindValue = this._previousValidInput = this.inputElement.value;
+    this._patternAlreadyChecked = false;
+  },
+
+  _isPrintable: function _isPrintable(event) {
+    // What a control/printable character is varies wildly based on the browser.
+    // - most control characters (arrows, backspace) do not send a `keypress`
+    // event
+    //   in Chrome, but the *do* on Firefox
+    // - in Firefox, when they do send a `keypress` event, control chars have
+    //   a charCode = 0, keyCode = xx (for ex. 40 for down arrow)
+    // - printable characters always send a keypress event.
+    // - in Firefox, printable chars always have a keyCode = 0. In Chrome, the
+    // keyCode
+    //   always matches the charCode.
+    // None of this makes any sense.
+
+    // For these keys, ASCII code == browser keycode.
+    var anyNonPrintable = event.keyCode == 8 || // backspace
+    event.keyCode == 9 || // tab
+    event.keyCode == 13 || // enter
+    event.keyCode == 27; // escape
+
+    // For these keys, make sure it's a browser keycode and not an ASCII code.
+    var mozNonPrintable = event.keyCode == 19 || // pause
+    event.keyCode == 20 || // caps lock
+    event.keyCode == 45 || // insert
+    event.keyCode == 46 || // delete
+    event.keyCode == 144 || // num lock
+    event.keyCode == 145 || // scroll lock
+    event.keyCode > 32 && event.keyCode < 41 || // page up/down, end, home, arrows
+    event.keyCode > 111 && event.keyCode < 124; // fn keys
+
+    return !anyNonPrintable && !(event.charCode == 0 && mozNonPrintable);
+  },
+
+  _onKeypress: function _onKeypress(event) {
+    if (!this.allowedPattern && this.inputElement.type !== 'number') {
+      return;
+    }
+    var regexp = this._patternRegExp;
+    if (!regexp) {
+      return;
+    }
+
+    // Handle special keys and backspace
+    if (event.metaKey || event.ctrlKey || event.altKey) {
+      return;
+    }
+
+    // Check the pattern either here or in `_onInput`, but not in both.
+    this._patternAlreadyChecked = true;
+
+    var thisChar = String.fromCharCode(event.charCode);
+    if (this._isPrintable(event) && !regexp.test(thisChar)) {
+      event.preventDefault();
+      this._announceInvalidCharacter('Invalid character ' + thisChar + ' not entered.');
+    }
+  },
+
+  _checkPatternValidity: function _checkPatternValidity() {
+    var regexp = this._patternRegExp;
+    if (!regexp) {
+      return true;
+    }
+    for (var i = 0; i < this.inputElement.value.length; i++) {
+      if (!regexp.test(this.inputElement.value[i])) {
+        return false;
+      }
+    }
+    return true;
+  },
+
+  /**
+   * Returns true if `value` is valid. The validator provided in `validator`
+   * will be used first, then any constraints.
+   * @return {boolean} True if the value is valid.
+   */
+  validate: function validate() {
+    if (!this.inputElement) {
+      this.invalid = false;
+      return true;
+    }
+
+    // Use the nested input's native validity.
+    var valid = this.inputElement.checkValidity();
+
+    // Only do extra checking if the browser thought this was valid.
+    if (valid) {
+      // Empty, required input is invalid
+      if (this.required && this.bindValue === '') {
+        valid = false;
+      } else if (this.hasValidator()) {
+        valid = _ironValidatableBehavior.IronValidatableBehavior.validate.call(this, this.bindValue);
+      }
+    }
+
+    this.invalid = !valid;
+    this.fire('iron-input-validate');
+    return valid;
+  },
+
+  _announceInvalidCharacter: function _announceInvalidCharacter(message) {
+    this.fire('iron-announce', { text: message });
+  },
+
+  _computeValue: function _computeValue(bindValue) {
+    return bindValue;
+  }
 });
 
 /***/ }),
@@ -4509,6 +5111,117 @@ function _getScrollInfo(event) {
 
 /***/ }),
 
+/***/ "./node_modules/@polymer/iron-range-behavior/iron-range-behavior.js":
+/*!**************************************************************************!*\
+  !*** ./node_modules/@polymer/iron-range-behavior/iron-range-behavior.js ***!
+  \**************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.IronRangeBehavior = undefined;
+
+__webpack_require__(/*! @polymer/polymer/polymer-legacy.js */ "./node_modules/@polymer/polymer/polymer-legacy.js");
+
+/**
+ * `iron-range-behavior` provides the behavior for something with a minimum to
+ * maximum range.
+ *
+ * @demo demo/index.html
+ * @polymerBehavior
+ */
+var IronRangeBehavior = exports.IronRangeBehavior = {
+
+  properties: {
+
+    /**
+     * The number that represents the current value.
+     */
+    value: { type: Number, value: 0, notify: true, reflectToAttribute: true },
+
+    /**
+     * The number that indicates the minimum value of the range.
+     */
+    min: { type: Number, value: 0, notify: true },
+
+    /**
+     * The number that indicates the maximum value of the range.
+     */
+    max: { type: Number, value: 100, notify: true },
+
+    /**
+     * Specifies the value granularity of the range's value.
+     */
+    step: { type: Number, value: 1, notify: true },
+
+    /**
+     * Returns the ratio of the value.
+     */
+    ratio: { type: Number, value: 0, readOnly: true, notify: true }
+  },
+
+  observers: ['_update(value, min, max, step)'],
+
+  _calcRatio: function _calcRatio(value) {
+    return (this._clampValue(value) - this.min) / (this.max - this.min);
+  },
+
+  _clampValue: function _clampValue(value) {
+    return Math.min(this.max, Math.max(this.min, this._calcStep(value)));
+  },
+
+  _calcStep: function _calcStep(value) {
+    // polymer/issues/2493
+    value = parseFloat(value);
+
+    if (!this.step) {
+      return value;
+    }
+
+    var numSteps = Math.round((value - this.min) / this.step);
+    if (this.step < 1) {
+      /**
+       * For small values of this.step, if we calculate the step using
+       * `Math.round(value / step) * step` we may hit a precision point issue
+       * eg. 0.1 * 0.2 =  0.020000000000000004
+       * http://docs.oracle.com/cd/E19957-01/806-3568/ncg_goldberg.html
+       *
+       * as a work around we can divide by the reciprocal of `step`
+       */
+      return numSteps / (1 / this.step) + this.min;
+    } else {
+      return numSteps * this.step + this.min;
+    }
+  },
+
+  _validateValue: function _validateValue() {
+    var v = this._clampValue(this.value);
+    this.value = this.oldValue = isNaN(v) ? this.oldValue : v;
+    return this.value !== v;
+  },
+
+  _update: function _update() {
+    this._validateValue();
+    this._setRatio(this._calcRatio(this.value) * 100);
+  }
+
+}; /**
+   @license
+   Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+   This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+   The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+   The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+   Code distributed by Google as part of the polymer project is also
+   subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+   */
+
+/***/ }),
+
 /***/ "./node_modules/@polymer/iron-resizable-behavior/iron-resizable-behavior.js":
 /*!**********************************************************************************!*\
   !*** ./node_modules/@polymer/iron-resizable-behavior/iron-resizable-behavior.js ***!
@@ -4727,6 +5440,149 @@ var IronResizableBehavior = exports.IronResizableBehavior = {
    Code distributed by Google as part of the polymer project is also
    subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
    */
+
+/***/ }),
+
+/***/ "./node_modules/@polymer/iron-validatable-behavior/iron-validatable-behavior.js":
+/*!**************************************************************************************!*\
+  !*** ./node_modules/@polymer/iron-validatable-behavior/iron-validatable-behavior.js ***!
+  \**************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.IronValidatableBehavior = exports.IronValidatableBehaviorMeta = undefined;
+
+__webpack_require__(/*! @polymer/polymer/polymer-legacy.js */ "./node_modules/@polymer/polymer/polymer-legacy.js");
+
+var _ironMeta = __webpack_require__(/*! @polymer/iron-meta/iron-meta.js */ "./node_modules/@polymer/iron-meta/iron-meta.js");
+
+/**
+ * Singleton IronMeta instance.
+ */
+/**
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+*/
+var IronValidatableBehaviorMeta = exports.IronValidatableBehaviorMeta = null;
+
+/**
+ * `Use Polymer.IronValidatableBehavior` to implement an element that validates
+ * user input. Use the related `Polymer.IronValidatorBehavior` to add custom
+ * validation logic to an iron-input.
+ *
+ * By default, an `<iron-form>` element validates its fields when the user
+ * presses the submit button. To validate a form imperatively, call the form's
+ * `validate()` method, which in turn will call `validate()` on all its
+ * children. By using `Polymer.IronValidatableBehavior`, your custom element
+ * will get a public `validate()`, which will return the validity of the
+ * element, and a corresponding `invalid` attribute, which can be used for
+ * styling.
+ *
+ * To implement the custom validation logic of your element, you must override
+ * the protected `_getValidity()` method of this behaviour, rather than
+ * `validate()`. See
+ * [this](https://github.com/PolymerElements/iron-form/blob/master/demo/simple-element.html)
+ * for an example.
+ *
+ * ### Accessibility
+ *
+ * Changing the `invalid` property, either manually or by calling `validate()`
+ * will update the `aria-invalid` attribute.
+ *
+ * @demo demo/index.html
+ * @polymerBehavior
+ */
+var IronValidatableBehavior = exports.IronValidatableBehavior = {
+
+  properties: {
+    /**
+     * Name of the validator to use.
+     */
+    validator: { type: String },
+
+    /**
+     * True if the last call to `validate` is invalid.
+     */
+    invalid: {
+      notify: true,
+      reflectToAttribute: true,
+      type: Boolean,
+      value: false,
+      observer: '_invalidChanged'
+    }
+  },
+
+  registered: function registered() {
+    exports.IronValidatableBehaviorMeta = IronValidatableBehaviorMeta = new _ironMeta.IronMeta({ type: 'validator' });
+  },
+
+  _invalidChanged: function _invalidChanged() {
+    if (this.invalid) {
+      this.setAttribute('aria-invalid', 'true');
+    } else {
+      this.removeAttribute('aria-invalid');
+    }
+  },
+
+  /* Recompute this every time it's needed, because we don't know if the
+   * underlying IronValidatableBehaviorMeta has changed. */
+  get _validator() {
+    return IronValidatableBehaviorMeta && IronValidatableBehaviorMeta.byKey(this.validator);
+  },
+
+  /**
+   * @return {boolean} True if the validator `validator` exists.
+   */
+  hasValidator: function hasValidator() {
+    return this._validator != null;
+  },
+
+  /**
+   * Returns true if the `value` is valid, and updates `invalid`. If you want
+   * your element to have custom validation logic, do not override this method;
+   * override `_getValidity(value)` instead.
+    * @param {Object} value Deprecated: The value to be validated. By default,
+   * it is passed to the validator's `validate()` function, if a validator is
+   set.
+   * If this argument is not specified, then the element's `value` property
+   * is used, if it exists.
+   * @return {boolean} True if `value` is valid.
+   */
+  validate: function validate(value) {
+    // If this is an element that also has a value property, and there was
+    // no explicit value argument passed, use the element's property instead.
+    if (value === undefined && this.value !== undefined) this.invalid = !this._getValidity(this.value);else this.invalid = !this._getValidity(value);
+    return !this.invalid;
+  },
+
+  /**
+   * Returns true if `value` is valid.  By default, it is passed
+   * to the validator's `validate()` function, if a validator is set. You
+   * should override this method if you want to implement custom validity
+   * logic for your element.
+   *
+   * @param {Object} value The value to be validated.
+   * @return {boolean} True if `value` is valid.
+   */
+
+  _getValidity: function _getValidity(value) {
+    if (this.hasValidator()) {
+      return this._validator.validate(value);
+    }
+    return true;
+  }
+};
 
 /***/ }),
 
@@ -5145,6 +6001,70 @@ var PaperButtonBehaviorImpl = exports.PaperButtonBehaviorImpl = {
 
 /** @polymerBehavior */
 var PaperButtonBehavior = exports.PaperButtonBehavior = [_ironButtonState.IronButtonState, _ironControlState.IronControlState, _paperRippleBehavior.PaperRippleBehavior, PaperButtonBehaviorImpl];
+
+/***/ }),
+
+/***/ "./node_modules/@polymer/paper-behaviors/paper-inky-focus-behavior.js":
+/*!****************************************************************************!*\
+  !*** ./node_modules/@polymer/paper-behaviors/paper-inky-focus-behavior.js ***!
+  \****************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.PaperInkyFocusBehavior = exports.PaperInkyFocusBehaviorImpl = undefined;
+
+__webpack_require__(/*! @polymer/polymer/polymer-legacy.js */ "./node_modules/@polymer/polymer/polymer-legacy.js");
+
+var _ironButtonState = __webpack_require__(/*! @polymer/iron-behaviors/iron-button-state.js */ "./node_modules/@polymer/iron-behaviors/iron-button-state.js");
+
+var _paperRippleBehavior = __webpack_require__(/*! ./paper-ripple-behavior.js */ "./node_modules/@polymer/paper-behaviors/paper-ripple-behavior.js");
+
+var _ironControlState = __webpack_require__(/*! @polymer/iron-behaviors/iron-control-state.js */ "./node_modules/@polymer/iron-behaviors/iron-control-state.js");
+
+/**
+ * `Polymer.PaperInkyFocusBehavior` implements a ripple when the element has
+ * keyboard focus.
+ *
+ * @polymerBehavior Polymer.PaperInkyFocusBehavior
+ */
+/**
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+*/
+var PaperInkyFocusBehaviorImpl = exports.PaperInkyFocusBehaviorImpl = {
+  observers: ['_focusedChanged(receivedFocusFromKeyboard)'],
+
+  _focusedChanged: function _focusedChanged(receivedFocusFromKeyboard) {
+    if (receivedFocusFromKeyboard) {
+      this.ensureRipple();
+    }
+    if (this.hasRipple()) {
+      this._ripple.holdDown = receivedFocusFromKeyboard;
+    }
+  },
+
+  _createRipple: function _createRipple() {
+    var ripple = _paperRippleBehavior.PaperRippleBehavior._createRipple();
+    ripple.id = 'ink';
+    ripple.setAttribute('center', '');
+    ripple.classList.add('circle');
+    return ripple;
+  }
+};
+
+/** @polymerBehavior Polymer.PaperInkyFocusBehavior */
+var PaperInkyFocusBehavior = exports.PaperInkyFocusBehavior = [_ironButtonState.IronButtonState, _ironControlState.IronControlState, _paperRippleBehavior.PaperRippleBehavior, PaperInkyFocusBehaviorImpl];
 
 /***/ }),
 
@@ -5892,6 +6812,1594 @@ document.head.appendChild($_documentContainer.content);
 
 /***/ }),
 
+/***/ "./node_modules/@polymer/paper-input/paper-input-addon-behavior.js":
+/*!*************************************************************************!*\
+  !*** ./node_modules/@polymer/paper-input/paper-input-addon-behavior.js ***!
+  \*************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.PaperInputAddonBehavior = undefined;
+
+__webpack_require__(/*! @polymer/polymer/polymer-legacy.js */ "./node_modules/@polymer/polymer/polymer-legacy.js");
+
+var _polymerDom = __webpack_require__(/*! @polymer/polymer/lib/legacy/polymer.dom.js */ "./node_modules/@polymer/polymer/lib/legacy/polymer.dom.js");
+
+/**
+ * Use `Polymer.PaperInputAddonBehavior` to implement an add-on for
+ * `<paper-input-container>`. A add-on appears below the input, and may display
+ * information based on the input value and validity such as a character counter
+ * or an error message.
+ * @polymerBehavior
+ */
+/**
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+*/
+var PaperInputAddonBehavior = exports.PaperInputAddonBehavior = {
+  attached: function attached() {
+    // Workaround for https://github.com/webcomponents/shadydom/issues/96
+    (0, _polymerDom.flush)();
+    this.fire('addon-attached');
+  },
+
+  /**
+   * The function called by `<paper-input-container>` when the input value or
+   * validity changes.
+   * @param {{
+   *   invalid: boolean,
+   *   inputElement: (Element|undefined),
+   *   value: (string|undefined)
+   * }} state -
+   *     inputElement: The input element.
+   *     value: The input value.
+   *     invalid: True if the input value is invalid.
+   */
+  update: function update(state) {}
+
+};
+
+/***/ }),
+
+/***/ "./node_modules/@polymer/paper-input/paper-input-behavior.js":
+/*!*******************************************************************!*\
+  !*** ./node_modules/@polymer/paper-input/paper-input-behavior.js ***!
+  \*******************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.PaperInputBehavior = exports.PaperInputBehaviorImpl = exports.PaperInputHelper = undefined;
+
+__webpack_require__(/*! @polymer/polymer/polymer-legacy.js */ "./node_modules/@polymer/polymer/polymer-legacy.js");
+
+var _ironA11yKeysBehavior = __webpack_require__(/*! @polymer/iron-a11y-keys-behavior/iron-a11y-keys-behavior.js */ "./node_modules/@polymer/iron-a11y-keys-behavior/iron-a11y-keys-behavior.js");
+
+var _ironControlState = __webpack_require__(/*! @polymer/iron-behaviors/iron-control-state.js */ "./node_modules/@polymer/iron-behaviors/iron-control-state.js");
+
+var _polymerElement = __webpack_require__(/*! @polymer/polymer/polymer-element.js */ "./node_modules/@polymer/polymer/polymer-element.js");
+
+var _polymerDom = __webpack_require__(/*! @polymer/polymer/lib/legacy/polymer.dom.js */ "./node_modules/@polymer/polymer/lib/legacy/polymer.dom.js");
+
+// Generate unique, monotonically increasing IDs for labels (needed by
+// aria-labelledby) and add-ons.
+var PaperInputHelper = exports.PaperInputHelper = {}; /**
+                                                      @license
+                                                      Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+                                                      This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+                                                      The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+                                                      The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+                                                      Code distributed by Google as part of the polymer project is also
+                                                      subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+                                                      */
+
+
+PaperInputHelper.NextLabelID = 1;
+PaperInputHelper.NextAddonID = 1;
+PaperInputHelper.NextInputID = 1;
+
+/**
+ * Use `Polymer.PaperInputBehavior` to implement inputs with
+ * `<paper-input-container>`. This behavior is implemented by `<paper-input>`.
+ * It exposes a number of properties from
+ * `<paper-input-container>` and `<input is="iron-input">` and they should be
+ * bound in your template.
+ *
+ * The input element can be accessed by the `inputElement` property if you need
+ * to access properties or methods that are not exposed.
+ * @polymerBehavior Polymer.PaperInputBehavior
+ */
+var PaperInputBehaviorImpl = exports.PaperInputBehaviorImpl = {
+
+  properties: {
+    /**
+     * Fired when the input changes due to user interaction.
+     *
+     * @event change
+     */
+
+    /**
+     * The label for this input. If you're using PaperInputBehavior to
+     * implement your own paper-input-like element, bind this to
+     * `<label>`'s content and `hidden` property, e.g.
+     * `<label hidden$="[[!label]]">[[label]]</label>` in your `template`
+     */
+    label: { type: String },
+
+    /**
+     * The value for this input. If you're using PaperInputBehavior to
+     * implement your own paper-input-like element, bind this to
+     * the `<iron-input>`'s `bindValue`
+     * property, or the value property of your input that is `notify:true`.
+     */
+    value: { notify: true, type: String },
+
+    /**
+     * Set to true to disable this input. If you're using PaperInputBehavior to
+     * implement your own paper-input-like element, bind this to
+     * both the `<paper-input-container>`'s and the input's `disabled` property.
+     */
+    disabled: { type: Boolean, value: false },
+
+    /**
+     * Returns true if the value is invalid. If you're using PaperInputBehavior
+     * to implement your own paper-input-like element, bind this to both the
+     * `<paper-input-container>`'s and the input's `invalid` property.
+     *
+     * If `autoValidate` is true, the `invalid` attribute is managed
+     * automatically, which can clobber attempts to manage it manually.
+     */
+    invalid: { type: Boolean, value: false, notify: true },
+
+    /**
+     * Set this to specify the pattern allowed by `preventInvalidInput`. If
+     * you're using PaperInputBehavior to implement your own paper-input-like
+     * element, bind this to the `<input is="iron-input">`'s `allowedPattern`
+     * property.
+     */
+    allowedPattern: { type: String },
+
+    /**
+     * The type of the input. The supported types are the
+     * [native input's
+     * types](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#Form_<input>_types).
+     * If you're using PaperInputBehavior to implement your own paper-input-like
+     * element, bind this to the (Polymer 1) `<input is="iron-input">`'s or
+     * (Polymer 2)
+     * `<iron-input>`'s `type` property.
+     */
+    type: { type: String },
+
+    /**
+     * The datalist of the input (if any). This should match the id of an
+     * existing `<datalist>`. If you're using PaperInputBehavior to implement
+     * your own paper-input-like element, bind this to the `<input
+     * is="iron-input">`'s `list` property.
+     */
+    list: { type: String },
+
+    /**
+     * A pattern to validate the `input` with. If you're using
+     * PaperInputBehavior to implement your own paper-input-like element, bind
+     * this to the `<input is="iron-input">`'s `pattern` property.
+     */
+    pattern: { type: String },
+
+    /**
+     * Set to true to mark the input as required. If you're using
+     * PaperInputBehavior to implement your own paper-input-like element, bind
+     * this to the `<input is="iron-input">`'s `required` property.
+     */
+    required: { type: Boolean, value: false },
+
+    /**
+     * The error message to display when the input is invalid. If you're using
+     * PaperInputBehavior to implement your own paper-input-like element,
+     * bind this to the `<paper-input-error>`'s content, if using.
+     */
+    errorMessage: { type: String },
+
+    /**
+     * Set to true to show a character counter.
+     */
+    charCounter: { type: Boolean, value: false },
+
+    /**
+     * Set to true to disable the floating label. If you're using
+     * PaperInputBehavior to implement your own paper-input-like element, bind
+     * this to the `<paper-input-container>`'s `noLabelFloat` property.
+     */
+    noLabelFloat: { type: Boolean, value: false },
+
+    /**
+     * Set to true to always float the label. If you're using PaperInputBehavior
+     * to implement your own paper-input-like element, bind this to the
+     * `<paper-input-container>`'s `alwaysFloatLabel` property.
+     */
+    alwaysFloatLabel: { type: Boolean, value: false },
+
+    /**
+     * Set to true to auto-validate the input value. If you're using
+     * PaperInputBehavior to implement your own paper-input-like element, bind
+     * this to the `<paper-input-container>`'s `autoValidate` property.
+     */
+    autoValidate: { type: Boolean, value: false },
+
+    /**
+     * Name of the validator to use. If you're using PaperInputBehavior to
+     * implement your own paper-input-like element, bind this to
+     * the `<input is="iron-input">`'s `validator` property.
+     */
+    validator: { type: String },
+
+    // HTMLInputElement attributes for binding if needed
+
+    /**
+     * If you're using PaperInputBehavior to implement your own paper-input-like
+     * element, bind this to the `<input is="iron-input">`'s `autocomplete`
+     * property.
+     */
+    autocomplete: { type: String, value: 'off' },
+
+    /**
+     * If you're using PaperInputBehavior to implement your own paper-input-like
+     * element, bind this to the `<input is="iron-input">`'s `autofocus`
+     * property.
+     */
+    autofocus: { type: Boolean, observer: '_autofocusChanged' },
+
+    /**
+     * If you're using PaperInputBehavior to implement your own paper-input-like
+     * element, bind this to the `<input is="iron-input">`'s `inputmode`
+     * property.
+     */
+    inputmode: { type: String },
+
+    /**
+     * The minimum length of the input value.
+     * If you're using PaperInputBehavior to implement your own paper-input-like
+     * element, bind this to the `<input is="iron-input">`'s `minlength`
+     * property.
+     */
+    minlength: { type: Number },
+
+    /**
+     * The maximum length of the input value.
+     * If you're using PaperInputBehavior to implement your own paper-input-like
+     * element, bind this to the `<input is="iron-input">`'s `maxlength`
+     * property.
+     */
+    maxlength: { type: Number },
+
+    /**
+     * The minimum (numeric or date-time) input value.
+     * If you're using PaperInputBehavior to implement your own paper-input-like
+     * element, bind this to the `<input is="iron-input">`'s `min` property.
+     */
+    min: { type: String },
+
+    /**
+     * The maximum (numeric or date-time) input value.
+     * Can be a String (e.g. `"2000-01-01"`) or a Number (e.g. `2`).
+     * If you're using PaperInputBehavior to implement your own paper-input-like
+     * element, bind this to the `<input is="iron-input">`'s `max` property.
+     */
+    max: { type: String },
+
+    /**
+     * Limits the numeric or date-time increments.
+     * If you're using PaperInputBehavior to implement your own paper-input-like
+     * element, bind this to the `<input is="iron-input">`'s `step` property.
+     */
+    step: { type: String },
+
+    /**
+     * If you're using PaperInputBehavior to implement your own paper-input-like
+     * element, bind this to the `<input is="iron-input">`'s `name` property.
+     */
+    name: { type: String },
+
+    /**
+     * A placeholder string in addition to the label. If this is set, the label
+     * will always float.
+     */
+    placeholder: {
+      type: String,
+      // need to set a default so _computeAlwaysFloatLabel is run
+      value: ''
+    },
+
+    /**
+     * If you're using PaperInputBehavior to implement your own paper-input-like
+     * element, bind this to the `<input is="iron-input">`'s `readonly`
+     * property.
+     */
+    readonly: { type: Boolean, value: false },
+
+    /**
+     * If you're using PaperInputBehavior to implement your own paper-input-like
+     * element, bind this to the `<input is="iron-input">`'s `size` property.
+     */
+    size: { type: Number },
+
+    // Nonstandard attributes for binding if needed
+
+    /**
+     * If you're using PaperInputBehavior to implement your own paper-input-like
+     * element, bind this to the `<input is="iron-input">`'s `autocapitalize`
+     * property.
+     */
+    autocapitalize: { type: String, value: 'none' },
+
+    /**
+     * If you're using PaperInputBehavior to implement your own paper-input-like
+     * element, bind this to the `<input is="iron-input">`'s `autocorrect`
+     * property.
+     */
+    autocorrect: { type: String, value: 'off' },
+
+    /**
+     * If you're using PaperInputBehavior to implement your own paper-input-like
+     * element, bind this to the `<input is="iron-input">`'s `autosave`
+     * property, used with type=search.
+     */
+    autosave: { type: String },
+
+    /**
+     * If you're using PaperInputBehavior to implement your own paper-input-like
+     * element, bind this to the `<input is="iron-input">`'s `results` property,
+     * used with type=search.
+     */
+    results: { type: Number },
+
+    /**
+     * If you're using PaperInputBehavior to implement your own paper-input-like
+     * element, bind this to the `<input is="iron-input">`'s `accept` property,
+     * used with type=file.
+     */
+    accept: { type: String },
+
+    /**
+     * If you're using PaperInputBehavior to implement your own paper-input-like
+     * element, bind this to the`<input is="iron-input">`'s `multiple` property,
+     * used with type=file.
+     */
+    multiple: { type: Boolean },
+
+    /** @private */
+    _ariaDescribedBy: { type: String, value: '' },
+
+    /** @private */
+    _ariaLabelledBy: { type: String, value: '' },
+
+    /** @private */
+    _inputId: { type: String, value: '' }
+  },
+
+  listeners: {
+    'addon-attached': '_onAddonAttached'
+  },
+
+  /**
+   * @type {!Object}
+   */
+  keyBindings: { 'shift+tab:keydown': '_onShiftTabDown' },
+
+  /** @private */
+  hostAttributes: { tabindex: 0 },
+
+  /**
+   * Returns a reference to the input element.
+   * @return {!HTMLElement}
+   */
+  get inputElement() {
+    // Chrome generates audit errors if an <input type="password"> has a
+    // duplicate ID, which is almost always true in Shady DOM. Generate
+    // a unique ID instead.
+    if (!this.$) {
+      this.$ = {};
+    }
+    if (!this.$.input) {
+      this._generateInputId();
+      this.$.input = this.$$('#' + this._inputId);
+    }
+    return this.$.input;
+  },
+
+  /**
+   * Returns a reference to the focusable element.
+   * @return {!HTMLElement}
+   */
+  get _focusableElement() {
+    return this.inputElement;
+  },
+
+  created: function created() {
+    // These types have some default placeholder text; overlapping
+    // the label on top of it looks terrible. Auto-float the label in this case.
+    this._typesThatHaveText = ['date', 'datetime', 'datetime-local', 'month', 'time', 'week', 'file'];
+  },
+
+  attached: function attached() {
+    this._updateAriaLabelledBy();
+
+    // In the 2.0 version of the element, this is handled in `onIronInputReady`,
+    // i.e. after the native input has finished distributing. In the 1.0
+    // version, the input is in the shadow tree, so it's already available.
+    if (!_polymerElement.PolymerElement && this.inputElement && this._typesThatHaveText.indexOf(this.inputElement.type) !== -1) {
+      this.alwaysFloatLabel = true;
+    }
+  },
+
+  _appendStringWithSpace: function _appendStringWithSpace(str, more) {
+    if (str) {
+      str = str + ' ' + more;
+    } else {
+      str = more;
+    }
+    return str;
+  },
+
+  _onAddonAttached: function _onAddonAttached(event) {
+    var target = (0, _polymerDom.dom)(event).rootTarget;
+    if (target.id) {
+      this._ariaDescribedBy = this._appendStringWithSpace(this._ariaDescribedBy, target.id);
+    } else {
+      var id = 'paper-input-add-on-' + PaperInputHelper.NextAddonID++;
+      target.id = id;
+      this._ariaDescribedBy = this._appendStringWithSpace(this._ariaDescribedBy, id);
+    }
+  },
+
+  /**
+   * Validates the input element and sets an error style if needed.
+   *
+   * @return {boolean}
+   */
+  validate: function validate() {
+    return this.inputElement.validate();
+  },
+
+  /**
+   * Forward focus to inputElement. Overriden from IronControlState.
+   */
+  _focusBlurHandler: function _focusBlurHandler(event) {
+    _ironControlState.IronControlState._focusBlurHandler.call(this, event);
+
+    // Forward the focus to the nested input.
+    if (this.focused && !this._shiftTabPressed && this._focusableElement) {
+      this._focusableElement.focus();
+    }
+  },
+
+  /**
+   * Handler that is called when a shift+tab keypress is detected by the menu.
+   *
+   * @param {CustomEvent} event A key combination event.
+   */
+  _onShiftTabDown: function _onShiftTabDown(event) {
+    var oldTabIndex = this.getAttribute('tabindex');
+    this._shiftTabPressed = true;
+    this.setAttribute('tabindex', '-1');
+    this.async(function () {
+      this.setAttribute('tabindex', oldTabIndex);
+      this._shiftTabPressed = false;
+    }, 1);
+  },
+
+  /**
+   * If `autoValidate` is true, then validates the element.
+   */
+  _handleAutoValidate: function _handleAutoValidate() {
+    if (this.autoValidate) this.validate();
+  },
+
+  /**
+   * Restores the cursor to its original position after updating the value.
+   * @param {string} newValue The value that should be saved.
+   */
+  updateValueAndPreserveCaret: function updateValueAndPreserveCaret(newValue) {
+    // Not all elements might have selection, and even if they have the
+    // right properties, accessing them might throw an exception (like for
+    // <input type=number>)
+    try {
+      var start = this.inputElement.selectionStart;
+      this.value = newValue;
+
+      // The cursor automatically jumps to the end after re-setting the value,
+      // so restore it to its original position.
+      this.inputElement.selectionStart = start;
+      this.inputElement.selectionEnd = start;
+    } catch (e) {
+      // Just set the value and give up on the caret.
+      this.value = newValue;
+    }
+  },
+
+  _computeAlwaysFloatLabel: function _computeAlwaysFloatLabel(alwaysFloatLabel, placeholder) {
+    return placeholder || alwaysFloatLabel;
+  },
+
+  _updateAriaLabelledBy: function _updateAriaLabelledBy() {
+    var label = (0, _polymerDom.dom)(this.root).querySelector('label');
+    if (!label) {
+      this._ariaLabelledBy = '';
+      return;
+    }
+    var labelledBy;
+    if (label.id) {
+      labelledBy = label.id;
+    } else {
+      labelledBy = 'paper-input-label-' + PaperInputHelper.NextLabelID++;
+      label.id = labelledBy;
+    }
+    this._ariaLabelledBy = labelledBy;
+  },
+
+  _generateInputId: function _generateInputId() {
+    if (!this._inputId || this._inputId === '') {
+      this._inputId = 'input-' + PaperInputHelper.NextInputID++;
+    }
+  },
+
+  _onChange: function _onChange(event) {
+    // In the Shadow DOM, the `change` event is not leaked into the
+    // ancestor tree, so we must do this manually.
+    // See
+    // https://w3c.github.io/webcomponents/spec/shadow/#events-that-are-not-leaked-into-ancestor-trees.
+    if (this.shadowRoot) {
+      this.fire(event.type, { sourceEvent: event }, { node: this, bubbles: event.bubbles, cancelable: event.cancelable });
+    }
+  },
+
+  _autofocusChanged: function _autofocusChanged() {
+    // Firefox doesn't respect the autofocus attribute if it's applied after
+    // the page is loaded (Chrome/WebKit do respect it), preventing an
+    // autofocus attribute specified in markup from taking effect when the
+    // element is upgraded. As a workaround, if the autofocus property is set,
+    // and the focus hasn't already been moved elsewhere, we take focus.
+    if (this.autofocus && this._focusableElement) {
+      // In IE 11, the default document.activeElement can be the page's
+      // outermost html element, but there are also cases (under the
+      // polyfill?) in which the activeElement is not a real HTMLElement, but
+      // just a plain object. We identify the latter case as having no valid
+      // activeElement.
+      var activeElement = document.activeElement;
+      var isActiveElementValid = activeElement instanceof HTMLElement;
+
+      // Has some other element has already taken the focus?
+      var isSomeElementActive = isActiveElementValid && activeElement !== document.body && activeElement !== document.documentElement; /* IE 11 */
+      if (!isSomeElementActive) {
+        // No specific element has taken the focus yet, so we can take it.
+        this._focusableElement.focus();
+      }
+    }
+  }
+};
+
+/** @polymerBehavior */
+var PaperInputBehavior = exports.PaperInputBehavior = [_ironControlState.IronControlState, _ironA11yKeysBehavior.IronA11yKeysBehavior, PaperInputBehaviorImpl];
+
+/***/ }),
+
+/***/ "./node_modules/@polymer/paper-input/paper-input-char-counter.js":
+/*!***********************************************************************!*\
+  !*** ./node_modules/@polymer/paper-input/paper-input-char-counter.js ***!
+  \***********************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _templateObject = _taggedTemplateLiteral(['\n    <style>\n      :host {\n        display: inline-block;\n        float: right;\n\n        @apply --paper-font-caption;\n        @apply --paper-input-char-counter;\n      }\n\n      :host([hidden]) {\n        display: none !important;\n      }\n\n      :host(:dir(rtl)) {\n        float: left;\n      }\n    </style>\n\n    <span>[[_charCounterStr]]</span>\n'], ['\n    <style>\n      :host {\n        display: inline-block;\n        float: right;\n\n        @apply --paper-font-caption;\n        @apply --paper-input-char-counter;\n      }\n\n      :host([hidden]) {\n        display: none !important;\n      }\n\n      :host(:dir(rtl)) {\n        float: left;\n      }\n    </style>\n\n    <span>[[_charCounterStr]]</span>\n']);
+
+__webpack_require__(/*! @polymer/polymer/polymer-legacy.js */ "./node_modules/@polymer/polymer/polymer-legacy.js");
+
+__webpack_require__(/*! @polymer/paper-styles/typography.js */ "./node_modules/@polymer/paper-styles/typography.js");
+
+var _paperInputAddonBehavior = __webpack_require__(/*! ./paper-input-addon-behavior.js */ "./node_modules/@polymer/paper-input/paper-input-addon-behavior.js");
+
+var _polymerFn = __webpack_require__(/*! @polymer/polymer/lib/legacy/polymer-fn.js */ "./node_modules/@polymer/polymer/lib/legacy/polymer-fn.js");
+
+var _htmlTag = __webpack_require__(/*! @polymer/polymer/lib/utils/html-tag.js */ "./node_modules/@polymer/polymer/lib/utils/html-tag.js");
+
+function _taggedTemplateLiteral(strings, raw) { return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); } /**
+                                                                                                                                                  @license
+                                                                                                                                                  Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+                                                                                                                                                  This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+                                                                                                                                                  The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+                                                                                                                                                  The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+                                                                                                                                                  Code distributed by Google as part of the polymer project is also
+                                                                                                                                                  subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+                                                                                                                                                  */
+/*
+`<paper-input-char-counter>` is a character counter for use with `<paper-input-container>`. It
+shows the number of characters entered in the input and the max length if it is specified.
+
+    <paper-input-container>
+      <input maxlength="20">
+      <paper-input-char-counter></paper-input-char-counter>
+    </paper-input-container>
+
+### Styling
+
+The following mixin is available for styling:
+
+Custom property | Description | Default
+----------------|-------------|----------
+`--paper-input-char-counter` | Mixin applied to the element | `{}`
+*/
+/*
+  FIXME(polymer-modulizer): the above comments were extracted
+  from HTML and may be out of place here. Review them and
+  then delete this comment!
+*/
+
+
+(0, _polymerFn.Polymer)({
+  _template: (0, _htmlTag.html)(_templateObject),
+
+  is: 'paper-input-char-counter',
+  behaviors: [_paperInputAddonBehavior.PaperInputAddonBehavior],
+  properties: { _charCounterStr: { type: String, value: '0' } },
+
+  /**
+   * This overrides the update function in PaperInputAddonBehavior.
+   * @param {{
+   *   inputElement: (Element|undefined),
+   *   value: (string|undefined),
+   *   invalid: boolean
+   * }} state -
+   *     inputElement: The input element.
+   *     value: The input value.
+   *     invalid: True if the input value is invalid.
+   */
+  update: function update(state) {
+    if (!state.inputElement) {
+      return;
+    }
+
+    state.value = state.value || '';
+
+    var counter = state.value.toString().length.toString();
+
+    if (state.inputElement.hasAttribute('maxlength')) {
+      counter += '/' + state.inputElement.getAttribute('maxlength');
+    }
+
+    this._charCounterStr = counter;
+  }
+});
+
+/***/ }),
+
+/***/ "./node_modules/@polymer/paper-input/paper-input-container.js":
+/*!********************************************************************!*\
+  !*** ./node_modules/@polymer/paper-input/paper-input-container.js ***!
+  \********************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _templateObject = _taggedTemplateLiteral(['\n    <style>\n      :host {\n        display: block;\n        padding: 8px 0;\n        @apply --paper-input-container;\n      }\n\n      :host([inline]) {\n        display: inline-block;\n      }\n\n      :host([disabled]) {\n        pointer-events: none;\n        opacity: 0.33;\n\n        @apply --paper-input-container-disabled;\n      }\n\n      :host([hidden]) {\n        display: none !important;\n      }\n\n      [hidden] {\n        display: none !important;\n      }\n\n      .floated-label-placeholder {\n        @apply --paper-font-caption;\n      }\n\n      .underline {\n        height: 2px;\n        position: relative;\n      }\n\n      .focused-line {\n        @apply --layout-fit;\n        border-bottom: 2px solid var(--paper-input-container-focus-color, var(--primary-color));\n\n        -webkit-transform-origin: center center;\n        transform-origin: center center;\n        -webkit-transform: scale3d(0,1,1);\n        transform: scale3d(0,1,1);\n\n        @apply --paper-input-container-underline-focus;\n      }\n\n      .underline.is-highlighted .focused-line {\n        -webkit-transform: none;\n        transform: none;\n        -webkit-transition: -webkit-transform 0.25s;\n        transition: transform 0.25s;\n\n        @apply --paper-transition-easing;\n      }\n\n      .underline.is-invalid .focused-line {\n        border-color: var(--paper-input-container-invalid-color, var(--error-color));\n        -webkit-transform: none;\n        transform: none;\n        -webkit-transition: -webkit-transform 0.25s;\n        transition: transform 0.25s;\n\n        @apply --paper-transition-easing;\n      }\n\n      .unfocused-line {\n        @apply --layout-fit;\n        border-bottom: 1px solid var(--paper-input-container-color, var(--secondary-text-color));\n        @apply --paper-input-container-underline;\n      }\n\n      :host([disabled]) .unfocused-line {\n        border-bottom: 1px dashed;\n        border-color: var(--paper-input-container-color, var(--secondary-text-color));\n        @apply --paper-input-container-underline-disabled;\n      }\n\n      .input-wrapper {\n        @apply --layout-horizontal;\n        @apply --layout-center;\n        position: relative;\n      }\n\n      .input-content {\n        @apply --layout-flex-auto;\n        @apply --layout-relative;\n        max-width: 100%;\n      }\n\n      .input-content ::slotted(label),\n      .input-content ::slotted(.paper-input-label) {\n        position: absolute;\n        top: 0;\n        left: 0;\n        width: 100%;\n        font: inherit;\n        color: var(--paper-input-container-color, var(--secondary-text-color));\n        -webkit-transition: -webkit-transform 0.25s, width 0.25s;\n        transition: transform 0.25s, width 0.25s;\n        -webkit-transform-origin: left top;\n        transform-origin: left top;\n        /* Fix for safari not focusing 0-height date/time inputs with -webkit-apperance: none; */\n        min-height: 1px;\n\n        @apply --paper-font-common-nowrap;\n        @apply --paper-font-subhead;\n        @apply --paper-input-container-label;\n        @apply --paper-transition-easing;\n      }\n\n      .input-content.label-is-floating ::slotted(label),\n      .input-content.label-is-floating ::slotted(.paper-input-label) {\n        -webkit-transform: translateY(-75%) scale(0.75);\n        transform: translateY(-75%) scale(0.75);\n\n        /* Since we scale to 75/100 of the size, we actually have 100/75 of the\n        original space now available */\n        width: 133%;\n\n        @apply --paper-input-container-label-floating;\n      }\n\n      :host(:dir(rtl)) .input-content.label-is-floating ::slotted(label),\n      :host(:dir(rtl)) .input-content.label-is-floating ::slotted(.paper-input-label) {\n        right: 0;\n        left: auto;\n        -webkit-transform-origin: right top;\n        transform-origin: right top;\n      }\n\n      .input-content.label-is-highlighted ::slotted(label),\n      .input-content.label-is-highlighted ::slotted(.paper-input-label) {\n        color: var(--paper-input-container-focus-color, var(--primary-color));\n\n        @apply --paper-input-container-label-focus;\n      }\n\n      .input-content.is-invalid ::slotted(label),\n      .input-content.is-invalid ::slotted(.paper-input-label) {\n        color: var(--paper-input-container-invalid-color, var(--error-color));\n      }\n\n      .input-content.label-is-hidden ::slotted(label),\n      .input-content.label-is-hidden ::slotted(.paper-input-label) {\n        visibility: hidden;\n      }\n\n      .input-content ::slotted(input),\n      .input-content ::slotted(iron-input),\n      .input-content ::slotted(textarea),\n      .input-content ::slotted(iron-autogrow-textarea),\n      .input-content ::slotted(.paper-input-input) {\n        @apply --paper-input-container-shared-input-style;\n        /* The apply shim doesn\'t apply the nested color custom property,\n          so we have to re-apply it here. */\n        color: var(--paper-input-container-input-color, var(--primary-text-color));\n        @apply --paper-input-container-input;\n      }\n\n      .input-content ::slotted(input)::-webkit-outer-spin-button,\n      .input-content ::slotted(input)::-webkit-inner-spin-button {\n        @apply --paper-input-container-input-webkit-spinner;\n      }\n\n      .input-content.focused ::slotted(input),\n      .input-content.focused ::slotted(iron-input),\n      .input-content.focused ::slotted(textarea),\n      .input-content.focused ::slotted(iron-autogrow-textarea),\n      .input-content.focused ::slotted(.paper-input-input) {\n        @apply --paper-input-container-input-focus;\n      }\n\n      .input-content.is-invalid ::slotted(input),\n      .input-content.is-invalid ::slotted(iron-input),\n      .input-content.is-invalid ::slotted(textarea),\n      .input-content.is-invalid ::slotted(iron-autogrow-textarea),\n      .input-content.is-invalid ::slotted(.paper-input-input) {\n        @apply --paper-input-container-input-invalid;\n      }\n\n      .prefix ::slotted(*) {\n        display: inline-block;\n        @apply --paper-font-subhead;\n        @apply --layout-flex-none;\n        @apply --paper-input-prefix;\n      }\n\n      .suffix ::slotted(*) {\n        display: inline-block;\n        @apply --paper-font-subhead;\n        @apply --layout-flex-none;\n\n        @apply --paper-input-suffix;\n      }\n\n      /* Firefox sets a min-width on the input, which can cause layout issues */\n      .input-content ::slotted(input) {\n        min-width: 0;\n      }\n\n      .input-content ::slotted(textarea) {\n        resize: none;\n      }\n\n      .add-on-content {\n        position: relative;\n      }\n\n      .add-on-content.is-invalid ::slotted(*) {\n        color: var(--paper-input-container-invalid-color, var(--error-color));\n      }\n\n      .add-on-content.is-highlighted ::slotted(*) {\n        color: var(--paper-input-container-focus-color, var(--primary-color));\n      }\n    </style>\n\n    <div class="floated-label-placeholder" aria-hidden="true" hidden="[[noLabelFloat]]">&nbsp;</div>\n\n    <div class="input-wrapper">\n      <span class="prefix"><slot name="prefix"></slot></span>\n\n      <div class$="[[_computeInputContentClass(noLabelFloat,alwaysFloatLabel,focused,invalid,_inputHasContent)]]" id="labelAndInputContainer">\n        <slot name="label"></slot>\n        <slot name="input"></slot>\n      </div>\n\n      <span class="suffix"><slot name="suffix"></slot></span>\n    </div>\n\n    <div class$="[[_computeUnderlineClass(focused,invalid)]]">\n      <div class="unfocused-line"></div>\n      <div class="focused-line"></div>\n    </div>\n\n    <div class$="[[_computeAddOnContentClass(focused,invalid)]]">\n      <slot name="add-on"></slot>\n    </div>\n'], ['\n    <style>\n      :host {\n        display: block;\n        padding: 8px 0;\n        @apply --paper-input-container;\n      }\n\n      :host([inline]) {\n        display: inline-block;\n      }\n\n      :host([disabled]) {\n        pointer-events: none;\n        opacity: 0.33;\n\n        @apply --paper-input-container-disabled;\n      }\n\n      :host([hidden]) {\n        display: none !important;\n      }\n\n      [hidden] {\n        display: none !important;\n      }\n\n      .floated-label-placeholder {\n        @apply --paper-font-caption;\n      }\n\n      .underline {\n        height: 2px;\n        position: relative;\n      }\n\n      .focused-line {\n        @apply --layout-fit;\n        border-bottom: 2px solid var(--paper-input-container-focus-color, var(--primary-color));\n\n        -webkit-transform-origin: center center;\n        transform-origin: center center;\n        -webkit-transform: scale3d(0,1,1);\n        transform: scale3d(0,1,1);\n\n        @apply --paper-input-container-underline-focus;\n      }\n\n      .underline.is-highlighted .focused-line {\n        -webkit-transform: none;\n        transform: none;\n        -webkit-transition: -webkit-transform 0.25s;\n        transition: transform 0.25s;\n\n        @apply --paper-transition-easing;\n      }\n\n      .underline.is-invalid .focused-line {\n        border-color: var(--paper-input-container-invalid-color, var(--error-color));\n        -webkit-transform: none;\n        transform: none;\n        -webkit-transition: -webkit-transform 0.25s;\n        transition: transform 0.25s;\n\n        @apply --paper-transition-easing;\n      }\n\n      .unfocused-line {\n        @apply --layout-fit;\n        border-bottom: 1px solid var(--paper-input-container-color, var(--secondary-text-color));\n        @apply --paper-input-container-underline;\n      }\n\n      :host([disabled]) .unfocused-line {\n        border-bottom: 1px dashed;\n        border-color: var(--paper-input-container-color, var(--secondary-text-color));\n        @apply --paper-input-container-underline-disabled;\n      }\n\n      .input-wrapper {\n        @apply --layout-horizontal;\n        @apply --layout-center;\n        position: relative;\n      }\n\n      .input-content {\n        @apply --layout-flex-auto;\n        @apply --layout-relative;\n        max-width: 100%;\n      }\n\n      .input-content ::slotted(label),\n      .input-content ::slotted(.paper-input-label) {\n        position: absolute;\n        top: 0;\n        left: 0;\n        width: 100%;\n        font: inherit;\n        color: var(--paper-input-container-color, var(--secondary-text-color));\n        -webkit-transition: -webkit-transform 0.25s, width 0.25s;\n        transition: transform 0.25s, width 0.25s;\n        -webkit-transform-origin: left top;\n        transform-origin: left top;\n        /* Fix for safari not focusing 0-height date/time inputs with -webkit-apperance: none; */\n        min-height: 1px;\n\n        @apply --paper-font-common-nowrap;\n        @apply --paper-font-subhead;\n        @apply --paper-input-container-label;\n        @apply --paper-transition-easing;\n      }\n\n      .input-content.label-is-floating ::slotted(label),\n      .input-content.label-is-floating ::slotted(.paper-input-label) {\n        -webkit-transform: translateY(-75%) scale(0.75);\n        transform: translateY(-75%) scale(0.75);\n\n        /* Since we scale to 75/100 of the size, we actually have 100/75 of the\n        original space now available */\n        width: 133%;\n\n        @apply --paper-input-container-label-floating;\n      }\n\n      :host(:dir(rtl)) .input-content.label-is-floating ::slotted(label),\n      :host(:dir(rtl)) .input-content.label-is-floating ::slotted(.paper-input-label) {\n        right: 0;\n        left: auto;\n        -webkit-transform-origin: right top;\n        transform-origin: right top;\n      }\n\n      .input-content.label-is-highlighted ::slotted(label),\n      .input-content.label-is-highlighted ::slotted(.paper-input-label) {\n        color: var(--paper-input-container-focus-color, var(--primary-color));\n\n        @apply --paper-input-container-label-focus;\n      }\n\n      .input-content.is-invalid ::slotted(label),\n      .input-content.is-invalid ::slotted(.paper-input-label) {\n        color: var(--paper-input-container-invalid-color, var(--error-color));\n      }\n\n      .input-content.label-is-hidden ::slotted(label),\n      .input-content.label-is-hidden ::slotted(.paper-input-label) {\n        visibility: hidden;\n      }\n\n      .input-content ::slotted(input),\n      .input-content ::slotted(iron-input),\n      .input-content ::slotted(textarea),\n      .input-content ::slotted(iron-autogrow-textarea),\n      .input-content ::slotted(.paper-input-input) {\n        @apply --paper-input-container-shared-input-style;\n        /* The apply shim doesn\'t apply the nested color custom property,\n          so we have to re-apply it here. */\n        color: var(--paper-input-container-input-color, var(--primary-text-color));\n        @apply --paper-input-container-input;\n      }\n\n      .input-content ::slotted(input)::-webkit-outer-spin-button,\n      .input-content ::slotted(input)::-webkit-inner-spin-button {\n        @apply --paper-input-container-input-webkit-spinner;\n      }\n\n      .input-content.focused ::slotted(input),\n      .input-content.focused ::slotted(iron-input),\n      .input-content.focused ::slotted(textarea),\n      .input-content.focused ::slotted(iron-autogrow-textarea),\n      .input-content.focused ::slotted(.paper-input-input) {\n        @apply --paper-input-container-input-focus;\n      }\n\n      .input-content.is-invalid ::slotted(input),\n      .input-content.is-invalid ::slotted(iron-input),\n      .input-content.is-invalid ::slotted(textarea),\n      .input-content.is-invalid ::slotted(iron-autogrow-textarea),\n      .input-content.is-invalid ::slotted(.paper-input-input) {\n        @apply --paper-input-container-input-invalid;\n      }\n\n      .prefix ::slotted(*) {\n        display: inline-block;\n        @apply --paper-font-subhead;\n        @apply --layout-flex-none;\n        @apply --paper-input-prefix;\n      }\n\n      .suffix ::slotted(*) {\n        display: inline-block;\n        @apply --paper-font-subhead;\n        @apply --layout-flex-none;\n\n        @apply --paper-input-suffix;\n      }\n\n      /* Firefox sets a min-width on the input, which can cause layout issues */\n      .input-content ::slotted(input) {\n        min-width: 0;\n      }\n\n      .input-content ::slotted(textarea) {\n        resize: none;\n      }\n\n      .add-on-content {\n        position: relative;\n      }\n\n      .add-on-content.is-invalid ::slotted(*) {\n        color: var(--paper-input-container-invalid-color, var(--error-color));\n      }\n\n      .add-on-content.is-highlighted ::slotted(*) {\n        color: var(--paper-input-container-focus-color, var(--primary-color));\n      }\n    </style>\n\n    <div class="floated-label-placeholder" aria-hidden="true" hidden="[[noLabelFloat]]">&nbsp;</div>\n\n    <div class="input-wrapper">\n      <span class="prefix"><slot name="prefix"></slot></span>\n\n      <div class\\$="[[_computeInputContentClass(noLabelFloat,alwaysFloatLabel,focused,invalid,_inputHasContent)]]" id="labelAndInputContainer">\n        <slot name="label"></slot>\n        <slot name="input"></slot>\n      </div>\n\n      <span class="suffix"><slot name="suffix"></slot></span>\n    </div>\n\n    <div class\\$="[[_computeUnderlineClass(focused,invalid)]]">\n      <div class="unfocused-line"></div>\n      <div class="focused-line"></div>\n    </div>\n\n    <div class\\$="[[_computeAddOnContentClass(focused,invalid)]]">\n      <slot name="add-on"></slot>\n    </div>\n']);
+
+__webpack_require__(/*! @polymer/polymer/polymer-legacy.js */ "./node_modules/@polymer/polymer/polymer-legacy.js");
+
+__webpack_require__(/*! @polymer/iron-flex-layout/iron-flex-layout.js */ "./node_modules/@polymer/iron-flex-layout/iron-flex-layout.js");
+
+__webpack_require__(/*! @polymer/paper-styles/default-theme.js */ "./node_modules/@polymer/paper-styles/default-theme.js");
+
+__webpack_require__(/*! @polymer/paper-styles/typography.js */ "./node_modules/@polymer/paper-styles/typography.js");
+
+var _polymerFn = __webpack_require__(/*! @polymer/polymer/lib/legacy/polymer-fn.js */ "./node_modules/@polymer/polymer/lib/legacy/polymer-fn.js");
+
+var _htmlTag = __webpack_require__(/*! @polymer/polymer/lib/utils/html-tag.js */ "./node_modules/@polymer/polymer/lib/utils/html-tag.js");
+
+var _caseMap = __webpack_require__(/*! @polymer/polymer/lib/utils/case-map.js */ "./node_modules/@polymer/polymer/lib/utils/case-map.js");
+
+var _polymerDom = __webpack_require__(/*! @polymer/polymer/lib/legacy/polymer.dom.js */ "./node_modules/@polymer/polymer/lib/legacy/polymer.dom.js");
+
+function _taggedTemplateLiteral(strings, raw) { return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); } /**
+                                                                                                                                                  @license
+                                                                                                                                                  Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+                                                                                                                                                  This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+                                                                                                                                                  The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+                                                                                                                                                  The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+                                                                                                                                                  Code distributed by Google as part of the polymer project is also
+                                                                                                                                                  subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+                                                                                                                                                  */
+/*
+`<paper-input-container>` is a container for a `<label>`, an `<iron-input>` or
+`<textarea>` and optional add-on elements such as an error message or character
+counter, used to implement Material Design text fields.
+
+For example:
+
+    <paper-input-container>
+      <label slot="label">Your name</label>
+      <iron-input slot="input">
+        <input>
+      </iron-input>
+      // In Polymer 1.0, you would use `<input is="iron-input" slot="input">` instead of the above.
+    </paper-input-container>
+
+You can style the nested `<input>` however you want; if you want it to look like a
+Material Design input, you can style it with the --paper-input-container-shared-input-style mixin.
+
+Do not wrap `<paper-input-container>` around elements that already include it, such as `<paper-input>`.
+Doing so may cause events to bounce infinitely between the container and its contained element.
+
+### Listening for input changes
+
+By default, it listens for changes on the `bind-value` attribute on its children nodes and perform
+tasks such as auto-validating and label styling when the `bind-value` changes. You can configure
+the attribute it listens to with the `attr-for-value` attribute.
+
+### Using a custom input element
+
+You can use a custom input element in a `<paper-input-container>`, for example to implement a
+compound input field like a social security number input. The custom input element should have the
+`paper-input-input` class, have a `notify:true` value property and optionally implements
+`Polymer.IronValidatableBehavior` if it is validatable.
+
+    <paper-input-container attr-for-value="ssn-value">
+      <label slot="label">Social security number</label>
+      <ssn-input slot="input" class="paper-input-input"></ssn-input>
+    </paper-input-container>
+
+
+If you're using a `<paper-input-container>` imperatively, it's important to make sure
+that you attach its children (the `iron-input` and the optional `label`) before you
+attach the `<paper-input-container>` itself, so that it can be set up correctly.
+
+### Validation
+
+If the `auto-validate` attribute is set, the input container will validate the input and update
+the container styling when the input value changes.
+
+### Add-ons
+
+Add-ons are child elements of a `<paper-input-container>` with the `add-on` attribute and
+implements the `Polymer.PaperInputAddonBehavior` behavior. They are notified when the input value
+or validity changes, and may implement functionality such as error messages or character counters.
+They appear at the bottom of the input.
+
+### Prefixes and suffixes
+These are child elements of a `<paper-input-container>` with the `prefix`
+or `suffix` attribute, and are displayed inline with the input, before or after.
+
+    <paper-input-container>
+      <div slot="prefix">$</div>
+      <label slot="label">Total</label>
+      <iron-input slot="input">
+        <input>
+      </iron-input>
+      // In Polymer 1.0, you would use `<input is="iron-input" slot="input">` instead of the above.
+      <paper-icon-button slot="suffix" icon="clear"></paper-icon-button>
+    </paper-input-container>
+
+### Styling
+
+The following custom properties and mixins are available for styling:
+
+Custom property | Description | Default
+----------------|-------------|----------
+`--paper-input-container-color` | Label and underline color when the input is not focused | `--secondary-text-color`
+`--paper-input-container-focus-color` | Label and underline color when the input is focused | `--primary-color`
+`--paper-input-container-invalid-color` | Label and underline color when the input is is invalid | `--error-color`
+`--paper-input-container-input-color` | Input foreground color | `--primary-text-color`
+`--paper-input-container` | Mixin applied to the container | `{}`
+`--paper-input-container-disabled` | Mixin applied to the container when it's disabled | `{}`
+`--paper-input-container-label` | Mixin applied to the label | `{}`
+`--paper-input-container-label-focus` | Mixin applied to the label when the input is focused | `{}`
+`--paper-input-container-label-floating` | Mixin applied to the label when floating | `{}`
+`--paper-input-container-input` | Mixin applied to the input | `{}`
+`--paper-input-container-input-disabled` | Mixin applied to the input when the component is disabled | `{}`
+`--paper-input-container-input-focus` | Mixin applied to the input when focused | `{}`
+`--paper-input-container-input-invalid` | Mixin applied to the input when invalid | `{}`
+`--paper-input-container-input-webkit-spinner` | Mixin applied to the webkit spinner | `{}`
+`--paper-input-container-input-webkit-clear` | Mixin applied to the webkit clear button | `{}`
+`--paper-input-container-input-webkit-calendar-picker-indicator` | Mixin applied to the webkit calendar picker indicator | `{}`
+`--paper-input-container-ms-clear` | Mixin applied to the Internet Explorer clear button | `{}`
+`--paper-input-container-underline` | Mixin applied to the underline | `{}`
+`--paper-input-container-underline-focus` | Mixin applied to the underline when the input is focused | `{}`
+`--paper-input-container-underline-disabled` | Mixin applied to the underline when the input is disabled | `{}`
+`--paper-input-prefix` | Mixin applied to the input prefix | `{}`
+`--paper-input-suffix` | Mixin applied to the input suffix | `{}`
+
+This element is `display:block` by default, but you can set the `inline` attribute to make it
+`display:inline-block`.
+*/
+/*
+  FIXME(polymer-modulizer): the above comments were extracted
+  from HTML and may be out of place here. Review them and
+  then delete this comment!
+*/
+
+
+var $_documentContainer = document.createElement('template');
+$_documentContainer.setAttribute('style', 'display: none;');
+
+$_documentContainer.innerHTML = '<custom-style>\n  <style is="custom-style">\n    html {\n      --paper-input-container-shared-input-style: {\n        position: relative; /* to make a stacking context */\n        outline: none;\n        box-shadow: none;\n        padding: 0;\n        margin: 0;\n        width: 100%;\n        max-width: 100%;\n        background: transparent;\n        border: none;\n        color: var(--paper-input-container-input-color, var(--primary-text-color));\n        -webkit-appearance: none;\n        text-align: inherit;\n        vertical-align: bottom;\n\n        @apply --paper-font-subhead;\n      };\n    }\n  </style>\n</custom-style>';
+
+document.head.appendChild($_documentContainer.content);
+(0, _polymerFn.Polymer)({
+  _template: (0, _htmlTag.html)(_templateObject),
+
+  is: 'paper-input-container',
+
+  properties: {
+    /**
+     * Set to true to disable the floating label. The label disappears when the
+     * input value is not null.
+     */
+    noLabelFloat: { type: Boolean, value: false },
+
+    /**
+     * Set to true to always float the floating label.
+     */
+    alwaysFloatLabel: { type: Boolean, value: false },
+
+    /**
+     * The attribute to listen for value changes on.
+     */
+    attrForValue: { type: String, value: 'bind-value' },
+
+    /**
+     * Set to true to auto-validate the input value when it changes.
+     */
+    autoValidate: { type: Boolean, value: false },
+
+    /**
+     * True if the input is invalid. This property is set automatically when the
+     * input value changes if auto-validating, or when the `iron-input-validate`
+     * event is heard from a child.
+     */
+    invalid: { observer: '_invalidChanged', type: Boolean, value: false },
+
+    /**
+     * True if the input has focus.
+     */
+    focused: { readOnly: true, type: Boolean, value: false, notify: true },
+
+    _addons: {
+      type: Array
+      // do not set a default value here intentionally - it will be initialized
+      // lazily when a distributed child is attached, which may occur before
+      // configuration for this element in polyfill.
+    },
+
+    _inputHasContent: { type: Boolean, value: false },
+
+    _inputSelector: { type: String, value: 'input,iron-input,textarea,.paper-input-input' },
+
+    _boundOnFocus: {
+      type: Function,
+      value: function value() {
+        return this._onFocus.bind(this);
+      }
+    },
+
+    _boundOnBlur: {
+      type: Function,
+      value: function value() {
+        return this._onBlur.bind(this);
+      }
+    },
+
+    _boundOnInput: {
+      type: Function,
+      value: function value() {
+        return this._onInput.bind(this);
+      }
+    },
+
+    _boundValueChanged: {
+      type: Function,
+      value: function value() {
+        return this._onValueChanged.bind(this);
+      }
+    }
+  },
+
+  listeners: {
+    'addon-attached': '_onAddonAttached',
+    'iron-input-validate': '_onIronInputValidate'
+  },
+
+  get _valueChangedEvent() {
+    return this.attrForValue + '-changed';
+  },
+
+  get _propertyForValue() {
+    return (0, _caseMap.dashToCamelCase)(this.attrForValue);
+  },
+
+  get _inputElement() {
+    return (0, _polymerDom.dom)(this).querySelector(this._inputSelector);
+  },
+
+  get _inputElementValue() {
+    return this._inputElement[this._propertyForValue] || this._inputElement.value;
+  },
+
+  ready: function ready() {
+    // Paper-input treats a value of undefined differently at startup than
+    // the rest of the time (specifically: it does not validate it at startup,
+    // but it does after that. We need to track whether the first time we
+    // encounter the value is basically this first time, so that we can validate
+    // it correctly the rest of the time. See
+    // https://github.com/PolymerElements/paper-input/issues/605
+    this.__isFirstValueUpdate = true;
+    if (!this._addons) {
+      this._addons = [];
+    }
+    this.addEventListener('focus', this._boundOnFocus, true);
+    this.addEventListener('blur', this._boundOnBlur, true);
+  },
+
+  attached: function attached() {
+    if (this.attrForValue) {
+      this._inputElement.addEventListener(this._valueChangedEvent, this._boundValueChanged);
+    } else {
+      this.addEventListener('input', this._onInput);
+    }
+
+    // Only validate when attached if the input already has a value.
+    if (this._inputElementValue && this._inputElementValue != '') {
+      this._handleValueAndAutoValidate(this._inputElement);
+    } else {
+      this._handleValue(this._inputElement);
+    }
+  },
+
+  /** @private */
+  _onAddonAttached: function _onAddonAttached(event) {
+    if (!this._addons) {
+      this._addons = [];
+    }
+    var target = event.target;
+    if (this._addons.indexOf(target) === -1) {
+      this._addons.push(target);
+      if (this.isAttached) {
+        this._handleValue(this._inputElement);
+      }
+    }
+  },
+
+  /** @private */
+  _onFocus: function _onFocus() {
+    this._setFocused(true);
+  },
+
+  /** @private */
+  _onBlur: function _onBlur() {
+    this._setFocused(false);
+    this._handleValueAndAutoValidate(this._inputElement);
+  },
+
+  /** @private */
+  _onInput: function _onInput(event) {
+    this._handleValueAndAutoValidate(event.target);
+  },
+
+  /** @private */
+  _onValueChanged: function _onValueChanged(event) {
+    var input = event.target;
+
+    // Paper-input treats a value of undefined differently at startup than
+    // the rest of the time (specifically: it does not validate it at startup,
+    // but it does after that. If this is in fact the bootup case, ignore
+    // validation, just this once.
+    if (this.__isFirstValueUpdate) {
+      this.__isFirstValueUpdate = false;
+      if (input.value === undefined) {
+        return;
+      }
+    }
+
+    this._handleValueAndAutoValidate(event.target);
+  },
+
+  /** @private */
+  _handleValue: function _handleValue(inputElement) {
+    var value = this._inputElementValue;
+
+    // type="number" hack needed because this.value is empty until it's valid
+    if (value || value === 0 || inputElement.type === 'number' && !inputElement.checkValidity()) {
+      this._inputHasContent = true;
+    } else {
+      this._inputHasContent = false;
+    }
+
+    this.updateAddons({ inputElement: inputElement, value: value, invalid: this.invalid });
+  },
+
+  /** @private */
+  _handleValueAndAutoValidate: function _handleValueAndAutoValidate(inputElement) {
+    if (this.autoValidate && inputElement) {
+      var valid;
+
+      if (inputElement.validate) {
+        valid = inputElement.validate(this._inputElementValue);
+      } else {
+        valid = inputElement.checkValidity();
+      }
+      this.invalid = !valid;
+    }
+
+    // Call this last to notify the add-ons.
+    this._handleValue(inputElement);
+  },
+
+  /** @private */
+  _onIronInputValidate: function _onIronInputValidate(event) {
+    this.invalid = this._inputElement.invalid;
+  },
+
+  /** @private */
+  _invalidChanged: function _invalidChanged() {
+    if (this._addons) {
+      this.updateAddons({ invalid: this.invalid });
+    }
+  },
+
+  /**
+   * Call this to update the state of add-ons.
+   * @param {Object} state Add-on state.
+   */
+  updateAddons: function updateAddons(state) {
+    for (var addon, index = 0; addon = this._addons[index]; index++) {
+      addon.update(state);
+    }
+  },
+
+  /** @private */
+  _computeInputContentClass: function _computeInputContentClass(noLabelFloat, alwaysFloatLabel, focused, invalid, _inputHasContent) {
+    var cls = 'input-content';
+    if (!noLabelFloat) {
+      var label = this.querySelector('label');
+
+      if (alwaysFloatLabel || _inputHasContent) {
+        cls += ' label-is-floating';
+        // If the label is floating, ignore any offsets that may have been
+        // applied from a prefix element.
+        this.$.labelAndInputContainer.style.position = 'static';
+
+        if (invalid) {
+          cls += ' is-invalid';
+        } else if (focused) {
+          cls += ' label-is-highlighted';
+        }
+      } else {
+        // When the label is not floating, it should overlap the input element.
+        if (label) {
+          this.$.labelAndInputContainer.style.position = 'relative';
+        }
+        if (invalid) {
+          cls += ' is-invalid';
+        }
+      }
+    } else {
+      if (_inputHasContent) {
+        cls += ' label-is-hidden';
+      }
+      if (invalid) {
+        cls += ' is-invalid';
+      }
+    }
+    if (focused) {
+      cls += ' focused';
+    }
+    return cls;
+  },
+
+  /** @private */
+  _computeUnderlineClass: function _computeUnderlineClass(focused, invalid) {
+    var cls = 'underline';
+    if (invalid) {
+      cls += ' is-invalid';
+    } else if (focused) {
+      cls += ' is-highlighted';
+    }
+    return cls;
+  },
+
+  /** @private */
+  _computeAddOnContentClass: function _computeAddOnContentClass(focused, invalid) {
+    var cls = 'add-on-content';
+    if (invalid) {
+      cls += ' is-invalid';
+    } else if (focused) {
+      cls += ' is-highlighted';
+    }
+    return cls;
+  }
+});
+
+/***/ }),
+
+/***/ "./node_modules/@polymer/paper-input/paper-input-error.js":
+/*!****************************************************************!*\
+  !*** ./node_modules/@polymer/paper-input/paper-input-error.js ***!
+  \****************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _templateObject = _taggedTemplateLiteral(['\n    <style>\n      :host {\n        display: inline-block;\n        visibility: hidden;\n\n        color: var(--paper-input-container-invalid-color, var(--error-color));\n\n        @apply --paper-font-caption;\n        @apply --paper-input-error;\n        position: absolute;\n        left:0;\n        right:0;\n      }\n\n      :host([invalid]) {\n        visibility: visible;\n      };\n    </style>\n\n    <slot></slot>\n'], ['\n    <style>\n      :host {\n        display: inline-block;\n        visibility: hidden;\n\n        color: var(--paper-input-container-invalid-color, var(--error-color));\n\n        @apply --paper-font-caption;\n        @apply --paper-input-error;\n        position: absolute;\n        left:0;\n        right:0;\n      }\n\n      :host([invalid]) {\n        visibility: visible;\n      };\n    </style>\n\n    <slot></slot>\n']);
+
+__webpack_require__(/*! @polymer/polymer/polymer-legacy.js */ "./node_modules/@polymer/polymer/polymer-legacy.js");
+
+__webpack_require__(/*! @polymer/paper-styles/default-theme.js */ "./node_modules/@polymer/paper-styles/default-theme.js");
+
+__webpack_require__(/*! @polymer/paper-styles/typography.js */ "./node_modules/@polymer/paper-styles/typography.js");
+
+var _paperInputAddonBehavior = __webpack_require__(/*! ./paper-input-addon-behavior.js */ "./node_modules/@polymer/paper-input/paper-input-addon-behavior.js");
+
+var _polymerFn = __webpack_require__(/*! @polymer/polymer/lib/legacy/polymer-fn.js */ "./node_modules/@polymer/polymer/lib/legacy/polymer-fn.js");
+
+var _htmlTag = __webpack_require__(/*! @polymer/polymer/lib/utils/html-tag.js */ "./node_modules/@polymer/polymer/lib/utils/html-tag.js");
+
+function _taggedTemplateLiteral(strings, raw) { return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); } /**
+                                                                                                                                                  @license
+                                                                                                                                                  Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+                                                                                                                                                  This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+                                                                                                                                                  The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+                                                                                                                                                  The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+                                                                                                                                                  Code distributed by Google as part of the polymer project is also
+                                                                                                                                                  subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+                                                                                                                                                  */
+/*
+`<paper-input-error>` is an error message for use with `<paper-input-container>`. The error is
+displayed when the `<paper-input-container>` is `invalid`.
+
+    <paper-input-container>
+      <input pattern="[0-9]*">
+      <paper-input-error slot="add-on">Only numbers are allowed!</paper-input-error>
+    </paper-input-container>
+
+### Styling
+
+The following custom properties and mixins are available for styling:
+
+Custom property | Description | Default
+----------------|-------------|----------
+`--paper-input-container-invalid-color` | The foreground color of the error | `--error-color`
+`--paper-input-error`                   | Mixin applied to the error        | `{}`
+*/
+/*
+  FIXME(polymer-modulizer): the above comments were extracted
+  from HTML and may be out of place here. Review them and
+  then delete this comment!
+*/
+
+
+(0, _polymerFn.Polymer)({
+  _template: (0, _htmlTag.html)(_templateObject),
+
+  is: 'paper-input-error',
+  behaviors: [_paperInputAddonBehavior.PaperInputAddonBehavior],
+
+  properties: {
+    /**
+     * True if the error is showing.
+     */
+    invalid: { readOnly: true, reflectToAttribute: true, type: Boolean }
+  },
+
+  /**
+   * This overrides the update function in PaperInputAddonBehavior.
+   * @param {{
+   *   inputElement: (Element|undefined),
+   *   value: (string|undefined),
+   *   invalid: boolean
+   * }} state -
+   *     inputElement: The input element.
+   *     value: The input value.
+   *     invalid: True if the input value is invalid.
+   */
+  update: function update(state) {
+    this._setInvalid(state.invalid);
+  }
+});
+
+/***/ }),
+
+/***/ "./node_modules/@polymer/paper-input/paper-input.js":
+/*!**********************************************************!*\
+  !*** ./node_modules/@polymer/paper-input/paper-input.js ***!
+  \**********************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+__webpack_require__(/*! @polymer/polymer/polymer-legacy.js */ "./node_modules/@polymer/polymer/polymer-legacy.js");
+
+var _ironFormElementBehavior = __webpack_require__(/*! @polymer/iron-form-element-behavior/iron-form-element-behavior.js */ "./node_modules/@polymer/iron-form-element-behavior/iron-form-element-behavior.js");
+
+__webpack_require__(/*! @polymer/iron-input/iron-input.js */ "./node_modules/@polymer/iron-input/iron-input.js");
+
+var _paperInputBehavior = __webpack_require__(/*! ./paper-input-behavior.js */ "./node_modules/@polymer/paper-input/paper-input-behavior.js");
+
+__webpack_require__(/*! ./paper-input-char-counter.js */ "./node_modules/@polymer/paper-input/paper-input-char-counter.js");
+
+__webpack_require__(/*! ./paper-input-container.js */ "./node_modules/@polymer/paper-input/paper-input-container.js");
+
+__webpack_require__(/*! ./paper-input-error.js */ "./node_modules/@polymer/paper-input/paper-input-error.js");
+
+var _polymerFn = __webpack_require__(/*! @polymer/polymer/lib/legacy/polymer-fn.js */ "./node_modules/@polymer/polymer/lib/legacy/polymer-fn.js");
+
+var _domModule = __webpack_require__(/*! @polymer/polymer/lib/elements/dom-module.js */ "./node_modules/@polymer/polymer/lib/elements/dom-module.js");
+
+var _polymerElement = __webpack_require__(/*! @polymer/polymer/polymer-element.js */ "./node_modules/@polymer/polymer/polymer-element.js");
+
+/**
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+*/
+/**
+Material design: [Text fields](https://www.google.com/design/spec/components/text-fields.html)
+
+`<paper-input>` is a single-line text field with Material Design styling.
+
+    <paper-input label="Input label"></paper-input>
+
+It may include an optional error message or character counter.
+
+    <paper-input error-message="Invalid input!" label="Input label"></paper-input>
+    <paper-input char-counter label="Input label"></paper-input>
+
+It can also include custom prefix or suffix elements, which are displayed
+before or after the text input itself. In order for an element to be
+considered as a prefix, it must have the `prefix` attribute (and similarly
+for `suffix`).
+
+    <paper-input label="total">
+      <div prefix>$</div>
+      <paper-icon-button slot="suffix" icon="clear"></paper-icon-button>
+    </paper-input>
+
+A `paper-input` can use the native `type=search` or `type=file` features.
+However, since we can't control the native styling of the input (search icon,
+file button, date placeholder, etc.), in these cases the label will be
+automatically floated. The `placeholder` attribute can still be used for
+additional informational text.
+
+    <paper-input label="search!" type="search"
+        placeholder="search for cats" autosave="test" results="5">
+    </paper-input>
+
+See `Polymer.PaperInputBehavior` for more API docs.
+
+### Focus
+
+To focus a paper-input, you can call the native `focus()` method as long as the
+paper input has a tab index. Similarly, `blur()` will blur the element.
+
+### Styling
+
+See `Polymer.PaperInputContainer` for a list of custom properties used to
+style this element.
+
+The following custom properties and mixins are available for styling:
+
+Custom property | Description | Default
+----------------|-------------|----------
+`--paper-input-container-ms-clear` | Mixin applied to the Internet Explorer reveal button (the eyeball) | {}
+
+@group Paper Elements
+@element paper-input
+@hero hero.svg
+@demo demo/index.html
+
+*/
+/* This is a fresh new hell to make this element hybrid. Basically, in 2.0
+    we lost is=, so the example same template can't be used with iron-input 1.0 and 2.0.
+    Expect some conditional code (especially in the tests).
+   */
+/*
+  FIXME(polymer-modulizer): the above comments were extracted
+  from HTML and may be out of place here. Review them and
+  then delete this comment!
+*/
+var $_documentContainer = document.createElement('template');
+$_documentContainer.setAttribute('style', 'display: none;');
+
+$_documentContainer.innerHTML = '<dom-module id="paper-input">\n  <template>\n    <style>\n      :host {\n        display: block;\n      }\n\n      :host([focused]) {\n        outline: none;\n      }\n\n      :host([hidden]) {\n        display: none !important;\n      }\n\n      input {\n        /* Firefox sets a min-width on the input, which can cause layout issues */\n        min-width: 0;\n      }\n\n      /* In 1.x, the <input> is distributed to paper-input-container, which styles it.\n      In 2.x the <iron-input> is distributed to paper-input-container, which styles\n      it, but in order for this to work correctly, we need to reset some\n      of the native input\'s properties to inherit (from the iron-input) */\n      iron-input > input {\n        @apply --paper-input-container-shared-input-style;\n        font-family: inherit;\n        font-weight: inherit;\n        font-size: inherit;\n        letter-spacing: inherit;\n        word-spacing: inherit;\n        line-height: inherit;\n        text-shadow: inherit;\n        color: inherit;\n        cursor: inherit;\n      }\n\n      input:disabled {\n        @apply --paper-input-container-input-disabled;\n      }\n\n      input::-webkit-outer-spin-button,\n      input::-webkit-inner-spin-button {\n        @apply --paper-input-container-input-webkit-spinner;\n      }\n\n      input::-webkit-clear-button {\n        @apply --paper-input-container-input-webkit-clear;\n      }\n\n      input::-webkit-calendar-picker-indicator {\n        @apply --paper-input-container-input-webkit-calendar-picker-indicator;\n      }\n\n      input::-webkit-input-placeholder {\n        color: var(--paper-input-container-color, var(--secondary-text-color));\n      }\n\n      input:-moz-placeholder {\n        color: var(--paper-input-container-color, var(--secondary-text-color));\n      }\n\n      input::-moz-placeholder {\n        color: var(--paper-input-container-color, var(--secondary-text-color));\n      }\n\n      input::-ms-clear {\n        @apply --paper-input-container-ms-clear;\n      }\n\n      input::-ms-reveal {\n        @apply --paper-input-container-ms-reveal;\n      }\n\n      input:-ms-input-placeholder {\n        color: var(--paper-input-container-color, var(--secondary-text-color));\n      }\n\n      label {\n        pointer-events: none;\n      }\n    </style>\n\n    <paper-input-container id="container" no-label-float="[[noLabelFloat]]" always-float-label="[[_computeAlwaysFloatLabel(alwaysFloatLabel,placeholder)]]" auto-validate$="[[autoValidate]]" disabled$="[[disabled]]" invalid="[[invalid]]">\n\n      <slot name="prefix" slot="prefix"></slot>\n\n      <label hidden$="[[!label]]" aria-hidden="true" for$="[[_inputId]]" slot="label">[[label]]</label>\n\n      <span id="template-placeholder"></span>\n\n      <slot name="suffix" slot="suffix"></slot>\n\n      <template is="dom-if" if="[[errorMessage]]">\n        <paper-input-error aria-live="assertive" slot="add-on">[[errorMessage]]</paper-input-error>\n      </template>\n\n      <template is="dom-if" if="[[charCounter]]">\n        <paper-input-char-counter slot="add-on"></paper-input-char-counter>\n      </template>\n\n    </paper-input-container>\n  </template>\n\n  <!-- This is a fresh new hell to make this element hybrid. Basically, in 2.0\n    we lost is=, so the example same template can\'t be used with iron-input 1.0 and 2.0.\n    Expect some conditional code (especially in the tests).\n   -->\n  <template id="v0">\n    <input is="iron-input" slot="input" class="input-element" id$="[[_inputId]]" aria-labelledby$="[[_ariaLabelledBy]]" aria-describedby$="[[_ariaDescribedBy]]" disabled$="[[disabled]]" title$="[[title]]" bind-value="{{value}}" invalid="{{invalid}}" prevent-invalid-input="[[preventInvalidInput]]" allowed-pattern="[[allowedPattern]]" validator="[[validator]]" type$="[[type]]" pattern$="[[pattern]]" required$="[[required]]" autocomplete$="[[autocomplete]]" autofocus$="[[autofocus]]" inputmode$="[[inputmode]]" minlength$="[[minlength]]" maxlength$="[[maxlength]]" min$="[[min]]" max$="[[max]]" step$="[[step]]" name$="[[name]]" placeholder$="[[placeholder]]" readonly$="[[readonly]]" list$="[[list]]" size$="[[size]]" autocapitalize$="[[autocapitalize]]" autocorrect$="[[autocorrect]]" on-change="_onChange" tabindex$="[[tabIndex]]" autosave$="[[autosave]]" results$="[[results]]" accept$="[[accept]]" multiple$="[[multiple]]">\n  </template>\n\n  <template id="v1">\n    <!-- Need to bind maxlength so that the paper-input-char-counter works correctly -->\n    <iron-input bind-value="{{value}}" slot="input" class="input-element" id$="[[_inputId]]" maxlength$="[[maxlength]]" allowed-pattern="[[allowedPattern]]" invalid="{{invalid}}" validator="[[validator]]">\n      <input aria-labelledby$="[[_ariaLabelledBy]]" aria-describedby$="[[_ariaDescribedBy]]" disabled$="[[disabled]]" title$="[[title]]" type$="[[type]]" pattern$="[[pattern]]" required$="[[required]]" autocomplete$="[[autocomplete]]" autofocus$="[[autofocus]]" inputmode$="[[inputmode]]" minlength$="[[minlength]]" maxlength$="[[maxlength]]" min$="[[min]]" max$="[[max]]" step$="[[step]]" name$="[[name]]" placeholder$="[[placeholder]]" readonly$="[[readonly]]" list$="[[list]]" size$="[[size]]" autocapitalize$="[[autocapitalize]]" autocorrect$="[[autocorrect]]" on-change="_onChange" tabindex$="[[tabIndex]]" autosave$="[[autosave]]" results$="[[results]]" accept$="[[accept]]" multiple$="[[multiple]]">\n    </iron-input>\n  </template>\n\n</dom-module>';
+
+document.head.appendChild($_documentContainer.content);
+(0, _polymerFn.Polymer)({
+  is: 'paper-input',
+
+  behaviors: [_paperInputBehavior.PaperInputBehavior, _ironFormElementBehavior.IronFormElementBehavior],
+
+  properties: {
+    value: {
+      // Required for the correct TypeScript type-generation
+      type: String
+    }
+  },
+
+  beforeRegister: function beforeRegister() {
+    // We need to tell which kind of of template to stamp based on
+    // what kind of `iron-input` we got, but because of polyfills and
+    // custom elements differences between v0 and v1, the safest bet is
+    // to check a particular method we know the iron-input#2.x can have.
+    // If it doesn't have it, then it's an iron-input#1.x.
+    var ironInput = document.createElement('iron-input');
+    var version = typeof ironInput._initSlottedInput == 'function' ? 'v1' : 'v0';
+    var template = _domModule.DomModule.import('paper-input', 'template');
+    var inputTemplate = _domModule.DomModule.import('paper-input', 'template#' + version);
+    var inputPlaceholder = template.content.querySelector('#template-placeholder');
+    if (inputPlaceholder) {
+      inputPlaceholder.parentNode.replaceChild(inputTemplate.content, inputPlaceholder);
+    }
+    // else it's already been processed, probably in superclass
+  },
+
+  /**
+   * Returns a reference to the focusable element. Overridden from
+   * PaperInputBehavior to correctly focus the native input.
+   *
+   * @return {!HTMLElement}
+   */
+  get _focusableElement() {
+    return _polymerElement.PolymerElement ? this.inputElement._inputElement : this.inputElement;
+  },
+
+  // Note: This event is only available in the 1.0 version of this element.
+  // In 2.0, the functionality of `_onIronInputReady` is done in
+  // PaperInputBehavior::attached.
+  listeners: { 'iron-input-ready': '_onIronInputReady' },
+
+  _onIronInputReady: function _onIronInputReady() {
+    // Even though this is only used in the next line, save this for
+    // backwards compatibility, since the native input had this ID until 2.0.5.
+    if (!this.$.nativeInput) {
+      this.$.nativeInput = this.$$('input');
+    }
+    if (this.inputElement && this._typesThatHaveText.indexOf(this.$.nativeInput.type) !== -1) {
+      this.alwaysFloatLabel = true;
+    }
+
+    // Only validate when attached if the input already has a value.
+    if (!!this.inputElement.bindValue) {
+      this.$.container._handleValueAndAutoValidate(this.inputElement);
+    }
+  }
+});
+
+/***/ }),
+
+/***/ "./node_modules/@polymer/paper-progress/paper-progress.js":
+/*!****************************************************************!*\
+  !*** ./node_modules/@polymer/paper-progress/paper-progress.js ***!
+  \****************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _templateObject = _taggedTemplateLiteral(['\n    <style>\n      :host {\n        display: block;\n        width: 200px;\n        position: relative;\n        overflow: hidden;\n      }\n\n      :host([hidden]), [hidden] {\n        display: none !important;\n      }\n\n      #progressContainer {\n        @apply --paper-progress-container;\n        position: relative;\n      }\n\n      #progressContainer,\n      /* the stripe for the indeterminate animation*/\n      .indeterminate::after {\n        height: var(--paper-progress-height, 4px);\n      }\n\n      #primaryProgress,\n      #secondaryProgress,\n      .indeterminate::after {\n        @apply --layout-fit;\n      }\n\n      #progressContainer,\n      .indeterminate::after {\n        background: var(--paper-progress-container-color, var(--google-grey-300));\n      }\n\n      :host(.transiting) #primaryProgress,\n      :host(.transiting) #secondaryProgress {\n        -webkit-transition-property: -webkit-transform;\n        transition-property: transform;\n\n        /* Duration */\n        -webkit-transition-duration: var(--paper-progress-transition-duration, 0.08s);\n        transition-duration: var(--paper-progress-transition-duration, 0.08s);\n\n        /* Timing function */\n        -webkit-transition-timing-function: var(--paper-progress-transition-timing-function, ease);\n        transition-timing-function: var(--paper-progress-transition-timing-function, ease);\n\n        /* Delay */\n        -webkit-transition-delay: var(--paper-progress-transition-delay, 0s);\n        transition-delay: var(--paper-progress-transition-delay, 0s);\n      }\n\n      #primaryProgress,\n      #secondaryProgress {\n        @apply --layout-fit;\n        -webkit-transform-origin: left center;\n        transform-origin: left center;\n        -webkit-transform: scaleX(0);\n        transform: scaleX(0);\n        will-change: transform;\n      }\n\n      #primaryProgress {\n        background: var(--paper-progress-active-color, var(--google-green-500));\n      }\n\n      #secondaryProgress {\n        background: var(--paper-progress-secondary-color, var(--google-green-100));\n      }\n\n      :host([disabled]) #primaryProgress {\n        background: var(--paper-progress-disabled-active-color, var(--google-grey-500));\n      }\n\n      :host([disabled]) #secondaryProgress {\n        background: var(--paper-progress-disabled-secondary-color, var(--google-grey-300));\n      }\n\n      :host(:not([disabled])) #primaryProgress.indeterminate {\n        -webkit-transform-origin: right center;\n        transform-origin: right center;\n        -webkit-animation: indeterminate-bar var(--paper-progress-indeterminate-cycle-duration, 2s) linear infinite;\n        animation: indeterminate-bar var(--paper-progress-indeterminate-cycle-duration, 2s) linear infinite;\n      }\n\n      :host(:not([disabled])) #primaryProgress.indeterminate::after {\n        content: "";\n        -webkit-transform-origin: center center;\n        transform-origin: center center;\n\n        -webkit-animation: indeterminate-splitter var(--paper-progress-indeterminate-cycle-duration, 2s) linear infinite;\n        animation: indeterminate-splitter var(--paper-progress-indeterminate-cycle-duration, 2s) linear infinite;\n      }\n\n      @-webkit-keyframes indeterminate-bar {\n        0% {\n          -webkit-transform: scaleX(1) translateX(-100%);\n        }\n        50% {\n          -webkit-transform: scaleX(1) translateX(0%);\n        }\n        75% {\n          -webkit-transform: scaleX(1) translateX(0%);\n          -webkit-animation-timing-function: cubic-bezier(.28,.62,.37,.91);\n        }\n        100% {\n          -webkit-transform: scaleX(0) translateX(0%);\n        }\n      }\n\n      @-webkit-keyframes indeterminate-splitter {\n        0% {\n          -webkit-transform: scaleX(.75) translateX(-125%);\n        }\n        30% {\n          -webkit-transform: scaleX(.75) translateX(-125%);\n          -webkit-animation-timing-function: cubic-bezier(.42,0,.6,.8);\n        }\n        90% {\n          -webkit-transform: scaleX(.75) translateX(125%);\n        }\n        100% {\n          -webkit-transform: scaleX(.75) translateX(125%);\n        }\n      }\n\n      @keyframes indeterminate-bar {\n        0% {\n          transform: scaleX(1) translateX(-100%);\n        }\n        50% {\n          transform: scaleX(1) translateX(0%);\n        }\n        75% {\n          transform: scaleX(1) translateX(0%);\n          animation-timing-function: cubic-bezier(.28,.62,.37,.91);\n        }\n        100% {\n          transform: scaleX(0) translateX(0%);\n        }\n      }\n\n      @keyframes indeterminate-splitter {\n        0% {\n          transform: scaleX(.75) translateX(-125%);\n        }\n        30% {\n          transform: scaleX(.75) translateX(-125%);\n          animation-timing-function: cubic-bezier(.42,0,.6,.8);\n        }\n        90% {\n          transform: scaleX(.75) translateX(125%);\n        }\n        100% {\n          transform: scaleX(.75) translateX(125%);\n        }\n      }\n    </style>\n\n    <div id="progressContainer">\n      <div id="secondaryProgress" hidden$="[[_hideSecondaryProgress(secondaryRatio)]]"></div>\n      <div id="primaryProgress"></div>\n    </div>\n'], ['\n    <style>\n      :host {\n        display: block;\n        width: 200px;\n        position: relative;\n        overflow: hidden;\n      }\n\n      :host([hidden]), [hidden] {\n        display: none !important;\n      }\n\n      #progressContainer {\n        @apply --paper-progress-container;\n        position: relative;\n      }\n\n      #progressContainer,\n      /* the stripe for the indeterminate animation*/\n      .indeterminate::after {\n        height: var(--paper-progress-height, 4px);\n      }\n\n      #primaryProgress,\n      #secondaryProgress,\n      .indeterminate::after {\n        @apply --layout-fit;\n      }\n\n      #progressContainer,\n      .indeterminate::after {\n        background: var(--paper-progress-container-color, var(--google-grey-300));\n      }\n\n      :host(.transiting) #primaryProgress,\n      :host(.transiting) #secondaryProgress {\n        -webkit-transition-property: -webkit-transform;\n        transition-property: transform;\n\n        /* Duration */\n        -webkit-transition-duration: var(--paper-progress-transition-duration, 0.08s);\n        transition-duration: var(--paper-progress-transition-duration, 0.08s);\n\n        /* Timing function */\n        -webkit-transition-timing-function: var(--paper-progress-transition-timing-function, ease);\n        transition-timing-function: var(--paper-progress-transition-timing-function, ease);\n\n        /* Delay */\n        -webkit-transition-delay: var(--paper-progress-transition-delay, 0s);\n        transition-delay: var(--paper-progress-transition-delay, 0s);\n      }\n\n      #primaryProgress,\n      #secondaryProgress {\n        @apply --layout-fit;\n        -webkit-transform-origin: left center;\n        transform-origin: left center;\n        -webkit-transform: scaleX(0);\n        transform: scaleX(0);\n        will-change: transform;\n      }\n\n      #primaryProgress {\n        background: var(--paper-progress-active-color, var(--google-green-500));\n      }\n\n      #secondaryProgress {\n        background: var(--paper-progress-secondary-color, var(--google-green-100));\n      }\n\n      :host([disabled]) #primaryProgress {\n        background: var(--paper-progress-disabled-active-color, var(--google-grey-500));\n      }\n\n      :host([disabled]) #secondaryProgress {\n        background: var(--paper-progress-disabled-secondary-color, var(--google-grey-300));\n      }\n\n      :host(:not([disabled])) #primaryProgress.indeterminate {\n        -webkit-transform-origin: right center;\n        transform-origin: right center;\n        -webkit-animation: indeterminate-bar var(--paper-progress-indeterminate-cycle-duration, 2s) linear infinite;\n        animation: indeterminate-bar var(--paper-progress-indeterminate-cycle-duration, 2s) linear infinite;\n      }\n\n      :host(:not([disabled])) #primaryProgress.indeterminate::after {\n        content: "";\n        -webkit-transform-origin: center center;\n        transform-origin: center center;\n\n        -webkit-animation: indeterminate-splitter var(--paper-progress-indeterminate-cycle-duration, 2s) linear infinite;\n        animation: indeterminate-splitter var(--paper-progress-indeterminate-cycle-duration, 2s) linear infinite;\n      }\n\n      @-webkit-keyframes indeterminate-bar {\n        0% {\n          -webkit-transform: scaleX(1) translateX(-100%);\n        }\n        50% {\n          -webkit-transform: scaleX(1) translateX(0%);\n        }\n        75% {\n          -webkit-transform: scaleX(1) translateX(0%);\n          -webkit-animation-timing-function: cubic-bezier(.28,.62,.37,.91);\n        }\n        100% {\n          -webkit-transform: scaleX(0) translateX(0%);\n        }\n      }\n\n      @-webkit-keyframes indeterminate-splitter {\n        0% {\n          -webkit-transform: scaleX(.75) translateX(-125%);\n        }\n        30% {\n          -webkit-transform: scaleX(.75) translateX(-125%);\n          -webkit-animation-timing-function: cubic-bezier(.42,0,.6,.8);\n        }\n        90% {\n          -webkit-transform: scaleX(.75) translateX(125%);\n        }\n        100% {\n          -webkit-transform: scaleX(.75) translateX(125%);\n        }\n      }\n\n      @keyframes indeterminate-bar {\n        0% {\n          transform: scaleX(1) translateX(-100%);\n        }\n        50% {\n          transform: scaleX(1) translateX(0%);\n        }\n        75% {\n          transform: scaleX(1) translateX(0%);\n          animation-timing-function: cubic-bezier(.28,.62,.37,.91);\n        }\n        100% {\n          transform: scaleX(0) translateX(0%);\n        }\n      }\n\n      @keyframes indeterminate-splitter {\n        0% {\n          transform: scaleX(.75) translateX(-125%);\n        }\n        30% {\n          transform: scaleX(.75) translateX(-125%);\n          animation-timing-function: cubic-bezier(.42,0,.6,.8);\n        }\n        90% {\n          transform: scaleX(.75) translateX(125%);\n        }\n        100% {\n          transform: scaleX(.75) translateX(125%);\n        }\n      }\n    </style>\n\n    <div id="progressContainer">\n      <div id="secondaryProgress" hidden\\$="[[_hideSecondaryProgress(secondaryRatio)]]"></div>\n      <div id="primaryProgress"></div>\n    </div>\n']);
+
+__webpack_require__(/*! @polymer/polymer/polymer-legacy.js */ "./node_modules/@polymer/polymer/polymer-legacy.js");
+
+__webpack_require__(/*! @polymer/iron-flex-layout/iron-flex-layout.js */ "./node_modules/@polymer/iron-flex-layout/iron-flex-layout.js");
+
+var _ironRangeBehavior = __webpack_require__(/*! @polymer/iron-range-behavior/iron-range-behavior.js */ "./node_modules/@polymer/iron-range-behavior/iron-range-behavior.js");
+
+__webpack_require__(/*! @polymer/paper-styles/color.js */ "./node_modules/@polymer/paper-styles/color.js");
+
+var _polymerFn = __webpack_require__(/*! @polymer/polymer/lib/legacy/polymer-fn.js */ "./node_modules/@polymer/polymer/lib/legacy/polymer-fn.js");
+
+var _htmlTag = __webpack_require__(/*! @polymer/polymer/lib/utils/html-tag.js */ "./node_modules/@polymer/polymer/lib/utils/html-tag.js");
+
+function _taggedTemplateLiteral(strings, raw) { return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); } /**
+                                                                                                                                                  @license
+                                                                                                                                                  Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+                                                                                                                                                  This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+                                                                                                                                                  The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+                                                                                                                                                  The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+                                                                                                                                                  Code distributed by Google as part of the polymer project is also
+                                                                                                                                                  subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+                                                                                                                                                  */
+/**
+Material design: [Progress & activity](https://www.google.com/design/spec/components/progress-activity.html)
+
+The progress bars are for situations where the percentage completed can be
+determined. They give users a quick sense of how much longer an operation
+will take.
+
+Example:
+
+    <paper-progress value="10"></paper-progress>
+
+There is also a secondary progress which is useful for displaying intermediate
+progress, such as the buffer level during a streaming playback progress bar.
+
+Example:
+
+    <paper-progress value="10" secondary-progress="30"></paper-progress>
+
+### Styling progress bar:
+
+To change the active progress bar color:
+
+    paper-progress {
+       --paper-progress-active-color: #e91e63;
+    }
+
+To change the secondary progress bar color:
+
+    paper-progress {
+      --paper-progress-secondary-color: #f8bbd0;
+    }
+
+To change the progress bar background color:
+
+    paper-progress {
+      --paper-progress-container-color: #64ffda;
+    }
+
+Add the class `transiting` to a paper-progress to animate the progress bar when
+the value changed. You can also customize the transition:
+
+    paper-progress {
+      --paper-progress-transition-duration: 0.08s;
+      --paper-progress-transition-timing-function: ease;
+      --paper-progress-transition-delay: 0s;
+    }
+
+To change the duration of the indeterminate cycle:
+
+    paper-progress {
+      --paper-progress-indeterminate-cycle-duration: 2s;
+    }
+
+The following mixins are available for styling:
+
+Custom property                                  | Description                                 | Default
+-------------------------------------------------|---------------------------------------------|--------------
+`--paper-progress-container`                     | Mixin applied to container                  | `{}`
+`--paper-progress-transition-duration`           | Duration of the transition                  | `0.08s`
+`--paper-progress-transition-timing-function`    | The timing function for the transition      | `ease`
+`--paper-progress-transition-delay`              | delay for the transition                    | `0s`
+`--paper-progress-container-color`               | Color of the container                      | `--google-grey-300`
+`--paper-progress-active-color`                  | The color of the active bar                 | `--google-green-500`
+`--paper-progress-secondary-color`               | The color of the secondary bar              | `--google-green-100`
+`--paper-progress-disabled-active-color`         | The color of the active bar if disabled     | `--google-grey-500`
+`--paper-progress-disabled-secondary-color`      | The color of the secondary bar if disabled  | `--google-grey-300`
+`--paper-progress-height`                        | The height of the progress bar              | `4px`
+`--paper-progress-indeterminate-cycle-duration`  | Duration of an indeterminate cycle          | `2s`
+
+@group Paper Elements
+@element paper-progress
+@hero hero.svg
+@demo demo/index.html
+*/
+/*
+  FIXME(polymer-modulizer): the above comments were extracted
+  from HTML and may be out of place here. Review them and
+  then delete this comment!
+*/
+
+
+(0, _polymerFn.Polymer)({
+  _template: (0, _htmlTag.html)(_templateObject),
+
+  is: 'paper-progress',
+  behaviors: [_ironRangeBehavior.IronRangeBehavior],
+
+  properties: {
+    /**
+     * The number that represents the current secondary progress.
+     */
+    secondaryProgress: { type: Number, value: 0 },
+
+    /**
+     * The secondary ratio
+     */
+    secondaryRatio: { type: Number, value: 0, readOnly: true },
+
+    /**
+     * Use an indeterminate progress indicator.
+     */
+    indeterminate: { type: Boolean, value: false, observer: '_toggleIndeterminate' },
+
+    /**
+     * True if the progress is disabled.
+     */
+    disabled: {
+      type: Boolean,
+      value: false,
+      reflectToAttribute: true,
+      observer: '_disabledChanged'
+    }
+  },
+
+  observers: ['_progressChanged(secondaryProgress, value, min, max, indeterminate)'],
+
+  hostAttributes: { role: 'progressbar' },
+
+  _toggleIndeterminate: function _toggleIndeterminate(indeterminate) {
+    // If we use attribute/class binding, the animation sometimes doesn't
+    // translate properly on Safari 7.1. So instead, we toggle the class here in
+    // the update method.
+    this.toggleClass('indeterminate', indeterminate, this.$.primaryProgress);
+  },
+
+  _transformProgress: function _transformProgress(progress, ratio) {
+    var transform = 'scaleX(' + ratio / 100 + ')';
+    progress.style.transform = progress.style.webkitTransform = transform;
+  },
+
+  _mainRatioChanged: function _mainRatioChanged(ratio) {
+    this._transformProgress(this.$.primaryProgress, ratio);
+  },
+
+  _progressChanged: function _progressChanged(secondaryProgress, value, min, max, indeterminate) {
+    secondaryProgress = this._clampValue(secondaryProgress);
+    value = this._clampValue(value);
+
+    var secondaryRatio = this._calcRatio(secondaryProgress) * 100;
+    var mainRatio = this._calcRatio(value) * 100;
+
+    this._setSecondaryRatio(secondaryRatio);
+    this._transformProgress(this.$.secondaryProgress, secondaryRatio);
+    this._transformProgress(this.$.primaryProgress, mainRatio);
+
+    this.secondaryProgress = secondaryProgress;
+
+    if (indeterminate) {
+      this.removeAttribute('aria-valuenow');
+    } else {
+      this.setAttribute('aria-valuenow', value);
+    }
+    this.setAttribute('aria-valuemin', min);
+    this.setAttribute('aria-valuemax', max);
+  },
+
+  _disabledChanged: function _disabledChanged(disabled) {
+    this.setAttribute('aria-disabled', disabled ? 'true' : 'false');
+  },
+
+  _hideSecondaryProgress: function _hideSecondaryProgress(secondaryRatio) {
+    return secondaryRatio === 0;
+  }
+});
+
+/***/ }),
+
 /***/ "./node_modules/@polymer/paper-ripple/paper-ripple.js":
 /*!************************************************************!*\
   !*** ./node_modules/@polymer/paper-ripple/paper-ripple.js ***!
@@ -6543,6 +9051,516 @@ Ripple.prototype = {
   @param {{node: Object}} detail Contains the animated node.
   */
 });
+
+/***/ }),
+
+/***/ "./node_modules/@polymer/paper-slider/paper-slider.js":
+/*!************************************************************!*\
+  !*** ./node_modules/@polymer/paper-slider/paper-slider.js ***!
+  \************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+__webpack_require__(/*! @polymer/polymer/polymer-legacy.js */ "./node_modules/@polymer/polymer/polymer-legacy.js");
+
+var _ironA11yKeysBehavior = __webpack_require__(/*! @polymer/iron-a11y-keys-behavior/iron-a11y-keys-behavior.js */ "./node_modules/@polymer/iron-a11y-keys-behavior/iron-a11y-keys-behavior.js");
+
+__webpack_require__(/*! @polymer/iron-flex-layout/iron-flex-layout.js */ "./node_modules/@polymer/iron-flex-layout/iron-flex-layout.js");
+
+var _ironFormElementBehavior = __webpack_require__(/*! @polymer/iron-form-element-behavior/iron-form-element-behavior.js */ "./node_modules/@polymer/iron-form-element-behavior/iron-form-element-behavior.js");
+
+var _ironRangeBehavior = __webpack_require__(/*! @polymer/iron-range-behavior/iron-range-behavior.js */ "./node_modules/@polymer/iron-range-behavior/iron-range-behavior.js");
+
+var _paperInkyFocusBehavior = __webpack_require__(/*! @polymer/paper-behaviors/paper-inky-focus-behavior.js */ "./node_modules/@polymer/paper-behaviors/paper-inky-focus-behavior.js");
+
+__webpack_require__(/*! @polymer/paper-input/paper-input.js */ "./node_modules/@polymer/paper-input/paper-input.js");
+
+__webpack_require__(/*! @polymer/paper-progress/paper-progress.js */ "./node_modules/@polymer/paper-progress/paper-progress.js");
+
+__webpack_require__(/*! @polymer/paper-styles/color.js */ "./node_modules/@polymer/paper-styles/color.js");
+
+var _polymerFn = __webpack_require__(/*! @polymer/polymer/lib/legacy/polymer-fn.js */ "./node_modules/@polymer/polymer/lib/legacy/polymer-fn.js");
+
+var _gestures = __webpack_require__(/*! @polymer/polymer/lib/utils/gestures.js */ "./node_modules/@polymer/polymer/lib/utils/gestures.js");
+
+var $_documentContainer = document.createElement('template'); /**
+                                                              @license
+                                                              Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+                                                              This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+                                                              The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+                                                              The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+                                                              Code distributed by Google as part of the polymer project is also
+                                                              subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+                                                              */
+/**
+Material design: [Sliders](https://www.google.com/design/spec/components/sliders.html)
+
+`paper-slider` allows user to select a value from a range of values by
+moving the slider thumb.  The interactive nature of the slider makes it a
+great choice for settings that reflect intensity levels, such as volume,
+brightness, or color saturation.
+
+Example:
+
+    <paper-slider></paper-slider>
+
+Use `min` and `max` to specify the slider range.  Default is 0 to 100.
+
+Example:
+
+    <paper-slider min="10" max="200" value="110"></paper-slider>
+
+### Styling
+
+The following custom properties and mixins are available for styling:
+
+Custom property | Description | Default
+----------------|-------------|----------
+`--paper-slider-container-color` | The background color of the bar | `--paper-grey-400`
+`--paper-slider-bar-color` | The background color of the slider | `transparent`
+`--paper-slider-active-color` | The progress bar color | `--google-blue-700`
+`--paper-slider-secondary-color` | The secondary progress bar color | `--google-blue-300`
+`--paper-slider-knob-color` | The knob color | `--google-blue-700`
+`--paper-slider-disabled-knob-color` | The disabled knob color | `--paper-grey-400`
+`--paper-slider-pin-color` | The pin color | `--google-blue-700`
+`--paper-slider-font-color` | The pin's text color | `#fff`
+`--paper-slider-markers-color` | The snaps markers color | `#000`
+`--paper-slider-disabled-active-color` | The disabled progress bar color | `--paper-grey-400`
+`--paper-slider-disabled-secondary-color` | The disabled secondary progress bar color | `--paper-grey-400`
+`--paper-slider-knob-start-color` | The fill color of the knob at the far left | `transparent`
+`--paper-slider-knob-start-border-color` | The border color of the knob at the far left | `--paper-grey-400`
+`--paper-slider-pin-start-color` | The color of the pin at the far left | `--paper-grey-400`
+`--paper-slider-height` | Height of the progress bar | `2px`
+`--paper-slider-input` | Mixin applied to the input in editable mode | `{}`
+`--paper-slider-input-container-input` | Mixin applied to the paper-input-container-input in editable mode | `{}`
+
+@group Paper Elements
+@element paper-slider
+@demo demo/index.html
+@hero hero.svg
+*/
+/*
+  FIXME(polymer-modulizer): the above comments were extracted
+  from HTML and may be out of place here. Review them and
+  then delete this comment!
+*/
+
+$_documentContainer.setAttribute('style', 'display: none;');
+
+$_documentContainer.innerHTML = '<dom-module id="paper-slider">\n  <template strip-whitespace="">\n    <style>\n      :host {\n        @apply --layout;\n        @apply --layout-justified;\n        @apply --layout-center;\n        width: 200px;\n        cursor: default;\n        -webkit-user-select: none;\n        -moz-user-select: none;\n        -ms-user-select: none;\n        user-select: none;\n        -webkit-tap-highlight-color: rgba(0, 0, 0, 0);\n        --paper-progress-active-color: var(--paper-slider-active-color, var(--google-blue-700));\n        --paper-progress-secondary-color: var(--paper-slider-secondary-color, var(--google-blue-300));\n        --paper-progress-disabled-active-color: var(--paper-slider-disabled-active-color, var(--paper-grey-400));\n        --paper-progress-disabled-secondary-color: var(--paper-slider-disabled-secondary-color, var(--paper-grey-400));\n        --calculated-paper-slider-height: var(--paper-slider-height, 2px);\n      }\n\n      /* focus shows the ripple */\n      :host(:focus) {\n        outline: none;\n      }\n\n      /**\n       * NOTE(keanulee): Though :host-context is not universally supported, some pages\n       * still rely on paper-slider being flipped when dir="rtl" is set on body. For full\n       * compatability, dir="rtl" must be explicitly set on paper-slider.\n       */\n      :dir(rtl) #sliderContainer {\n        -webkit-transform: scaleX(-1);\n        transform: scaleX(-1);\n      }\n\n      /**\n       * NOTE(keanulee): This is separate from the rule above because :host-context may\n       * not be recognized.\n       */\n      :host([dir="rtl"]) #sliderContainer {\n        -webkit-transform: scaleX(-1);\n        transform: scaleX(-1);\n      }\n\n      /**\n       * NOTE(keanulee): Needed to override the :host-context rule (where supported)\n       * to support LTR sliders in RTL pages.\n       */\n      :host([dir="ltr"]) #sliderContainer {\n        -webkit-transform: scaleX(1);\n        transform: scaleX(1);\n      }\n\n      #sliderContainer {\n        position: relative;\n        width: 100%;\n        height: calc(30px + var(--calculated-paper-slider-height));\n        margin-left: calc(15px + var(--calculated-paper-slider-height)/2);\n        margin-right: calc(15px + var(--calculated-paper-slider-height)/2);\n      }\n\n      #sliderContainer:focus {\n        outline: 0;\n      }\n\n      #sliderContainer.editable {\n        margin-top: 12px;\n        margin-bottom: 12px;\n      }\n\n      .bar-container {\n        position: absolute;\n        top: 0;\n        bottom: 0;\n        left: 0;\n        right: 0;\n        overflow: hidden;\n      }\n\n      .ring > .bar-container {\n        left: calc(5px + var(--calculated-paper-slider-height)/2);\n        transition: left 0.18s ease;\n      }\n\n      .ring.expand.dragging > .bar-container {\n        transition: none;\n      }\n\n      .ring.expand:not(.pin) > .bar-container {\n        left: calc(8px + var(--calculated-paper-slider-height)/2);\n      }\n\n      #sliderBar {\n        padding: 15px 0;\n        width: 100%;\n        background-color: var(--paper-slider-bar-color, transparent);\n        --paper-progress-container-color: var(--paper-slider-container-color, var(--paper-grey-400));\n        --paper-progress-height: var(--calculated-paper-slider-height);\n      }\n\n      .slider-markers {\n        position: absolute;\n        top: calc(14px + var(--paper-slider-height,2px)/2);\n        height: var(--calculated-paper-slider-height);\n        left: 0;\n        right: -1px;\n        box-sizing: border-box;\n        pointer-events: none;\n        @apply --layout-horizontal;\n      }\n\n      .slider-marker {\n        @apply --layout-flex;\n      }\n      .slider-markers::after,\n      .slider-marker::after {\n        content: "";\n        display: block;\n        margin-left: -1px;\n        width: 2px;\n        height: var(--calculated-paper-slider-height);\n        border-radius: 50%;\n        background-color: var(--paper-slider-markers-color, #000);\n      }\n\n      .slider-knob {\n        position: absolute;\n        left: 0;\n        top: 0;\n        margin-left: calc(-15px - var(--calculated-paper-slider-height)/2);\n        width: calc(30px + var(--calculated-paper-slider-height));\n        height: calc(30px + var(--calculated-paper-slider-height));\n      }\n\n      .transiting > .slider-knob {\n        transition: left 0.08s ease;\n      }\n\n      .slider-knob:focus {\n        outline: none;\n      }\n\n      .slider-knob.dragging {\n        transition: none;\n      }\n\n      .snaps > .slider-knob.dragging {\n        transition: -webkit-transform 0.08s ease;\n        transition: transform 0.08s ease;\n      }\n\n      .slider-knob-inner {\n        margin: 10px;\n        width: calc(100% - 20px);\n        height: calc(100% - 20px);\n        background-color: var(--paper-slider-knob-color, var(--google-blue-700));\n        border: 2px solid var(--paper-slider-knob-color, var(--google-blue-700));\n        border-radius: 50%;\n\n        -moz-box-sizing: border-box;\n        box-sizing: border-box;\n\n        transition-property: -webkit-transform, background-color, border;\n        transition-property: transform, background-color, border;\n        transition-duration: 0.18s;\n        transition-timing-function: ease;\n      }\n\n      .expand:not(.pin) > .slider-knob > .slider-knob-inner {\n        -webkit-transform: scale(1.5);\n        transform: scale(1.5);\n      }\n\n      .ring > .slider-knob > .slider-knob-inner {\n        background-color: var(--paper-slider-knob-start-color, transparent);\n        border: 2px solid var(--paper-slider-knob-start-border-color, var(--paper-grey-400));\n      }\n\n      .slider-knob-inner::before {\n        background-color: var(--paper-slider-pin-color, var(--google-blue-700));\n      }\n\n      .pin > .slider-knob > .slider-knob-inner::before {\n        content: "";\n        position: absolute;\n        top: 0;\n        left: 50%;\n        margin-left: -13px;\n        width: 26px;\n        height: 26px;\n        border-radius: 50% 50% 50% 0;\n\n        -webkit-transform: rotate(-45deg) scale(0) translate(0);\n        transform: rotate(-45deg) scale(0) translate(0);\n      }\n\n      .slider-knob-inner::before,\n      .slider-knob-inner::after {\n        transition: -webkit-transform .18s ease, background-color .18s ease;\n        transition: transform .18s ease, background-color .18s ease;\n      }\n\n      .pin.ring > .slider-knob > .slider-knob-inner::before {\n        background-color: var(--paper-slider-pin-start-color, var(--paper-grey-400));\n      }\n\n      .pin.expand > .slider-knob > .slider-knob-inner::before {\n        -webkit-transform: rotate(-45deg) scale(1) translate(17px, -17px);\n        transform: rotate(-45deg) scale(1) translate(17px, -17px);\n      }\n\n      .pin > .slider-knob > .slider-knob-inner::after {\n        content: attr(value);\n        position: absolute;\n        top: 0;\n        left: 50%;\n        margin-left: -16px;\n        width: 32px;\n        height: 26px;\n        text-align: center;\n        color: var(--paper-slider-font-color, #fff);\n        font-size: 10px;\n\n        -webkit-transform: scale(0) translate(0);\n        transform: scale(0) translate(0);\n      }\n\n      .pin.expand > .slider-knob > .slider-knob-inner::after {\n        -webkit-transform: scale(1) translate(0, -17px);\n        transform: scale(1) translate(0, -17px);\n      }\n\n      /* paper-input */\n      .slider-input {\n        width: 50px;\n        overflow: hidden;\n        --paper-input-container-input: {\n          text-align: center;\n          @apply --paper-slider-input-container-input;\n        };\n        @apply --paper-slider-input;\n      }\n\n      /* disabled state */\n      #sliderContainer.disabled {\n        pointer-events: none;\n      }\n\n      .disabled > .slider-knob > .slider-knob-inner {\n        background-color: var(--paper-slider-disabled-knob-color, var(--paper-grey-400));\n        border: 2px solid var(--paper-slider-disabled-knob-color, var(--paper-grey-400));\n        -webkit-transform: scale3d(0.75, 0.75, 1);\n        transform: scale3d(0.75, 0.75, 1);\n      }\n\n      .disabled.ring > .slider-knob > .slider-knob-inner {\n        background-color: var(--paper-slider-knob-start-color, transparent);\n        border: 2px solid var(--paper-slider-knob-start-border-color, var(--paper-grey-400));\n      }\n\n      paper-ripple {\n        color: var(--paper-slider-knob-color, var(--google-blue-700));\n      }\n    </style>\n\n    <div id="sliderContainer" class$="[[_getClassNames(disabled, pin, snaps, immediateValue, min, expand, dragging, transiting, editable)]]">\n      <div class="bar-container">\n        <paper-progress disabled$="[[disabled]]" id="sliderBar" aria-hidden="true" min="[[min]]" max="[[max]]" step="[[step]]" value="[[immediateValue]]" secondary-progress="[[secondaryProgress]]" on-down="_bardown" on-up="_resetKnob" on-track="_bartrack" on-tap="_barclick">\n        </paper-progress>\n      </div>\n\n      <template is="dom-if" if="[[snaps]]">\n        <div class="slider-markers">\n          <template is="dom-repeat" items="[[markers]]">\n            <div class="slider-marker"></div>\n          </template>\n        </div>\n      </template>\n\n      <div id="sliderKnob" class="slider-knob" on-down="_knobdown" on-up="_resetKnob" on-track="_onTrack" on-transitionend="_knobTransitionEnd">\n          <div class="slider-knob-inner" value$="[[immediateValue]]"></div>\n      </div>\n    </div>\n\n    <template is="dom-if" if="[[editable]]">\n      <paper-input id="input" type="number" step="[[step]]" min="[[min]]" max="[[max]]" class="slider-input" disabled$="[[disabled]]" value="[[immediateValue]]" on-change="_changeValue" on-keydown="_inputKeyDown" no-label-float="">\n      </paper-input>\n    </template>\n  </template>\n\n  \n</dom-module>';
+
+document.head.appendChild($_documentContainer.content);
+(0, _polymerFn.Polymer)({
+  is: 'paper-slider',
+
+  behaviors: [_ironA11yKeysBehavior.IronA11yKeysBehavior, _ironFormElementBehavior.IronFormElementBehavior, _paperInkyFocusBehavior.PaperInkyFocusBehavior, _ironRangeBehavior.IronRangeBehavior],
+
+  properties: {
+
+    value: { type: Number, value: 0 },
+
+    /**
+     * If true, the slider thumb snaps to tick marks evenly spaced based
+     * on the `step` property value.
+     */
+    snaps: { type: Boolean, value: false, notify: true },
+
+    /**
+     * If true, a pin with numeric value label is shown when the slider thumb
+     * is pressed. Use for settings for which users need to know the exact
+     * value of the setting.
+     */
+    pin: { type: Boolean, value: false, notify: true },
+
+    /**
+     * The number that represents the current secondary progress.
+     */
+    secondaryProgress: {
+      type: Number,
+      value: 0,
+      notify: true,
+      observer: '_secondaryProgressChanged'
+    },
+
+    /**
+     * If true, an input is shown and user can use it to set the slider value.
+     */
+    editable: { type: Boolean, value: false },
+
+    /**
+     * The immediate value of the slider.  This value is updated while the user
+     * is dragging the slider.
+     */
+    immediateValue: { type: Number, value: 0, readOnly: true, notify: true },
+
+    /**
+     * The maximum number of markers
+     */
+    maxMarkers: { type: Number, value: 0, notify: true },
+
+    /**
+     * If true, the knob is expanded
+     */
+    expand: { type: Boolean, value: false, readOnly: true },
+
+    /**
+     * If true, a touchmove on the slider bar doesn't drag the slider thunb.
+     * Tapping on the slider bar still updates the slider's position
+     */
+    ignoreBarTouch: { type: Boolean, value: false },
+
+    /**
+     * True when the user is dragging the slider.
+     */
+    dragging: { type: Boolean, value: false, readOnly: true, notify: true },
+
+    transiting: { type: Boolean, value: false, readOnly: true },
+
+    markers: {
+      type: Array,
+      readOnly: true,
+      value: function value() {
+        return [];
+      }
+    }
+  },
+
+  observers: ['_updateKnob(value, min, max, snaps, step)', '_valueChanged(value)', '_immediateValueChanged(immediateValue)', '_updateMarkers(maxMarkers, min, max, snaps)'],
+
+  hostAttributes: { role: 'slider', tabindex: 0 },
+
+  keyBindings: {
+    'left': '_leftKey',
+    'right': '_rightKey',
+    'down pagedown home': '_decrementKey',
+    'up pageup end': '_incrementKey'
+  },
+
+  ready: function ready() {
+    if (this.ignoreBarTouch) {
+      (0, _gestures.setTouchAction)(this.$.sliderBar, 'auto');
+    }
+  },
+
+  /**
+   * Increases value by `step` but not above `max`.
+   * @method increment
+   */
+  increment: function increment() {
+    this.value = this._clampValue(this.value + this.step);
+  },
+
+  /**
+   * Decreases value by `step` but not below `min`.
+   * @method decrement
+   */
+  decrement: function decrement() {
+    this.value = this._clampValue(this.value - this.step);
+  },
+
+  _updateKnob: function _updateKnob(value, min, max, snaps, step) {
+    this.setAttribute('aria-valuemin', min);
+    this.setAttribute('aria-valuemax', max);
+    this.setAttribute('aria-valuenow', value);
+
+    this._positionKnob(this._calcRatio(value) * 100);
+  },
+
+  _valueChanged: function _valueChanged() {
+    this.fire('value-change', { composed: true });
+  },
+
+  _immediateValueChanged: function _immediateValueChanged() {
+    if (this.dragging) {
+      this.fire('immediate-value-change', { composed: true });
+    } else {
+      this.value = this.immediateValue;
+    }
+  },
+
+  _secondaryProgressChanged: function _secondaryProgressChanged() {
+    this.secondaryProgress = this._clampValue(this.secondaryProgress);
+  },
+
+  _expandKnob: function _expandKnob() {
+    this._setExpand(true);
+  },
+
+  _resetKnob: function _resetKnob() {
+    this.cancelDebouncer('expandKnob');
+    this._setExpand(false);
+  },
+
+  _positionKnob: function _positionKnob(ratio) {
+    this._setImmediateValue(this._calcStep(this._calcKnobPosition(ratio)));
+    this._setRatio(this._calcRatio(this.immediateValue) * 100);
+
+    this.$.sliderKnob.style.left = this.ratio + '%';
+    if (this.dragging) {
+      this._knobstartx = this.ratio * this._w / 100;
+      this.translate3d(0, 0, 0, this.$.sliderKnob);
+    }
+  },
+
+  _calcKnobPosition: function _calcKnobPosition(ratio) {
+    return (this.max - this.min) * ratio / 100 + this.min;
+  },
+
+  _onTrack: function _onTrack(event) {
+    event.stopPropagation();
+    switch (event.detail.state) {
+      case 'start':
+        this._trackStart(event);
+        break;
+      case 'track':
+        this._trackX(event);
+        break;
+      case 'end':
+        this._trackEnd();
+        break;
+    }
+  },
+
+  _trackStart: function _trackStart(event) {
+    this._setTransiting(false);
+    this._w = this.$.sliderBar.offsetWidth;
+    this._x = this.ratio * this._w / 100;
+    this._startx = this._x;
+    this._knobstartx = this._startx;
+    this._minx = -this._startx;
+    this._maxx = this._w - this._startx;
+    this.$.sliderKnob.classList.add('dragging');
+    this._setDragging(true);
+  },
+
+  _trackX: function _trackX(event) {
+    if (!this.dragging) {
+      this._trackStart(event);
+    }
+
+    var direction = this._isRTL ? -1 : 1;
+    var dx = Math.min(this._maxx, Math.max(this._minx, event.detail.dx * direction));
+    this._x = this._startx + dx;
+
+    var immediateValue = this._calcStep(this._calcKnobPosition(this._x / this._w * 100));
+    this._setImmediateValue(immediateValue);
+
+    // update knob's position
+    var translateX = this._calcRatio(this.immediateValue) * this._w - this._knobstartx;
+    this.translate3d(translateX + 'px', 0, 0, this.$.sliderKnob);
+  },
+
+  _trackEnd: function _trackEnd() {
+    var s = this.$.sliderKnob.style;
+
+    this.$.sliderKnob.classList.remove('dragging');
+    this._setDragging(false);
+    this._resetKnob();
+    this.value = this.immediateValue;
+
+    s.transform = s.webkitTransform = '';
+
+    this.fire('change', { composed: true });
+  },
+
+  _knobdown: function _knobdown(event) {
+    this._expandKnob();
+
+    // cancel selection
+    event.preventDefault();
+
+    // set the focus manually because we will called prevent default
+    this.focus();
+  },
+
+  _bartrack: function _bartrack(event) {
+    if (this._allowBarEvent(event)) {
+      this._onTrack(event);
+    }
+  },
+
+  _barclick: function _barclick(event) {
+    this._w = this.$.sliderBar.offsetWidth;
+    var rect = this.$.sliderBar.getBoundingClientRect();
+    var ratio = (event.detail.x - rect.left) / this._w * 100;
+    if (this._isRTL) {
+      ratio = 100 - ratio;
+    }
+    var prevRatio = this.ratio;
+
+    this._setTransiting(true);
+    this._positionKnob(ratio);
+
+    // if the ratio doesn't change, sliderKnob's animation won't start
+    // and `_knobTransitionEnd` won't be called
+    // Therefore, we need to manually update the `transiting` state
+    if (prevRatio === this.ratio) {
+      this._setTransiting(false);
+    }
+
+    this.async(function () {
+      this.fire('change', { composed: true });
+    });
+
+    // cancel selection
+    event.preventDefault();
+
+    // set the focus manually because we will called prevent default
+    this.focus();
+  },
+
+  _bardown: function _bardown(event) {
+    if (this._allowBarEvent(event)) {
+      this.debounce('expandKnob', this._expandKnob, 60);
+      this._barclick(event);
+    }
+  },
+
+  _knobTransitionEnd: function _knobTransitionEnd(event) {
+    if (event.target === this.$.sliderKnob) {
+      this._setTransiting(false);
+    }
+  },
+
+  _updateMarkers: function _updateMarkers(maxMarkers, min, max, snaps) {
+    if (!snaps) {
+      this._setMarkers([]);
+    }
+    var steps = Math.round((max - min) / this.step);
+    if (steps > maxMarkers) {
+      steps = maxMarkers;
+    }
+    if (steps < 0 || !isFinite(steps)) {
+      steps = 0;
+    }
+    this._setMarkers(new Array(steps));
+  },
+
+  _mergeClasses: function _mergeClasses(classes) {
+    return Object.keys(classes).filter(function (className) {
+      return classes[className];
+    }).join(' ');
+  },
+
+  _getClassNames: function _getClassNames() {
+    return this._mergeClasses({
+      disabled: this.disabled,
+      pin: this.pin,
+      snaps: this.snaps,
+      ring: this.immediateValue <= this.min,
+      expand: this.expand,
+      dragging: this.dragging,
+      transiting: this.transiting,
+      editable: this.editable
+    });
+  },
+
+  _allowBarEvent: function _allowBarEvent(event) {
+    return !this.ignoreBarTouch || event.detail.sourceEvent instanceof MouseEvent;
+  },
+
+  get _isRTL() {
+    if (this.__isRTL === undefined) {
+      this.__isRTL = window.getComputedStyle(this)['direction'] === 'rtl';
+    }
+    return this.__isRTL;
+  },
+
+  _leftKey: function _leftKey(event) {
+    if (this._isRTL) this._incrementKey(event);else this._decrementKey(event);
+  },
+
+  _rightKey: function _rightKey(event) {
+    if (this._isRTL) this._decrementKey(event);else this._incrementKey(event);
+  },
+
+  _incrementKey: function _incrementKey(event) {
+    if (!this.disabled) {
+      if (event.detail.key === 'end') {
+        this.value = this.max;
+      } else {
+        this.increment();
+      }
+      this.fire('change');
+      event.preventDefault();
+    }
+  },
+
+  _decrementKey: function _decrementKey(event) {
+    if (!this.disabled) {
+      if (event.detail.key === 'home') {
+        this.value = this.min;
+      } else {
+        this.decrement();
+      }
+      this.fire('change');
+      event.preventDefault();
+    }
+  },
+
+  _changeValue: function _changeValue(event) {
+    this.value = event.target.value;
+    this.fire('change', { composed: true });
+  },
+
+  _inputKeyDown: function _inputKeyDown(event) {
+    event.stopPropagation();
+  },
+
+  // create the element ripple inside the `sliderKnob`
+  _createRipple: function _createRipple() {
+    this._rippleContainer = this.$.sliderKnob;
+    return _paperInkyFocusBehavior.PaperInkyFocusBehaviorImpl._createRipple.call(this);
+  },
+
+  // Hide the ripple when user is not interacting with keyboard.
+  // This behavior is different from other ripple-y controls, but is
+  // according to spec:
+  // https://www.google.com/design/spec/components/sliders.html
+  _focusedChanged: function _focusedChanged(receivedFocusFromKeyboard) {
+    if (receivedFocusFromKeyboard) {
+      this.ensureRipple();
+    }
+    if (this.hasRipple()) {
+      // note, ripple must be un-hidden prior to setting `holdDown`
+      if (receivedFocusFromKeyboard) {
+        this._ripple.style.display = '';
+      } else {
+        this._ripple.style.display = 'none';
+      }
+      this._ripple.holdDown = receivedFocusFromKeyboard;
+    }
+  }
+});
+
+/**
+ * Fired when the slider's value changes.
+ *
+ * @event value-change
+ */
+
+/**
+ * Fired when the slider's immediateValue changes. Only occurs while the
+ * user is dragging.
+ *
+ * To detect changes to immediateValue that happen for any input (i.e.
+ * dragging, tapping, clicking, etc.) listen for immediate-value-changed
+ * instead.
+ *
+ * @event immediate-value-change
+ */
+
+/**
+ * Fired when the slider's value changes due to user interaction.
+ *
+ * Changes to the slider's value due to changes in an underlying
+ * bound variable will not trigger this event.
+ *
+ * @event change
+ */
 
 /***/ }),
 
@@ -34199,6 +37217,8 @@ __webpack_require__(/*! @polymer/iron-icons/iron-icons.js */ "./node_modules/@po
 __webpack_require__(/*! @polymer/paper-styles/color.js */ "./node_modules/@polymer/paper-styles/color.js");
 __webpack_require__(/*! @polymer/paper-dialog/paper-dialog.js */ "./node_modules/@polymer/paper-dialog/paper-dialog.js");
 __webpack_require__(/*! @polymer/paper-button/paper-button.js */ "./node_modules/@polymer/paper-button/paper-button.js");
+__webpack_require__(/*! @polymer/paper-slider/paper-slider.js */ "./node_modules/@polymer/paper-slider/paper-slider.js");
+__webpack_require__(/*! @polymer/iron-fit-behavior/iron-fit-behavior.js */ "./node_modules/@polymer/iron-fit-behavior/iron-fit-behavior.js");
 var _ = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
 // local source
 var store_1 = __webpack_require__(/*! ../store/store */ "./src/nps-widget/store/store.ts");
@@ -34267,6 +37287,10 @@ var NpsWidget = /** @class */ (function (_super) {
     NpsWidget.prototype.stateReceiver = function (state) {
         this.introductionStatement = state.settings.miscSettings.introductionStatement;
         this.mainQuestion = state.settings.miscSettings.mainQuestion;
+        // ReSharper disable TsResolvedFromInaccessibleModule
+        this.answerValueMin = _.first(state.settings.answerValues);
+        this.answerValueMax = _.last(state.settings.answerValues);
+        // ReSharper restore TsResolvedFromInaccessibleModule
     };
     NpsWidget.prototype.connectedCallback = function () {
         _super.prototype.connectedCallback.call(this);
@@ -34285,7 +37309,7 @@ var NpsWidget = /** @class */ (function (_super) {
     };
     Object.defineProperty(NpsWidget, "template", {
         get: function () {
-            return polymer_element_1.html(templateObject_1 || (templateObject_1 = __makeTemplateObject(["\n\n      <style is=\"custom-style\">\n\n        paper-fab {\n          margin: var(--nps-margin, );\n          z-index: var(--nps-zindex, 99);\n          position: fixed;\n          top: var(--nps-top);\n          bottom: var(--nps-bottom, 10px);\n          left: var(--nps-left);\n          right: var(--nps-right, 10px);\n          --paper-fab-background: var(--nps-background-color, #FFE787);\n          color: var(--nps-foreground-color, lightgrey);\n        }\n\n        paper-fab:hover {\n          --paper-fab-background: var(--nps-background-hover-colour, #f2c40e);\n          color: var(--nps-foreground-hover-colour, black);\n        }\n\n      </style>\n\n      <paper-fab icon=\"icons:[[iconType]]\" on-click=\"dosm\"></paper-fab>\n\n      <paper-dialog id=\"modal\" modal>\n        <h2>{{introductionStatement}}</h2>\n          <div>[[mainQuestion]]</div>\n        <div class=\"buttons\">\n          <paper-button dialog-dismiss>Cancel</paper-button>\n          <paper-button dialog-confirm autofocus>Accept</paper-button>\n        </div>\n      </paper-dialog>\n    "], ["\n\n      <style is=\"custom-style\">\n\n        paper-fab {\n          margin: var(--nps-margin, );\n          z-index: var(--nps-zindex, 99);\n          position: fixed;\n          top: var(--nps-top);\n          bottom: var(--nps-bottom, 10px);\n          left: var(--nps-left);\n          right: var(--nps-right, 10px);\n          --paper-fab-background: var(--nps-background-color, #FFE787);\n          color: var(--nps-foreground-color, lightgrey);\n        }\n\n        paper-fab:hover {\n          --paper-fab-background: var(--nps-background-hover-colour, #f2c40e);\n          color: var(--nps-foreground-hover-colour, black);\n        }\n\n      </style>\n\n      <paper-fab icon=\"icons:[[iconType]]\" on-click=\"dosm\"></paper-fab>\n\n      <paper-dialog id=\"modal\" modal>\n        <h2>{{introductionStatement}}</h2>\n          <div>[[mainQuestion]]</div>\n        <div class=\"buttons\">\n          <paper-button dialog-dismiss>Cancel</paper-button>\n          <paper-button dialog-confirm autofocus>Accept</paper-button>\n        </div>\n      </paper-dialog>\n    "])));
+            return polymer_element_1.html(templateObject_1 || (templateObject_1 = __makeTemplateObject(["\n\n      <style is=\"custom-style\">\n\n        paper-fab {\n          margin: var(--nps-margin, );\n          z-index: var(--nps-zindex, 99);\n          position: fixed;\n          top: var(--nps-top);\n          bottom: var(--nps-bottom, 10px);\n          left: var(--nps-left);\n          right: var(--nps-right, 10px);\n          --paper-fab-background: ", ";\n          color: ", ";\n        }\n\n        paper-fab:hover {\n          --paper-fab-background: ", ";\n          color: ", ";\n        }\n\n        paper-slider {\n          --paper-slider-knob-color: ", ";\n          --paper-slider-active-color: ", ";\n          width: 100%;\n          margin-top: 30px;\n          margin-bottom: 20px;\n          --paper-slider-container-color: ", ";\n--paper-slider-markers-color: ", ";\n--paper-slider-knob-start-color: ", ";\n--paper-slider-height: 7px;\n--paper-slider-pin-color: ", ";\n\n\n          \n        }\n\n      </style>\n\n      <paper-fab icon=\"icons:[[iconType]]\" on-click=\"dosm\"></paper-fab>\n\n      <paper-dialog id=\"modal\" modal>\n        <div class=\"container\">\n          <h3>{{introductionStatement}}</h3>\n            <span>[[mainQuestion]]</span>\n            <paper-slider id=\"ratings\" pin snaps min=\"[[answerValueMin]]\" max=\"[[answerValueMax]]\" max-markers=\"[[answerValueMax]]\" step=\"1\" value=\"\"></paper-slider>\n          <div class=\"buttons\">\n            <paper-button dialog-dismiss>Maybe later...</paper-button>\n            <paper-button dialog-confirm>Send my feedback</paper-button>\n          </div>\n        </div>\n      </paper-dialog>\n    "], ["\n\n      <style is=\"custom-style\">\n\n        paper-fab {\n          margin: var(--nps-margin, );\n          z-index: var(--nps-zindex, 99);\n          position: fixed;\n          top: var(--nps-top);\n          bottom: var(--nps-bottom, 10px);\n          left: var(--nps-left);\n          right: var(--nps-right, 10px);\n          --paper-fab-background: ", ";\n          color: ", ";\n        }\n\n        paper-fab:hover {\n          --paper-fab-background: ", ";\n          color: ", ";\n        }\n\n        paper-slider {\n          --paper-slider-knob-color: ", ";\n          --paper-slider-active-color: ", ";\n          width: 100%;\n          margin-top: 30px;\n          margin-bottom: 20px;\n          --paper-slider-container-color: ", ";\n--paper-slider-markers-color: ", ";\n--paper-slider-knob-start-color: ", ";\n--paper-slider-height: 7px;\n--paper-slider-pin-color: ", ";\n\n\n          \n        }\n\n      </style>\n\n      <paper-fab icon=\"icons:[[iconType]]\" on-click=\"dosm\"></paper-fab>\n\n      <paper-dialog id=\"modal\" modal>\n        <div class=\"container\">\n          <h3>{{introductionStatement}}</h3>\n            <span>[[mainQuestion]]</span>\n            <paper-slider id=\"ratings\" pin snaps min=\"[[answerValueMin]]\" max=\"[[answerValueMax]]\" max-markers=\"[[answerValueMax]]\" step=\"1\" value=\"\"></paper-slider>\n          <div class=\"buttons\">\n            <paper-button dialog-dismiss>Maybe later...</paper-button>\n            <paper-button dialog-confirm>Send my feedback</paper-button>\n          </div>\n        </div>\n      </paper-dialog>\n    "])), ColorHelper.backgroundColour(), ColorHelper.foregroundColour(), ColorHelper.backgroundColourHover(), ColorHelper.foregroundColourHover(), ColorHelper.backgroundColourHover(), ColorHelper.backgroundColourHover(), ColorHelper.backgroundColour(), ColorHelper.foregroundColour(), ColorHelper.foregroundColour(), ColorHelper.backgroundColourHover());
         },
         enumerable: true,
         configurable: true
@@ -34300,8 +37324,21 @@ var NpsWidget = /** @class */ (function (_super) {
     return NpsWidget;
 }(PolymerElement));
 exports.default = NpsWidget;
+var ColorHelper = /** @class */ (function () {
+    function ColorHelper() {
+    }
+    ColorHelper.backgroundColour = function () { return polymer_element_1.html(templateObject_2 || (templateObject_2 = __makeTemplateObject(["var(--nps-background-color, #FFE787)"], ["var(--nps-background-color, #FFE787)"]))); };
+    ;
+    ColorHelper.foregroundColour = function () { return polymer_element_1.html(templateObject_3 || (templateObject_3 = __makeTemplateObject(["var(--nps-foreground-color, grey)"], ["var(--nps-foreground-color, grey)"]))); };
+    ;
+    ColorHelper.backgroundColourHover = function () { return polymer_element_1.html(templateObject_4 || (templateObject_4 = __makeTemplateObject(["var(--nps-background-hover-colour, #f2c40e)"], ["var(--nps-background-hover-colour, #f2c40e)"]))); };
+    ;
+    ColorHelper.foregroundColourHover = function () { return polymer_element_1.html(templateObject_5 || (templateObject_5 = __makeTemplateObject(["var(--nps-foreground-hover-colour, black)"], ["var(--nps-foreground-hover-colour, black)"]))); };
+    ;
+    return ColorHelper;
+}());
 window.customElements.define(NpsWidget.is, NpsWidget);
-var templateObject_1;
+var templateObject_1, templateObject_2, templateObject_3, templateObject_4, templateObject_5;
 
 
 /***/ }),

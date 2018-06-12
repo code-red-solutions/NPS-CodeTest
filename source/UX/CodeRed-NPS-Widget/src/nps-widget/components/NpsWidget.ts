@@ -5,6 +5,8 @@ import '@polymer/iron-icons/iron-icons.js';
 import '@polymer/paper-styles/color.js';
 import '@polymer/paper-dialog/paper-dialog.js';
 import '@polymer/paper-button/paper-button.js';
+import '@polymer/paper-slider/paper-slider.js';
+import '@polymer/iron-fit-behavior/iron-fit-behavior.js';
 import * as _ from 'lodash';
 
 // local source
@@ -31,6 +33,8 @@ export default class NpsWidget extends PolymerElement implements IReduxBindable 
   private introductionStatement: string;
   private iconType: string = 'feedback';
   private mainQuestion: string;
+  private answerValueMin: number;
+  private answerValueMax: number;
 
   static get is() { return 'nps-widget'; }
 
@@ -104,6 +108,10 @@ export default class NpsWidget extends PolymerElement implements IReduxBindable 
   stateReceiver(state: IApplicationState): void {
     this.introductionStatement = state.settings.miscSettings.introductionStatement;
     this.mainQuestion = state.settings.miscSettings.mainQuestion;
+    // ReSharper disable TsResolvedFromInaccessibleModule
+    this.answerValueMin = _.first(state.settings.answerValues);
+    this.answerValueMax = _.last(state.settings.answerValues);
+    // ReSharper restore TsResolvedFromInaccessibleModule
   }
 
   connectedCallback() {
@@ -128,6 +136,7 @@ export default class NpsWidget extends PolymerElement implements IReduxBindable 
 
   }
 
+
   static get template() {
     return html`
 
@@ -141,13 +150,29 @@ export default class NpsWidget extends PolymerElement implements IReduxBindable 
           bottom: var(--nps-bottom, 10px);
           left: var(--nps-left);
           right: var(--nps-right, 10px);
-          --paper-fab-background: var(--nps-background-color, #FFE787);
-          color: var(--nps-foreground-color, lightgrey);
+          --paper-fab-background: ${ColorHelper.backgroundColour()};
+          color: ${ColorHelper.foregroundColour()};
         }
 
         paper-fab:hover {
-          --paper-fab-background: var(--nps-background-hover-colour, #f2c40e);
-          color: var(--nps-foreground-hover-colour, black);
+          --paper-fab-background: ${ColorHelper.backgroundColourHover()};
+          color: ${ColorHelper.foregroundColourHover()};
+        }
+
+        paper-slider {
+          --paper-slider-knob-color: ${ColorHelper.backgroundColourHover()};
+          --paper-slider-active-color: ${ColorHelper.backgroundColourHover()};
+          width: 100%;
+          margin-top: 30px;
+          margin-bottom: 20px;
+          --paper-slider-container-color: ${ColorHelper.backgroundColour()};
+--paper-slider-markers-color: ${ColorHelper.foregroundColour()};
+--paper-slider-knob-start-color: ${ColorHelper.foregroundColour()};
+--paper-slider-height: 7px;
+--paper-slider-pin-color: ${ColorHelper.backgroundColourHover()};
+
+
+          
         }
 
       </style>
@@ -155,11 +180,14 @@ export default class NpsWidget extends PolymerElement implements IReduxBindable 
       <paper-fab icon="icons:[[iconType]]" on-click="dosm"></paper-fab>
 
       <paper-dialog id="modal" modal>
-        <h2>{{introductionStatement}}</h2>
-          <div>[[mainQuestion]]</div>
-        <div class="buttons">
-          <paper-button dialog-dismiss>Cancel</paper-button>
-          <paper-button dialog-confirm autofocus>Accept</paper-button>
+        <div class="container">
+          <h3>{{introductionStatement}}</h3>
+            <span>[[mainQuestion]]</span>
+            <paper-slider id="ratings" pin snaps min="[[answerValueMin]]" max="[[answerValueMax]]" max-markers="[[answerValueMax]]" step="1" value=""></paper-slider>
+          <div class="buttons">
+            <paper-button dialog-dismiss>Maybe later...</paper-button>
+            <paper-button dialog-confirm>Send my feedback</paper-button>
+          </div>
         </div>
       </paper-dialog>
     `;
@@ -174,6 +202,13 @@ export default class NpsWidget extends PolymerElement implements IReduxBindable 
     console.log('dosm clicked');
     this.$.modal.open();
   }
+}
+
+class ColorHelper {
+  static backgroundColour() { return html`var(--nps-background-color, #FFE787)` };
+  static foregroundColour() { return html`var(--nps-foreground-color, grey)` };
+  static backgroundColourHover() { return html`var(--nps-background-hover-colour, #f2c40e)` };
+  static foregroundColourHover() { return html`var(--nps-foreground-hover-colour, black)` };
 }
 
 window.customElements.define(NpsWidget.is, NpsWidget);

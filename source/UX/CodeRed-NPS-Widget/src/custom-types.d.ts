@@ -8,5 +8,5 @@ declare module "@polymer/polymer/polymer-element" {
     updateStyles(jsonVariable): void;
   }
 
-  export function html(template: TemplateStringsArray, values?: any[]);
+  export function html(template: TemplateStringsArray, ...args: TemplateStringsArray[]);
 }
