@@ -7,7 +7,10 @@ import '@polymer/paper-dialog/paper-dialog.js';
 import '@polymer/paper-button/paper-button.js';
 import '@polymer/paper-slider/paper-slider.js';
 import '@polymer/iron-fit-behavior/iron-fit-behavior.js';
-import * as _ from 'lodash';
+import '@polymer/paper-input/paper-textarea.js';
+import '@polymer/paper-tooltip/paper-tooltip.js';
+import '@polymer/iron-localstorage/iron-localstorage.js';
+import * as __ from 'lodash';
 
 // local source
 import { configureStore, IApplicationState  } from '../store/store';
@@ -26,21 +29,30 @@ import { html } from '@polymer/polymer/polymer-element';
 import Types = require('../store/settings/types');
 import AnswerRange = Types.AnswerRange;
 import { connectToRedux } from '../../utils/ReduxConnector';
+import { setRatingValueThunk, setAnswerRangeQuestionResponse, setRatingValue } from '../store/userstate/actions';
+import { AnswerRangeQuestionFinder } from '../services/AnswerRangeQuestionFinder';
+import { UserState } from '../store/userstate/types';
 
 export default class NpsWidget extends PolymerElement implements IReduxBindable {
 
-  private store: Store<IApplicationState> = configureStore(undefined);
+  private store: Store<IApplicationState>;
   private introductionStatement: string;
   private iconType: string = 'feedback';
   private mainQuestion: string;
   private answerValueMin: number;
   private answerValueMax: number;
+  private rating: number;
+  private selectedAnswerRangeQuestion: string;
+  private answerRangeQuestionResponse: string;
+  private myLocalStorage: UserState;
 
   static get is() { return 'nps-widget'; }
 
   constructor(config) {
 
     super();
+
+    this.store = configureStore(undefined);
 
     // log the state
     console.log(this.store.getState());
@@ -67,11 +79,11 @@ export default class NpsWidget extends PolymerElement implements IReduxBindable 
 
           const answerRanges = new Array<AnswerRange>();
           // ReSharper disable once TsResolvedFromInaccessibleModule
-          _.forEach(
+          __.forEach(
             config.settings.answerRanges,
             (item) => {
               // ReSharper disable once TsResolvedFromInaccessibleModule
-              answerRanges.push(_.assign(new AnswerRange(), item));
+              answerRanges.push(__.assign(new AnswerRange(), item));
             }
           );
 
@@ -83,7 +95,7 @@ export default class NpsWidget extends PolymerElement implements IReduxBindable 
         }
 
         // ReSharper disable once TsResolvedFromInaccessibleModule
-        const miscSettings: MiscSettings = _.assign(
+        const miscSettings: MiscSettings = __.assign(
           new MiscSettings(),
           {
             widgetName: config.settings.widgetName,
@@ -94,7 +106,7 @@ export default class NpsWidget extends PolymerElement implements IReduxBindable 
         );
 
         // TODO: Troubleshoot why type safety isn't workgin here - in the meantime cast to any
-        this.store.dispatch(addMiscSettings(miscSettings));
+        this.store.dispatch((addMiscSettings(miscSettings)) as any);
 
       }
 
@@ -106,25 +118,48 @@ export default class NpsWidget extends PolymerElement implements IReduxBindable 
   }
 
   stateReceiver(state: IApplicationState): void {
+
+    // Items to be bound to UI that are NOT user input need a property to bind to.
+    // When they're changed via state management, they need to be populated back onto
+    // objects that can be one-way bound
+
+    // If there are any user inputs that need to be changed via state, (that's an anti-pattern)
+    // they will need to be added here so the state change is obsverved and can be written back to
+    // the bound propery and the UI element updated.
+
+    // The exception to this is the slider as I want to pick up the immediate-change-value
+
     this.introductionStatement = state.settings.miscSettings.introductionStatement;
     this.mainQuestion = state.settings.miscSettings.mainQuestion;
+    this.selectedAnswerRangeQuestion = state.userState.selectedAnswerRangeQuestion;
     // ReSharper disable TsResolvedFromInaccessibleModule
-    this.answerValueMin = _.first(state.settings.answerValues);
-    this.answerValueMax = _.last(state.settings.answerValues);
+    this.answerValueMin = __.first(state.settings.answerValues);
+    this.answerValueMax = __.last(state.settings.answerValues);
     // ReSharper restore TsResolvedFromInaccessibleModule
+
+    // I wanted a quick way to get user data into local storage, so just
+    // dump it in and we can pull it out selectively when hydrating
+    this.myLocalStorage = state.userState;
+
   }
 
   connectedCallback() {
+
     super.connectedCallback();
+
+    // The following hooks up the stateReceiver
     connectToRedux(this, this.store);
+
   }
 
   render() {
 
+    // Get the styling config from the store and apply it to the UI
+
     const stylingConfig = this.store.getState().styling;
 
     // ReSharper disable once TsResolvedFromInaccessibleModule
-    _.forEach(stylingConfig, styleProperty => {
+    __.forEach(stylingConfig, styleProperty => {
 
       const jsonVariable = {};
 
@@ -160,34 +195,46 @@ export default class NpsWidget extends PolymerElement implements IReduxBindable 
         }
 
         paper-slider {
-          --paper-slider-knob-color: ${ColorHelper.backgroundColourHover()};
-          --paper-slider-active-color: ${ColorHelper.backgroundColourHover()};
-          width: 100%;
-          margin-top: 30px;
-          margin-bottom: 20px;
-          --paper-slider-container-color: ${ColorHelper.backgroundColour()};
---paper-slider-markers-color: ${ColorHelper.foregroundColour()};
---paper-slider-knob-start-color: ${ColorHelper.foregroundColour()};
---paper-slider-height: 7px;
---paper-slider-pin-color: ${ColorHelper.backgroundColourHover()};
-
-
-          
+        --paper-slider-knob-color: ${ColorHelper.backgroundColourHover()};
+        --paper-slider-active-color: ${ColorHelper.backgroundColourHover()};
+        margin-bottom: 20px;
+        --paper-slider-container-color: ${ColorHelper.backgroundColour()};
+        --paper-slider-markers-color: ${ColorHelper.foregroundColour()};
+        --paper-slider-knob-start-color: ${ColorHelper.foregroundColour()};
+        --paper-slider-height: 7px;
+        --paper-slider-pin-color: ${ColorHelper.backgroundColourHover()};
+        width: 95%;
+        margin-top: 30px;
+        float: left;
         }
 
       </style>
 
-      <paper-fab icon="icons:[[iconType]]" on-click="dosm"></paper-fab>
+      <iron-localstorage id="localstorage" name="" value="[[myLocalStorage]]"></iron-localstorage>
+
+      <paper-fab id="paper-fab" icon="icons:[[iconType]]" on-click="onFabClick"></paper-fab>
 
       <paper-dialog id="modal" modal>
         <div class="container">
-          <h3>{{introductionStatement}}</h3>
-            <span>[[mainQuestion]]</span>
-            <paper-slider id="ratings" pin snaps min="[[answerValueMin]]" max="[[answerValueMax]]" max-markers="[[answerValueMax]]" step="1" value=""></paper-slider>
-          <div class="buttons">
-            <paper-button dialog-dismiss>Maybe later...</paper-button>
-            <paper-button dialog-confirm>Send my feedback</paper-button>
-          </div>
+          <h3>[[introductionStatement]]</h3>
+            <div class="container"  style="width: 100%">
+              [[mainQuestion]]
+              <paper-slider id="ratings" pin snaps min="[[answerValueMin]]" max="[[answerValueMax]]" max-markers="[[answerValueMax]]" step="1" immediate-value="{{rating}}" on-immediate-value-changed="onSliderImmediateChange"></paper-slider>
+              <div style="float: right; width: 5%; text-align: right; padding-top: 22px;">
+                <h2>{{rating}}</h2>
+              </div>
+            </div>
+            <div class="container" style="float: left; width: 100%;">
+              <paper-textarea label$="[[selectedAnswerRangeQuestion]] (optional)" on-value-changed="onAnswerRangeQuestionResponseChange" value="{{answerRangeQuestionResponse}}"></paper-textarea>
+              <br/>
+            </div>
+            <div class="container" style="width: 100%">
+              <div class="buttons" style="float: right">
+                <paper-button dialog-dismiss>Maybe later...</paper-button>
+                <paper-button dialog-confirm>Send my feedback</paper-button>
+              </div>
+            </div>
+            <br/>
         </div>
       </paper-dialog>
     `;
@@ -195,13 +242,56 @@ export default class NpsWidget extends PolymerElement implements IReduxBindable 
   }
 
   ready() {
+
     super.ready();
+
+    // Get config to read the widget name and construct a unique id for local storage
+    var localStorageId = `nps-widget-nameof-${this.store.getState().settings.miscSettings.widgetName}`;
+    this.$.localstorage.name = localStorageId;
+
+    // Check to see if there's any values to hydrate
+    const localStorageData = window.localStorage.getItem(localStorageId);
+
+    if (localStorageData != null) {
+      // ReSharper disable once TsResolvedFromInaccessibleModule
+      const localState: IApplicationState = __.assign(
+        <IApplicationState>{},
+        {userState: JSON.parse(localStorageData) as UserState}
+      );
+
+      // We can't use the bound property here as it's bound to immediate-change, so let's
+      // call the directly value prop directly, which will change the immed-value
+      // which will call the changed event below and alter the state
+      this.$.ratings.value = localState.userState.rating;
+      this.answerRangeQuestionResponse = localState.userState.answerRangeQuestionResponse;
+    }
+
   }
 
-  dosm() {
-    console.log('dosm clicked');
+  onFabClick() {
     this.$.modal.open();
   }
+
+
+  // UI items that are user input can be two-way bound but state management still needs to know about the change.
+  // Any programatic change will trigger the events below and will channge the store
+
+  onSliderImmediateChange(e) {
+    // TODO: Troubleshoot why type safety isn't workgin here - in the meantime cast to any
+    this.store.dispatch((setRatingValueThunk(
+      e.target.immediateValue as number,
+      new AnswerRangeQuestionFinder()
+    )) as any);
+    console.log(this.store.getState());
+  }
+
+  onAnswerRangeQuestionResponseChange(e) {
+    this.store.dispatch((setAnswerRangeQuestionResponse(
+      e.target.value as string
+    )) as any);
+    console.log(this.store.getState());
+  }
+
 }
 
 class ColorHelper {

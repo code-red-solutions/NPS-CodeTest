@@ -16,7 +16,7 @@ export const initialState: Settings = new Settings(
   new Array<number>(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10),
   new MiscSettings(
     'Default widget',
-    'Hi there! We value your feedback on this service so we can better serve you. Could you please take a moment to answer this question?',
+    'We value your feedback on this service. It helps us better serve you. Please take a moment to answer the following,',
     'On a scale of 0 - 10, how likely would you be to use this service again?',
     90
   )

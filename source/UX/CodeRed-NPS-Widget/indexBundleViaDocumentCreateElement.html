@@ -52,32 +52,21 @@
   </script>
   <script type="text/javascript">
 
-    /*
-
-    Possible values are:
-      zindex
-      backgroundColour
-      backgroundHoverColour
-      foregroundColour
-      foregroundHoverColour
-      top
-      bottom
-      left
-      right
-      margin
-
-    */
-
     var npsConfig = {
-      styling: {
-        backgroundHoverColour: 'pink',
-        foregroundHoverColour: 'blue',
-        backgroundColour: 'blue',
-        foregroundColour: 'pink',
-        bottom: '20px',
-        right: '20px',
-        margin: '0px'
-      },
+      /*
+      Possible values for styling are:
+        zindex
+        backgroundColour
+        backgroundHoverColour
+        foregroundColour
+        foregroundHoverColour
+        top
+        bottom
+        left
+        right
+        margin
+      */
+      styling: {},
       settings: {
         introductionStatement: 'Thank you for using this service. We would appreciate your feedback by answering this question.',
         mainQuestion: 'How likely would you be to recommend this service to others?',
@@ -102,6 +91,7 @@
       }
     };
     initialzeCodeRedNpsWidget(npsConfig);
+
   </script>
 
 </head>

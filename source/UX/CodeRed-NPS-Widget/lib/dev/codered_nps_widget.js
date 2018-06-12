@@ -741,6 +741,297 @@ var IronA11yKeysBehavior = exports.IronA11yKeysBehavior = {
 
 /***/ }),
 
+/***/ "./node_modules/@polymer/iron-autogrow-textarea/iron-autogrow-textarea.js":
+/*!********************************************************************************!*\
+  !*** ./node_modules/@polymer/iron-autogrow-textarea/iron-autogrow-textarea.js ***!
+  \********************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _templateObject = _taggedTemplateLiteral(['\n    <style>\n      :host {\n        display: inline-block;\n        position: relative;\n        width: 400px;\n        border: 1px solid;\n        padding: 2px;\n        -moz-appearance: textarea;\n        -webkit-appearance: textarea;\n        overflow: hidden;\n      }\n\n      .mirror-text {\n        visibility: hidden;\n        word-wrap: break-word;\n        @apply --iron-autogrow-textarea;\n      }\n\n      .fit {\n        @apply --layout-fit;\n      }\n\n      textarea {\n        position: relative;\n        outline: none;\n        border: none;\n        resize: none;\n        background: inherit;\n        color: inherit;\n        /* see comments in template */\n        width: 100%;\n        height: 100%;\n        font-size: inherit;\n        font-family: inherit;\n        line-height: inherit;\n        text-align: inherit;\n        @apply --iron-autogrow-textarea;\n      }\n\n      textarea::-webkit-input-placeholder {\n        @apply --iron-autogrow-textarea-placeholder;\n      }\n\n      textarea:-moz-placeholder {\n        @apply --iron-autogrow-textarea-placeholder;\n      }\n\n      textarea::-moz-placeholder {\n        @apply --iron-autogrow-textarea-placeholder;\n      }\n\n      textarea:-ms-input-placeholder {\n        @apply --iron-autogrow-textarea-placeholder;\n      }\n    </style>\n\n    <!-- the mirror sizes the input/textarea so it grows with typing -->\n    <!-- use &#160; instead &nbsp; of to allow this element to be used in XHTML -->\n    <div id="mirror" class="mirror-text" aria-hidden="true">&nbsp;</div>\n\n    <!-- size the input/textarea with a div, because the textarea has intrinsic size in ff -->\n    <div class="textarea-container fit">\n      <textarea id="textarea" name$="[[name]]" aria-label$="[[label]]" autocomplete$="[[autocomplete]]" autofocus$="[[autofocus]]" inputmode$="[[inputmode]]" placeholder$="[[placeholder]]" readonly$="[[readonly]]" required$="[[required]]" disabled$="[[disabled]]" rows$="[[rows]]" minlength$="[[minlength]]" maxlength$="[[maxlength]]"></textarea>\n    </div>\n'], ['\n    <style>\n      :host {\n        display: inline-block;\n        position: relative;\n        width: 400px;\n        border: 1px solid;\n        padding: 2px;\n        -moz-appearance: textarea;\n        -webkit-appearance: textarea;\n        overflow: hidden;\n      }\n\n      .mirror-text {\n        visibility: hidden;\n        word-wrap: break-word;\n        @apply --iron-autogrow-textarea;\n      }\n\n      .fit {\n        @apply --layout-fit;\n      }\n\n      textarea {\n        position: relative;\n        outline: none;\n        border: none;\n        resize: none;\n        background: inherit;\n        color: inherit;\n        /* see comments in template */\n        width: 100%;\n        height: 100%;\n        font-size: inherit;\n        font-family: inherit;\n        line-height: inherit;\n        text-align: inherit;\n        @apply --iron-autogrow-textarea;\n      }\n\n      textarea::-webkit-input-placeholder {\n        @apply --iron-autogrow-textarea-placeholder;\n      }\n\n      textarea:-moz-placeholder {\n        @apply --iron-autogrow-textarea-placeholder;\n      }\n\n      textarea::-moz-placeholder {\n        @apply --iron-autogrow-textarea-placeholder;\n      }\n\n      textarea:-ms-input-placeholder {\n        @apply --iron-autogrow-textarea-placeholder;\n      }\n    </style>\n\n    <!-- the mirror sizes the input/textarea so it grows with typing -->\n    <!-- use &#160; instead &nbsp; of to allow this element to be used in XHTML -->\n    <div id="mirror" class="mirror-text" aria-hidden="true">&nbsp;</div>\n\n    <!-- size the input/textarea with a div, because the textarea has intrinsic size in ff -->\n    <div class="textarea-container fit">\n      <textarea id="textarea" name\\$="[[name]]" aria-label\\$="[[label]]" autocomplete\\$="[[autocomplete]]" autofocus\\$="[[autofocus]]" inputmode\\$="[[inputmode]]" placeholder\\$="[[placeholder]]" readonly\\$="[[readonly]]" required\\$="[[required]]" disabled\\$="[[disabled]]" rows\\$="[[rows]]" minlength\\$="[[minlength]]" maxlength\\$="[[maxlength]]"></textarea>\n    </div>\n']);
+
+__webpack_require__(/*! @polymer/polymer/polymer-legacy.js */ "./node_modules/@polymer/polymer/polymer-legacy.js");
+
+var _ironControlState = __webpack_require__(/*! @polymer/iron-behaviors/iron-control-state.js */ "./node_modules/@polymer/iron-behaviors/iron-control-state.js");
+
+__webpack_require__(/*! @polymer/iron-flex-layout/iron-flex-layout.js */ "./node_modules/@polymer/iron-flex-layout/iron-flex-layout.js");
+
+var _ironValidatableBehavior = __webpack_require__(/*! @polymer/iron-validatable-behavior/iron-validatable-behavior.js */ "./node_modules/@polymer/iron-validatable-behavior/iron-validatable-behavior.js");
+
+var _polymerFn = __webpack_require__(/*! @polymer/polymer/lib/legacy/polymer-fn.js */ "./node_modules/@polymer/polymer/lib/legacy/polymer-fn.js");
+
+var _htmlTag = __webpack_require__(/*! @polymer/polymer/lib/utils/html-tag.js */ "./node_modules/@polymer/polymer/lib/utils/html-tag.js");
+
+var _polymerDom = __webpack_require__(/*! @polymer/polymer/lib/legacy/polymer.dom.js */ "./node_modules/@polymer/polymer/lib/legacy/polymer.dom.js");
+
+function _taggedTemplateLiteral(strings, raw) { return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); } /**
+                                                                                                                                                  @license
+                                                                                                                                                  Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+                                                                                                                                                  This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+                                                                                                                                                  The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+                                                                                                                                                  The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+                                                                                                                                                  Code distributed by Google as part of the polymer project is also
+                                                                                                                                                  subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+                                                                                                                                                  */
+/**
+`iron-autogrow-textarea` is an element containing a textarea that grows in height as more
+lines of input are entered. Unless an explicit height or the `maxRows` property is set, it will
+never scroll.
+
+Example:
+
+    <iron-autogrow-textarea></iron-autogrow-textarea>
+
+### Styling
+
+The following custom properties and mixins are available for styling:
+
+Custom property | Description | Default
+----------------|-------------|----------
+`--iron-autogrow-textarea` | Mixin applied to the textarea | `{}`
+`--iron-autogrow-textarea-placeholder` | Mixin applied to the textarea placeholder | `{}`
+
+@group Iron Elements
+@hero hero.svg
+@demo demo/index.html
+*/
+/*
+  FIXME(polymer-modulizer): the above comments were extracted
+  from HTML and may be out of place here. Review them and
+  then delete this comment!
+*/
+
+
+(0, _polymerFn.Polymer)({
+  _template: (0, _htmlTag.html)(_templateObject),
+
+  is: 'iron-autogrow-textarea',
+  behaviors: [_ironValidatableBehavior.IronValidatableBehavior, _ironControlState.IronControlState],
+
+  properties: {
+    /**
+     * Use this property instead of `bind-value` for two-way data binding.
+     * @type {string|number}
+     */
+    value: { observer: '_valueChanged', type: String, notify: true },
+
+    /**
+     * This property is deprecated, and just mirrors `value`. Use `value`
+     * instead.
+     * @type {string|number}
+     */
+    bindValue: { observer: '_bindValueChanged', type: String, notify: true },
+
+    /**
+     * The initial number of rows.
+     *
+     * @attribute rows
+     * @type number
+     * @default 1
+     */
+    rows: { type: Number, value: 1, observer: '_updateCached' },
+
+    /**
+     * The maximum number of rows this element can grow to until it
+     * scrolls. 0 means no maximum.
+     *
+     * @attribute maxRows
+     * @type number
+     * @default 0
+     */
+    maxRows: { type: Number, value: 0, observer: '_updateCached' },
+
+    /**
+     * Bound to the textarea's `autocomplete` attribute.
+     */
+    autocomplete: { type: String, value: 'off' },
+
+    /**
+     * Bound to the textarea's `autofocus` attribute.
+     */
+    autofocus: { type: Boolean, value: false },
+
+    /**
+     * Bound to the textarea's `inputmode` attribute.
+     */
+    inputmode: { type: String },
+
+    /**
+     * Bound to the textarea's `placeholder` attribute.
+     */
+    placeholder: { type: String },
+
+    /**
+     * Bound to the textarea's `readonly` attribute.
+     */
+    readonly: { type: String },
+
+    /**
+     * Set to true to mark the textarea as required.
+     */
+    required: { type: Boolean },
+
+    /**
+     * The minimum length of the input value.
+     */
+    minlength: { type: Number },
+
+    /**
+     * The maximum length of the input value.
+     */
+    maxlength: { type: Number },
+
+    /**
+     * Bound to the textarea's `aria-label` attribute.
+     */
+    label: { type: String }
+
+  },
+
+  listeners: { 'input': '_onInput' },
+
+  /**
+   * Returns the underlying textarea.
+   * @return {!HTMLTextAreaElement}
+   */
+  get textarea() {
+    return this.$.textarea;
+  },
+
+  /**
+   * Returns textarea's selection start.
+   * @return {number}
+   */
+  get selectionStart() {
+    return this.$.textarea.selectionStart;
+  },
+
+  /**
+   * Returns textarea's selection end.
+   * @return {number}
+   */
+  get selectionEnd() {
+    return this.$.textarea.selectionEnd;
+  },
+
+  /**
+   * Sets the textarea's selection start.
+   */
+  set selectionStart(value) {
+    this.$.textarea.selectionStart = value;
+  },
+
+  /**
+   * Sets the textarea's selection end.
+   */
+  set selectionEnd(value) {
+    this.$.textarea.selectionEnd = value;
+  },
+
+  attached: function attached() {
+    /* iOS has an arbitrary left margin of 3px that isn't present
+     * in any other browser, and means that the paper-textarea's cursor
+     * overlaps the label.
+     * See https://github.com/PolymerElements/paper-input/issues/468.
+     */
+    var IS_IOS = navigator.userAgent.match(/iP(?:[oa]d|hone)/);
+    if (IS_IOS) {
+      this.$.textarea.style.marginLeft = '-3px';
+    }
+  },
+
+  /**
+   * Returns true if `value` is valid. The validator provided in `validator`
+   * will be used first, if it exists; otherwise, the `textarea`'s validity
+   * is used.
+   * @return {boolean} True if the value is valid.
+   */
+  validate: function validate() {
+    // Use the nested input's native validity.
+    var valid = this.$.textarea.validity.valid;
+
+    // Only do extra checking if the browser thought this was valid.
+    if (valid) {
+      // Empty, required input is invalid
+      if (this.required && this.value === '') {
+        valid = false;
+      } else if (this.hasValidator()) {
+        valid = _ironValidatableBehavior.IronValidatableBehavior.validate.call(this, this.value);
+      }
+    }
+
+    this.invalid = !valid;
+    this.fire('iron-input-validate');
+    return valid;
+  },
+
+  _bindValueChanged: function _bindValueChanged(bindValue) {
+    this.value = bindValue;
+  },
+
+  _valueChanged: function _valueChanged(value) {
+    var textarea = this.textarea;
+    if (!textarea) {
+      return;
+    }
+
+    // If the bindValue changed manually, then we need to also update
+    // the underlying textarea's value. Otherwise this change was probably
+    // generated from the _onInput handler, and the two values are already
+    // the same.
+    if (textarea.value !== value) {
+      textarea.value = !(value || value === 0) ? '' : value;
+    }
+
+    this.bindValue = value;
+    this.$.mirror.innerHTML = this._valueForMirror();
+
+    // Manually notify because we don't want to notify until after setting
+    // value.
+    this.fire('bind-value-changed', { value: this.bindValue });
+  },
+
+  _onInput: function _onInput(event) {
+    var eventPath = (0, _polymerDom.dom)(event).path;
+    this.value = eventPath ? eventPath[0].value : event.target.value;
+  },
+
+  _constrain: function _constrain(tokens) {
+    var _tokens;
+    tokens = tokens || [''];
+    // Enforce the min and max heights for a multiline input to avoid
+    // measurement
+    if (this.maxRows > 0 && tokens.length > this.maxRows) {
+      _tokens = tokens.slice(0, this.maxRows);
+    } else {
+      _tokens = tokens.slice(0);
+    }
+    while (this.rows > 0 && _tokens.length < this.rows) {
+      _tokens.push('');
+    }
+    // Use &#160; instead &nbsp; of to allow this element to be used in XHTML.
+    return _tokens.join('<br/>') + '&#160;';
+  },
+
+  _valueForMirror: function _valueForMirror() {
+    var input = this.textarea;
+    if (!input) {
+      return;
+    }
+    this.tokens = input && input.value ? input.value.replace(/&/gm, '&amp;').replace(/"/gm, '&quot;').replace(/'/gm, '&#39;').replace(/</gm, '&lt;').replace(/>/gm, '&gt;').split('\n') : [''];
+    return this._constrain(this.tokens);
+  },
+
+  _updateCached: function _updateCached() {
+    this.$.mirror.innerHTML = this._constrain(this.tokens);
+  }
+});
+
+/***/ }),
+
 /***/ "./node_modules/@polymer/iron-behaviors/iron-button-state.js":
 /*!*******************************************************************!*\
   !*** ./node_modules/@polymer/iron-behaviors/iron-button-state.js ***!
@@ -2856,6 +3147,256 @@ is separate from validation, and `allowed-pattern` does not affect how the input
   _computeValue: function _computeValue(bindValue) {
     return bindValue;
   }
+});
+
+/***/ }),
+
+/***/ "./node_modules/@polymer/iron-localstorage/iron-localstorage.js":
+/*!**********************************************************************!*\
+  !*** ./node_modules/@polymer/iron-localstorage/iron-localstorage.js ***!
+  \**********************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _polymerLegacy = __webpack_require__(/*! @polymer/polymer/polymer-legacy.js */ "./node_modules/@polymer/polymer/polymer-legacy.js");
+
+var _polymerFn = __webpack_require__(/*! @polymer/polymer/lib/legacy/polymer-fn.js */ "./node_modules/@polymer/polymer/lib/legacy/polymer-fn.js");
+
+/**
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+*/
+/**
+Element access to Web Storage API (window.localStorage).
+
+Keeps `value` property in sync with localStorage.
+
+Value is saved as json by default.
+
+### Usage:
+
+`ls-sample` will automatically save changes to its value.
+
+    <dom-module id="ls-sample">
+      <iron-localstorage name="my-app-storage"
+        value="{{cartoon}}"
+        on-iron-localstorage-load-empty="initializeDefaultCartoon"
+      ></iron-localstorage>
+    </dom-module>
+
+    <script>
+      Polymer({
+        is: 'ls-sample',
+        properties: {
+          cartoon: {
+            type: Object
+          }
+        },
+        // initializes default if nothing has been stored
+        initializeDefaultCartoon: function() {
+          this.cartoon = {
+            name: "Mickey",
+            hasEars: true
+          }
+        },
+        // use path set api to propagate changes to localstorage
+        makeModifications: function() {
+          this.set('cartoon.name', "Minions");
+          this.set('cartoon.hasEars', false);
+        }
+      });
+    </script>
+
+### Tech notes:
+
+* * `value.*` is observed, and saved on modifications. You must use
+    path change notification methods such as `set()` to modify value
+    for changes to be observed.
+
+* * Set `auto-save-disabled` to prevent automatic saving.
+
+* * Value is saved as JSON by default.
+
+* * To delete a key, set value to null
+
+* Element listens to StorageAPI `storage` event, and will reload upon receiving it.
+
+* **Warning**: do not bind value to sub-properties until Polymer
+[bug 1550](https://github.com/Polymer/polymer/issues/1550)
+is resolved. Local storage will be blown away.
+`<iron-localstorage value="{{foo.bar}}"` will cause **data loss**.
+
+@demo demo/index.html
+@hero hero.svg
+*/
+/*
+  FIXME(polymer-modulizer): the above comments were extracted
+  from HTML and may be out of place here. Review them and
+  then delete this comment!
+*/
+(0, _polymerFn.Polymer)({
+  is: 'iron-localstorage',
+
+  properties: {
+    /**
+     * localStorage item key
+     */
+    name: { type: String, value: '' },
+    /**
+     * The data associated with this storage.
+     * If set to null item will be deleted.
+     * @type {*}
+     */
+    value: { type: Object, notify: true },
+
+    /**
+     * If true: do not convert value to JSON on save/load
+     */
+    useRaw: { type: Boolean, value: false },
+
+    /**
+     * Value will not be saved automatically if true. You'll have to do it
+     * manually with `save()`
+     */
+    autoSaveDisabled: { type: Boolean, value: false },
+    /**
+     * Last error encountered while saving/loading items
+     */
+    errorMessage: { type: String, notify: true },
+
+    /** True if value has been loaded */
+    _loaded: { type: Boolean, value: false }
+  },
+
+  observers: ['_debounceReload(name,useRaw)', '_trySaveValue(autoSaveDisabled)', '_trySaveValue(value.*)'],
+
+  ready: function ready() {
+    this._boundHandleStorage = this._handleStorage.bind(this);
+  },
+
+  attached: function attached() {
+    window.addEventListener('storage', this._boundHandleStorage);
+  },
+
+  detached: function detached() {
+    window.removeEventListener('storage', this._boundHandleStorage);
+  },
+
+  _handleStorage: function _handleStorage(ev) {
+    if (ev.key == this.name) {
+      this._load(true);
+    }
+  },
+
+  _trySaveValue: function _trySaveValue() {
+    if (this.autoSaveDisabled === undefined || this._doNotSave) {
+      return;
+    }
+
+    if (this._loaded && !this.autoSaveDisabled) {
+      this.debounce('save', this.save);
+    }
+  },
+
+  _debounceReload: function _debounceReload() {
+    if (this.name !== undefined && this.useRaw !== undefined) {
+      this.debounce('reload', this.reload);
+    }
+  },
+
+  /**
+   * Loads the value again. Use if you modify
+   * localStorage using DOM calls, and want to
+   * keep this element in sync.
+   */
+  reload: function reload() {
+    this._loaded = false;
+    this._load();
+  },
+
+  /**
+   * loads value from local storage
+   * @param {boolean=} externalChange true if loading changes from a different window
+   */
+  _load: function _load(externalChange) {
+    try {
+      var v = window.localStorage.getItem(this.name);
+    } catch (ex) {
+      this.errorMessage = ex.message;
+
+      this._error('Could not save to localStorage.  Try enabling cookies for this page.', ex);
+    };
+
+    if (v === null) {
+      this._loaded = true;
+      this._doNotSave = true; // guard for save watchers
+      this.value = null;
+      this._doNotSave = false;
+      this.fire('iron-localstorage-load-empty', { externalChange: externalChange }, { composed: true });
+    } else {
+      if (!this.useRaw) {
+        try {
+          // parse value as JSON
+          v = JSON.parse(v);
+        } catch (x) {
+          this.errorMessage = 'Could not parse local storage value';
+          _polymerLegacy.Base._error('could not parse local storage value', v);
+          v = null;
+        }
+      }
+      this._loaded = true;
+      this._doNotSave = true;
+      this.value = v;
+      this._doNotSave = false;
+      this.fire('iron-localstorage-load', { externalChange: externalChange }, {
+        composed: true
+      });
+    }
+  },
+
+  /**
+   * Saves the value to localStorage. Call to save if autoSaveDisabled is set.
+   * If `value` is null or undefined, deletes localStorage.
+   */
+  save: function save() {
+    var v = this.useRaw ? this.value : JSON.stringify(this.value);
+    try {
+      if (this.value === null || this.value === undefined) {
+        window.localStorage.removeItem(this.name);
+      } else {
+        window.localStorage.setItem(this.name, /** @type {string} */v);
+      }
+    } catch (ex) {
+      // Happens in Safari incognito mode,
+      this.errorMessage = ex.message;
+      _polymerLegacy.Base._error('Could not save to localStorage. Incognito mode may be blocking this action', ex);
+    }
+  }
+
+  /**
+   * Fired when value loads from localStorage.
+   *
+   * @event iron-localstorage-load
+   * @param {{externalChange:boolean}} detail -
+   *     externalChange: true if change occured in different window.
+   */
+
+  /**
+   * Fired when loaded value does not exist.
+   * Event handler can be used to initialize default value.
+   *
+   * @event iron-localstorage-load-empty
+   * @param {{externalChange:boolean}} detail -
+   *     externalChange: true if change occured in different window.
+   */
 });
 
 /***/ }),
@@ -8200,6 +8741,149 @@ document.head.appendChild($_documentContainer.content);
 
 /***/ }),
 
+/***/ "./node_modules/@polymer/paper-input/paper-textarea.js":
+/*!*************************************************************!*\
+  !*** ./node_modules/@polymer/paper-input/paper-textarea.js ***!
+  \*************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _templateObject = _taggedTemplateLiteral(['\n    <style>\n      :host {\n        display: block;\n      }\n\n      :host([hidden]) {\n        display: none !important;\n      }\n\n      label {\n        pointer-events: none;\n      }\n    </style>\n\n    <paper-input-container no-label-float$="[[noLabelFloat]]" always-float-label="[[_computeAlwaysFloatLabel(alwaysFloatLabel,placeholder)]]" auto-validate$="[[autoValidate]]" disabled$="[[disabled]]" invalid="[[invalid]]">\n\n      <label hidden$="[[!label]]" aria-hidden="true" for$="[[_inputId]]" slot="label">[[label]]</label>\n\n      <iron-autogrow-textarea class="paper-input-input" slot="input" id$="[[_inputId]]" aria-labelledby$="[[_ariaLabelledBy]]" aria-describedby$="[[_ariaDescribedBy]]" bind-value="{{value}}" invalid="{{invalid}}" validator$="[[validator]]" disabled$="[[disabled]]" autocomplete$="[[autocomplete]]" autofocus$="[[autofocus]]" inputmode$="[[inputmode]]" name$="[[name]]" placeholder$="[[placeholder]]" readonly$="[[readonly]]" required$="[[required]]" minlength$="[[minlength]]" maxlength$="[[maxlength]]" autocapitalize$="[[autocapitalize]]" rows$="[[rows]]" max-rows$="[[maxRows]]" on-change="_onChange"></iron-autogrow-textarea>\n\n      <template is="dom-if" if="[[errorMessage]]">\n        <paper-input-error aria-live="assertive" slot="add-on">[[errorMessage]]</paper-input-error>\n      </template>\n\n      <template is="dom-if" if="[[charCounter]]">\n        <paper-input-char-counter slot="add-on"></paper-input-char-counter>\n      </template>\n\n    </paper-input-container>\n'], ['\n    <style>\n      :host {\n        display: block;\n      }\n\n      :host([hidden]) {\n        display: none !important;\n      }\n\n      label {\n        pointer-events: none;\n      }\n    </style>\n\n    <paper-input-container no-label-float\\$="[[noLabelFloat]]" always-float-label="[[_computeAlwaysFloatLabel(alwaysFloatLabel,placeholder)]]" auto-validate\\$="[[autoValidate]]" disabled\\$="[[disabled]]" invalid="[[invalid]]">\n\n      <label hidden\\$="[[!label]]" aria-hidden="true" for\\$="[[_inputId]]" slot="label">[[label]]</label>\n\n      <iron-autogrow-textarea class="paper-input-input" slot="input" id\\$="[[_inputId]]" aria-labelledby\\$="[[_ariaLabelledBy]]" aria-describedby\\$="[[_ariaDescribedBy]]" bind-value="{{value}}" invalid="{{invalid}}" validator\\$="[[validator]]" disabled\\$="[[disabled]]" autocomplete\\$="[[autocomplete]]" autofocus\\$="[[autofocus]]" inputmode\\$="[[inputmode]]" name\\$="[[name]]" placeholder\\$="[[placeholder]]" readonly\\$="[[readonly]]" required\\$="[[required]]" minlength\\$="[[minlength]]" maxlength\\$="[[maxlength]]" autocapitalize\\$="[[autocapitalize]]" rows\\$="[[rows]]" max-rows\\$="[[maxRows]]" on-change="_onChange"></iron-autogrow-textarea>\n\n      <template is="dom-if" if="[[errorMessage]]">\n        <paper-input-error aria-live="assertive" slot="add-on">[[errorMessage]]</paper-input-error>\n      </template>\n\n      <template is="dom-if" if="[[charCounter]]">\n        <paper-input-char-counter slot="add-on"></paper-input-char-counter>\n      </template>\n\n    </paper-input-container>\n']);
+
+__webpack_require__(/*! @polymer/polymer/polymer-legacy.js */ "./node_modules/@polymer/polymer/polymer-legacy.js");
+
+__webpack_require__(/*! @polymer/iron-autogrow-textarea/iron-autogrow-textarea.js */ "./node_modules/@polymer/iron-autogrow-textarea/iron-autogrow-textarea.js");
+
+var _ironFormElementBehavior = __webpack_require__(/*! @polymer/iron-form-element-behavior/iron-form-element-behavior.js */ "./node_modules/@polymer/iron-form-element-behavior/iron-form-element-behavior.js");
+
+var _paperInputBehavior = __webpack_require__(/*! ./paper-input-behavior.js */ "./node_modules/@polymer/paper-input/paper-input-behavior.js");
+
+__webpack_require__(/*! ./paper-input-char-counter.js */ "./node_modules/@polymer/paper-input/paper-input-char-counter.js");
+
+__webpack_require__(/*! ./paper-input-container.js */ "./node_modules/@polymer/paper-input/paper-input-container.js");
+
+__webpack_require__(/*! ./paper-input-error.js */ "./node_modules/@polymer/paper-input/paper-input-error.js");
+
+var _polymerFn = __webpack_require__(/*! @polymer/polymer/lib/legacy/polymer-fn.js */ "./node_modules/@polymer/polymer/lib/legacy/polymer-fn.js");
+
+var _htmlTag = __webpack_require__(/*! @polymer/polymer/lib/utils/html-tag.js */ "./node_modules/@polymer/polymer/lib/utils/html-tag.js");
+
+function _taggedTemplateLiteral(strings, raw) { return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); } /**
+                                                                                                                                                  @license
+                                                                                                                                                  Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+                                                                                                                                                  This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+                                                                                                                                                  The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+                                                                                                                                                  The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+                                                                                                                                                  Code distributed by Google as part of the polymer project is also
+                                                                                                                                                  subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+                                                                                                                                                  */
+/*
+`<paper-textarea>` is a multi-line text field with Material Design styling.
+
+    <paper-textarea label="Textarea label"></paper-textarea>
+
+See `Polymer.PaperInputBehavior` for more API docs.
+
+### Validation
+
+Currently only `required` and `maxlength` validation is supported.
+
+### Styling
+
+See `Polymer.PaperInputContainer` for a list of custom properties used to
+style this element.
+*/
+/*
+  FIXME(polymer-modulizer): the above comments were extracted
+  from HTML and may be out of place here. Review them and
+  then delete this comment!
+*/
+
+
+(0, _polymerFn.Polymer)({
+  _template: (0, _htmlTag.html)(_templateObject),
+
+  is: 'paper-textarea',
+
+  behaviors: [_paperInputBehavior.PaperInputBehavior, _ironFormElementBehavior.IronFormElementBehavior],
+
+  properties: {
+    _ariaLabelledBy: {
+      observer: '_ariaLabelledByChanged',
+      type: String
+    },
+
+    _ariaDescribedBy: {
+      observer: '_ariaDescribedByChanged',
+      type: String
+    },
+
+    /**
+     * The initial number of rows.
+     *
+     * @attribute rows
+     * @type number
+     * @default 1
+     */
+    rows: {
+      type: Number,
+      value: 1
+    },
+
+    /**
+     * The maximum number of rows this element can grow to until it
+     * scrolls. 0 means no maximum.
+     *
+     * @attribute maxRows
+     * @type number
+     * @default 0
+     */
+    maxRows: {
+      type: Number,
+      value: 0
+    }
+  },
+
+  /**
+   * @return {number}
+   */
+  get selectionStart() {
+    return this.$.input.textarea.selectionStart;
+  },
+
+  set selectionStart(start) {
+    this.$.input.textarea.selectionStart = start;
+  },
+
+  /**
+   * @return {number}
+   */
+  get selectionEnd() {
+    return this.$.input.textarea.selectionEnd;
+  },
+
+  set selectionEnd(end) {
+    this.$.input.textarea.selectionEnd = end;
+  },
+
+  _ariaLabelledByChanged: function _ariaLabelledByChanged(ariaLabelledBy) {
+    this._focusableElement.setAttribute('aria-labelledby', ariaLabelledBy);
+  },
+
+  _ariaDescribedByChanged: function _ariaDescribedByChanged(ariaDescribedBy) {
+    this._focusableElement.setAttribute('aria-describedby', ariaDescribedBy);
+  },
+
+  get _focusableElement() {
+    return this.inputElement.textarea;
+  }
+});
+
+/***/ }),
+
 /***/ "./node_modules/@polymer/paper-progress/paper-progress.js":
 /*!****************************************************************!*\
   !*** ./node_modules/@polymer/paper-progress/paper-progress.js ***!
@@ -9780,6 +10464,429 @@ Design typography section.
   then delete this comment!
 */
 ;
+
+/***/ }),
+
+/***/ "./node_modules/@polymer/paper-tooltip/paper-tooltip.js":
+/*!**************************************************************!*\
+  !*** ./node_modules/@polymer/paper-tooltip/paper-tooltip.js ***!
+  \**************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _templateObject = _taggedTemplateLiteral(['\n    <style>\n      :host {\n        display: block;\n        position: absolute;\n        outline: none;\n        z-index: 1002;\n        -moz-user-select: none;\n        -ms-user-select: none;\n        -webkit-user-select: none;\n        user-select: none;\n        cursor: default;\n      }\n\n      #tooltip {\n        display: block;\n        outline: none;\n        @apply --paper-font-common-base;\n        font-size: 10px;\n        line-height: 1;\n        background-color: var(--paper-tooltip-background, #616161);\n        color: var(--paper-tooltip-text-color, white);\n        padding: 8px;\n        border-radius: 2px;\n        @apply --paper-tooltip;\n      }\n\n      @keyframes keyFrameScaleUp {\n        0% {\n          transform: scale(0.0);\n        }\n        100% {\n          transform: scale(1.0);\n        }\n      }\n\n      @keyframes keyFrameScaleDown {\n        0% {\n          transform: scale(1.0);\n        }\n        100% {\n          transform: scale(0.0);\n        }\n      }\n\n      @keyframes keyFrameFadeInOpacity {\n        0% {\n          opacity: 0;\n        }\n        100% {\n          opacity: var(--paper-tooltip-opacity, 0.9);\n        }\n      }\n\n      @keyframes keyFrameFadeOutOpacity {\n        0% {\n          opacity: var(--paper-tooltip-opacity, 0.9);\n        }\n        100% {\n          opacity: 0;\n        }\n      }\n\n      @keyframes keyFrameSlideDownIn {\n        0% {\n          transform: translateY(-2000px);\n          opacity: 0;\n        }\n        10% {\n          opacity: 0.2;\n        }\n        100% {\n          transform: translateY(0);\n          opacity: var(--paper-tooltip-opacity, 0.9);\n        }\n      }\n\n      @keyframes keyFrameSlideDownOut {\n        0% {\n          transform: translateY(0);\n          opacity: var(--paper-tooltip-opacity, 0.9);\n        }\n        10% {\n          opacity: 0.2;\n        }\n        100% {\n          transform: translateY(-2000px);\n          opacity: 0;\n        }\n      }\n\n      .fade-in-animation {\n        opacity: 0;\n        animation-delay: var(--paper-tooltip-delay-in, 500ms);\n        animation-name: keyFrameFadeInOpacity;\n        animation-iteration-count: 1;\n        animation-timing-function: ease-in;\n        animation-duration: var(--paper-tooltip-duration-in, 500ms);\n        animation-fill-mode: forwards;\n        @apply --paper-tooltip-animation;\n      }\n\n      .fade-out-animation {\n        opacity: var(--paper-tooltip-opacity, 0.9);\n        animation-delay: var(--paper-tooltip-delay-out, 0ms);\n        animation-name: keyFrameFadeOutOpacity;\n        animation-iteration-count: 1;\n        animation-timing-function: ease-in;\n        animation-duration: var(--paper-tooltip-duration-out, 500ms);\n        animation-fill-mode: forwards;\n        @apply --paper-tooltip-animation;\n      }\n\n      .scale-up-animation {\n        transform: scale(0);\n        opacity: var(--paper-tooltip-opacity, 0.9);\n        animation-delay: var(--paper-tooltip-delay-in, 500ms);\n        animation-name: keyFrameScaleUp;\n        animation-iteration-count: 1;\n        animation-timing-function: ease-in;\n        animation-duration: var(--paper-tooltip-duration-in, 500ms);\n        animation-fill-mode: forwards;\n        @apply --paper-tooltip-animation;\n      }\n\n      .scale-down-animation {\n        transform: scale(1);\n        opacity: var(--paper-tooltip-opacity, 0.9);\n        animation-delay: var(--paper-tooltip-delay-out, 500ms);\n        animation-name: keyFrameScaleDown;\n        animation-iteration-count: 1;\n        animation-timing-function: ease-in;\n        animation-duration: var(--paper-tooltip-duration-out, 500ms);\n        animation-fill-mode: forwards;\n        @apply --paper-tooltip-animation;\n      }\n\n      .slide-down-animation {\n        transform: translateY(-2000px);\n        opacity: 0;\n        animation-delay: var(--paper-tooltip-delay-out, 500ms);\n        animation-name: keyFrameSlideDownIn;\n        animation-iteration-count: 1;\n        animation-timing-function: cubic-bezier(0.0, 0.0, 0.2, 1);\n        animation-duration: var(--paper-tooltip-duration-out, 500ms);\n        animation-fill-mode: forwards;\n        @apply --paper-tooltip-animation;\n      }\n\n      .slide-down-animation-out {\n        transform: translateY(0);\n        opacity: var(--paper-tooltip-opacity, 0.9);\n        animation-delay: var(--paper-tooltip-delay-out, 500ms);\n        animation-name: keyFrameSlideDownOut;\n        animation-iteration-count: 1;\n        animation-timing-function: cubic-bezier(0.4, 0.0, 1, 1);\n        animation-duration: var(--paper-tooltip-duration-out, 500ms);\n        animation-fill-mode: forwards;\n        @apply --paper-tooltip-animation;\n      }\n\n      .cancel-animation {\n        animation-delay: -30s !important;\n      }\n\n      /* Thanks IE 10. */\n\n      .hidden {\n        display: none !important;\n      }\n    </style>\n\n    <div id="tooltip" class="hidden">\n      <slot></slot>\n    </div>\n'], ['\n    <style>\n      :host {\n        display: block;\n        position: absolute;\n        outline: none;\n        z-index: 1002;\n        -moz-user-select: none;\n        -ms-user-select: none;\n        -webkit-user-select: none;\n        user-select: none;\n        cursor: default;\n      }\n\n      #tooltip {\n        display: block;\n        outline: none;\n        @apply --paper-font-common-base;\n        font-size: 10px;\n        line-height: 1;\n        background-color: var(--paper-tooltip-background, #616161);\n        color: var(--paper-tooltip-text-color, white);\n        padding: 8px;\n        border-radius: 2px;\n        @apply --paper-tooltip;\n      }\n\n      @keyframes keyFrameScaleUp {\n        0% {\n          transform: scale(0.0);\n        }\n        100% {\n          transform: scale(1.0);\n        }\n      }\n\n      @keyframes keyFrameScaleDown {\n        0% {\n          transform: scale(1.0);\n        }\n        100% {\n          transform: scale(0.0);\n        }\n      }\n\n      @keyframes keyFrameFadeInOpacity {\n        0% {\n          opacity: 0;\n        }\n        100% {\n          opacity: var(--paper-tooltip-opacity, 0.9);\n        }\n      }\n\n      @keyframes keyFrameFadeOutOpacity {\n        0% {\n          opacity: var(--paper-tooltip-opacity, 0.9);\n        }\n        100% {\n          opacity: 0;\n        }\n      }\n\n      @keyframes keyFrameSlideDownIn {\n        0% {\n          transform: translateY(-2000px);\n          opacity: 0;\n        }\n        10% {\n          opacity: 0.2;\n        }\n        100% {\n          transform: translateY(0);\n          opacity: var(--paper-tooltip-opacity, 0.9);\n        }\n      }\n\n      @keyframes keyFrameSlideDownOut {\n        0% {\n          transform: translateY(0);\n          opacity: var(--paper-tooltip-opacity, 0.9);\n        }\n        10% {\n          opacity: 0.2;\n        }\n        100% {\n          transform: translateY(-2000px);\n          opacity: 0;\n        }\n      }\n\n      .fade-in-animation {\n        opacity: 0;\n        animation-delay: var(--paper-tooltip-delay-in, 500ms);\n        animation-name: keyFrameFadeInOpacity;\n        animation-iteration-count: 1;\n        animation-timing-function: ease-in;\n        animation-duration: var(--paper-tooltip-duration-in, 500ms);\n        animation-fill-mode: forwards;\n        @apply --paper-tooltip-animation;\n      }\n\n      .fade-out-animation {\n        opacity: var(--paper-tooltip-opacity, 0.9);\n        animation-delay: var(--paper-tooltip-delay-out, 0ms);\n        animation-name: keyFrameFadeOutOpacity;\n        animation-iteration-count: 1;\n        animation-timing-function: ease-in;\n        animation-duration: var(--paper-tooltip-duration-out, 500ms);\n        animation-fill-mode: forwards;\n        @apply --paper-tooltip-animation;\n      }\n\n      .scale-up-animation {\n        transform: scale(0);\n        opacity: var(--paper-tooltip-opacity, 0.9);\n        animation-delay: var(--paper-tooltip-delay-in, 500ms);\n        animation-name: keyFrameScaleUp;\n        animation-iteration-count: 1;\n        animation-timing-function: ease-in;\n        animation-duration: var(--paper-tooltip-duration-in, 500ms);\n        animation-fill-mode: forwards;\n        @apply --paper-tooltip-animation;\n      }\n\n      .scale-down-animation {\n        transform: scale(1);\n        opacity: var(--paper-tooltip-opacity, 0.9);\n        animation-delay: var(--paper-tooltip-delay-out, 500ms);\n        animation-name: keyFrameScaleDown;\n        animation-iteration-count: 1;\n        animation-timing-function: ease-in;\n        animation-duration: var(--paper-tooltip-duration-out, 500ms);\n        animation-fill-mode: forwards;\n        @apply --paper-tooltip-animation;\n      }\n\n      .slide-down-animation {\n        transform: translateY(-2000px);\n        opacity: 0;\n        animation-delay: var(--paper-tooltip-delay-out, 500ms);\n        animation-name: keyFrameSlideDownIn;\n        animation-iteration-count: 1;\n        animation-timing-function: cubic-bezier(0.0, 0.0, 0.2, 1);\n        animation-duration: var(--paper-tooltip-duration-out, 500ms);\n        animation-fill-mode: forwards;\n        @apply --paper-tooltip-animation;\n      }\n\n      .slide-down-animation-out {\n        transform: translateY(0);\n        opacity: var(--paper-tooltip-opacity, 0.9);\n        animation-delay: var(--paper-tooltip-delay-out, 500ms);\n        animation-name: keyFrameSlideDownOut;\n        animation-iteration-count: 1;\n        animation-timing-function: cubic-bezier(0.4, 0.0, 1, 1);\n        animation-duration: var(--paper-tooltip-duration-out, 500ms);\n        animation-fill-mode: forwards;\n        @apply --paper-tooltip-animation;\n      }\n\n      .cancel-animation {\n        animation-delay: -30s !important;\n      }\n\n      /* Thanks IE 10. */\n\n      .hidden {\n        display: none !important;\n      }\n    </style>\n\n    <div id="tooltip" class="hidden">\n      <slot></slot>\n    </div>\n']);
+
+__webpack_require__(/*! @polymer/polymer/polymer-legacy.js */ "./node_modules/@polymer/polymer/polymer-legacy.js");
+
+var _polymerFn = __webpack_require__(/*! @polymer/polymer/lib/legacy/polymer-fn.js */ "./node_modules/@polymer/polymer/lib/legacy/polymer-fn.js");
+
+var _htmlTag = __webpack_require__(/*! @polymer/polymer/lib/utils/html-tag.js */ "./node_modules/@polymer/polymer/lib/utils/html-tag.js");
+
+var _polymerDom = __webpack_require__(/*! @polymer/polymer/lib/legacy/polymer.dom.js */ "./node_modules/@polymer/polymer/lib/legacy/polymer.dom.js");
+
+function _taggedTemplateLiteral(strings, raw) { return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); } /**
+                                                                                                                                                  @license
+                                                                                                                                                  Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+                                                                                                                                                  This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+                                                                                                                                                  The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+                                                                                                                                                  The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+                                                                                                                                                  Code distributed by Google as part of the polymer project is also
+                                                                                                                                                  subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+                                                                                                                                                  */
+/**
+Material design: [Tooltips](https://www.google.com/design/spec/components/tooltips.html)
+`<paper-tooltip>` is a label that appears on hover and focus when the user
+hovers over an element with the cursor or with the keyboard. It will be centered
+to an anchor element specified in the `for` attribute, or, if that doesn't exist,
+centered to the parent node containing it. Note that as of `paper-tooltip#2.0.0`,
+you must explicitely include the `web-animations` polyfill if you want this
+element to work on browsers not implementing the WebAnimations spec.
+Example:
+    // polyfill
+    <link rel="import" href="../../neon-animation/web-animations.html">
+    <div style="display:inline-block">
+      <button>Click me!</button>
+      <paper-tooltip>Tooltip text</paper-tooltip>
+    </div>
+    <div>
+      <button id="btn">Click me!</button>
+      <paper-tooltip for="btn">Tooltip text</paper-tooltip>
+    </div>
+The tooltip can be positioned on the top|bottom|left|right of the anchor using
+the `position` attribute. The default position is bottom.
+    <paper-tooltip for="btn" position="left">Tooltip text</paper-tooltip>
+    <paper-tooltip for="btn" position="top">Tooltip text</paper-tooltip>
+### Styling
+The following custom properties and mixins are available for styling:
+Custom property | Description | Default
+----------------|-------------|----------
+`--paper-tooltip-background` | The background color of the tooltip | `#616161`
+`--paper-tooltip-opacity` | The opacity of the tooltip | `0.9`
+`--paper-tooltip-text-color` | The text color of the tooltip | `white`
+`--paper-tooltip` | Mixin applied to the tooltip | `{}`
+`--paper-tooltip-delay-in` | Delay before tooltip starts to fade in | `500`
+`--paper-tooltip-delay-out` | Delay before tooltip starts to fade out | `0`
+`--paper-tooltip-duration-in` | Duration of animation when showing tooltip | `500`
+`--paper-tooltip-duration-out` | Duration of animation when hiding tooltip | `0`
+`--paper-tooltip-animation` | Mixin applied to the tooltip animation | `{}`
+@group Paper Elements
+@element paper-tooltip
+@demo demo/index.html
+*/
+/*
+  FIXME(polymer-modulizer): the above comments were extracted
+  from HTML and may be out of place here. Review them and
+  then delete this comment!
+*/
+
+
+(0, _polymerFn.Polymer)({
+  _template: (0, _htmlTag.html)(_templateObject),
+
+  is: 'paper-tooltip',
+  hostAttributes: { role: 'tooltip', tabindex: -1 },
+
+  properties: {
+    /**
+     * The id of the element that the tooltip is anchored to. This element
+     * must be a sibling of the tooltip. If this property is not set,
+     * then the tooltip will be centered to the parent node containing it.
+     */
+    for: { type: String, observer: '_findTarget' },
+    /**
+     * Set this to true if you want to manually control when the tooltip
+     * is shown or hidden.
+     */
+    manualMode: { type: Boolean, value: false, observer: '_manualModeChanged' },
+    /**
+     * Positions the tooltip to the top, right, bottom, left of its content.
+     */
+    position: { type: String, value: 'bottom' },
+    /**
+     * If true, no parts of the tooltip will ever be shown offscreen.
+     */
+    fitToVisibleBounds: { type: Boolean, value: false },
+    /**
+     * The spacing between the top of the tooltip and the element it is
+     * anchored to.
+     */
+    offset: { type: Number, value: 14 },
+    /**
+     * This property is deprecated, but left over so that it doesn't
+     * break exiting code. Please use `offset` instead. If both `offset` and
+     * `marginTop` are provided, `marginTop` will be ignored.
+     * @deprecated since version 1.0.3
+     */
+    marginTop: { type: Number, value: 14 },
+    /**
+     * The delay that will be applied before the `entry` animation is
+     * played when showing the tooltip.
+     */
+    animationDelay: { type: Number, value: 500, observer: '_delayChange' },
+    /**
+     * The animation that will be played on entry.  This replaces the
+     * deprecated animationConfig.  Entries here will override the
+     * animationConfig settings.  You can enter your own animation
+     * by setting it to the css class name.
+     */
+    animationEntry: { type: String, value: '' },
+    /**
+     * The animation that will be played on exit.  This replaces the
+     * deprecated animationConfig.  Entries here will override the
+     * animationConfig settings.  You can enter your own animation
+     * by setting it to the css class name.
+     */
+    animationExit: { type: String, value: '' },
+    /**
+     * This property is deprecated.  Use --paper-tooltip-animation to change the
+     * animation. The entry and exit animations that will be played when showing
+     * and hiding the tooltip. If you want to override this, you must ensure
+     * that your animationConfig has the exact format below.
+     * @deprecated since version
+     *
+     * The entry and exit animations that will be played when showing and
+     * hiding the tooltip. If you want to override this, you must ensure
+     * that your animationConfig has the exact format below.
+     */
+    animationConfig: {
+      type: Object,
+      value: function value() {
+        return {
+          'entry': [{ name: 'fade-in-animation', node: this, timing: { delay: 0 } }],
+          'exit': [{ name: 'fade-out-animation', node: this }]
+        };
+      }
+    },
+    _showing: { type: Boolean, value: false }
+  },
+
+  listeners: {
+    'webkitAnimationEnd': '_onAnimationEnd'
+  },
+
+  /**
+   * Returns the target element that this tooltip is anchored to. It is
+   * either the element given by the `for` attribute, or the immediate parent
+   * of the tooltip.
+   *
+   * @type {Node}
+   */
+  get target() {
+    var parentNode = (0, _polymerDom.dom)(this).parentNode;
+    // If the parentNode is a document fragment, then we need to use the host.
+    var ownerRoot = (0, _polymerDom.dom)(this).getOwnerRoot();
+    var target;
+    if (this.for) {
+      target = (0, _polymerDom.dom)(ownerRoot).querySelector('#' + this.for);
+    } else {
+      target = parentNode.nodeType == Node.DOCUMENT_FRAGMENT_NODE ? ownerRoot.host : parentNode;
+    }
+    return target;
+  },
+
+  /**
+   * @return {void}
+   */
+  attached: function attached() {
+    this._findTarget();
+  },
+
+  /**
+   * @return {void}
+   */
+  detached: function detached() {
+    if (!this.manualMode) this._removeListeners();
+  },
+
+  /**
+   * Replaces Neon-Animation playAnimation - just calls show and hide.
+   * @deprecated Use show and hide instead.
+   * @param {string} type Either `entry` or `exit`
+   */
+  playAnimation: function playAnimation(type) {
+    if (type === 'entry') {
+      this.show();
+    } else if (type === 'exit') {
+      this.hide();
+    }
+  },
+
+  /**
+   * Cancels the animation and either fully shows or fully hides tooltip
+   */
+  cancelAnimation: function cancelAnimation() {
+    // Short-cut and cancel all animations and hide
+    this.$.tooltip.classList.add('cancel-animation');
+  },
+
+  /**
+   * Shows the tooltip programatically
+   * @return {void}
+   */
+  show: function show() {
+    // If the tooltip is already showing, there's nothing to do.
+    if (this._showing) return;
+
+    if ((0, _polymerDom.dom)(this).textContent.trim() === '') {
+      // Check if effective children are also empty
+      var allChildrenEmpty = true;
+      var effectiveChildren = (0, _polymerDom.dom)(this).getEffectiveChildNodes();
+      for (var i = 0; i < effectiveChildren.length; i++) {
+        if (effectiveChildren[i].textContent.trim() !== '') {
+          allChildrenEmpty = false;
+          break;
+        }
+      }
+      if (allChildrenEmpty) {
+        return;
+      }
+    }
+
+    this._showing = true;
+    this.$.tooltip.classList.remove('hidden');
+    this.$.tooltip.classList.remove('cancel-animation');
+    this.$.tooltip.classList.remove(this._getAnimationType('exit'));
+    this.updatePosition();
+    this._animationPlaying = true;
+    this.$.tooltip.classList.add(this._getAnimationType('entry'));
+  },
+
+  /**
+   * Hides the tooltip programatically
+   * @return {void}
+   */
+  hide: function hide() {
+    // If the tooltip is already hidden, there's nothing to do.
+    if (!this._showing) {
+      return;
+    }
+
+    // If the entry animation is still playing, don't try to play the exit
+    // animation since this will reset the opacity to 1. Just end the animation.
+    if (this._animationPlaying) {
+      this._showing = false;
+      this._cancelAnimation();
+      return;
+    } else {
+      // Play Exit Animation
+      this._onAnimationFinish();
+    }
+
+    this._showing = false;
+    this._animationPlaying = true;
+  },
+
+  /**
+   * @return {void}
+   */
+  updatePosition: function updatePosition() {
+    if (!this._target || !this.offsetParent) return;
+    var offset = this.offset;
+    // If a marginTop has been provided by the user (pre 1.0.3), use it.
+    if (this.marginTop != 14 && this.offset == 14) offset = this.marginTop;
+    var parentRect = this.offsetParent.getBoundingClientRect();
+    var targetRect = this._target.getBoundingClientRect();
+    var thisRect = this.getBoundingClientRect();
+    var horizontalCenterOffset = (targetRect.width - thisRect.width) / 2;
+    var verticalCenterOffset = (targetRect.height - thisRect.height) / 2;
+    var targetLeft = targetRect.left - parentRect.left;
+    var targetTop = targetRect.top - parentRect.top;
+    var tooltipLeft, tooltipTop;
+    switch (this.position) {
+      case 'top':
+        tooltipLeft = targetLeft + horizontalCenterOffset;
+        tooltipTop = targetTop - thisRect.height - offset;
+        break;
+      case 'bottom':
+        tooltipLeft = targetLeft + horizontalCenterOffset;
+        tooltipTop = targetTop + targetRect.height + offset;
+        break;
+      case 'left':
+        tooltipLeft = targetLeft - thisRect.width - offset;
+        tooltipTop = targetTop + verticalCenterOffset;
+        break;
+      case 'right':
+        tooltipLeft = targetLeft + targetRect.width + offset;
+        tooltipTop = targetTop + verticalCenterOffset;
+        break;
+    }
+    // TODO(noms): This should use IronFitBehavior if possible.
+    if (this.fitToVisibleBounds) {
+      // Clip the left/right side
+      if (parentRect.left + tooltipLeft + thisRect.width > window.innerWidth) {
+        this.style.right = '0px';
+        this.style.left = 'auto';
+      } else {
+        this.style.left = Math.max(0, tooltipLeft) + 'px';
+        this.style.right = 'auto';
+      }
+      // Clip the top/bottom side.
+      if (parentRect.top + tooltipTop + thisRect.height > window.innerHeight) {
+        this.style.bottom = parentRect.height + 'px';
+        this.style.top = 'auto';
+      } else {
+        this.style.top = Math.max(-parentRect.top, tooltipTop) + 'px';
+        this.style.bottom = 'auto';
+      }
+    } else {
+      this.style.left = tooltipLeft + 'px';
+      this.style.top = tooltipTop + 'px';
+    }
+  },
+
+  _addListeners: function _addListeners() {
+    if (this._target) {
+      this.listen(this._target, 'mouseenter', 'show');
+      this.listen(this._target, 'focus', 'show');
+      this.listen(this._target, 'mouseleave', 'hide');
+      this.listen(this._target, 'blur', 'hide');
+      this.listen(this._target, 'tap', 'hide');
+    }
+    this.listen(this.$.tooltip, 'animationend', '_onAnimationEnd');
+    this.listen(this, 'mouseenter', 'hide');
+  },
+
+  _findTarget: function _findTarget() {
+    if (!this.manualMode) this._removeListeners();
+    this._target = this.target;
+    if (!this.manualMode) this._addListeners();
+  },
+
+  _delayChange: function _delayChange(newValue) {
+    // Only Update delay if different value set
+    if (newValue !== 500) {
+      this.updateStyles({ '--paper-tooltip-delay-in': newValue + 'ms' });
+    }
+  },
+
+  _manualModeChanged: function _manualModeChanged() {
+    if (this.manualMode) this._removeListeners();else this._addListeners();
+  },
+
+  _cancelAnimation: function _cancelAnimation() {
+    // Short-cut and cancel all animations and hide
+    this.$.tooltip.classList.remove(this._getAnimationType('entry'));
+    this.$.tooltip.classList.remove(this._getAnimationType('exit'));
+    this.$.tooltip.classList.remove('cancel-animation');
+    this.$.tooltip.classList.add('hidden');
+  },
+
+  _onAnimationFinish: function _onAnimationFinish() {
+    if (this._showing) {
+      this.$.tooltip.classList.remove(this._getAnimationType('entry'));
+      this.$.tooltip.classList.remove('cancel-animation');
+      this.$.tooltip.classList.add(this._getAnimationType('exit'));
+    }
+  },
+
+  _onAnimationEnd: function _onAnimationEnd() {
+    // If no longer showing add class hidden to completely hide tooltip
+    this._animationPlaying = false;
+    if (!this._showing) {
+      this.$.tooltip.classList.remove(this._getAnimationType('exit'));
+      this.$.tooltip.classList.add('hidden');
+    }
+  },
+
+  _getAnimationType: function _getAnimationType(type) {
+    // These properties have priority over animationConfig values
+    if (type === 'entry' && this.animationEntry !== '') {
+      return this.animationEntry;
+    }
+    if (type === 'exit' && this.animationExit !== '') {
+      return this.animationExit;
+    }
+    // If no results then return the legacy value from animationConfig
+    if (this.animationConfig[type] && typeof this.animationConfig[type][0].name === 'string') {
+      // Checking Timing and Update if necessary - Legacy for animationConfig
+      if (this.animationConfig[type][0].timing && this.animationConfig[type][0].timing.delay && this.animationConfig[type][0].timing.delay !== 0) {
+        var timingDelay = this.animationConfig[type][0].timing.delay;
+        // Has Timing Change - Update CSS
+        if (type === 'entry') {
+          this.updateStyles({ '--paper-tooltip-delay-in': timingDelay + 'ms' });
+        } else if (type === 'exit') {
+          this.updateStyles({ '--paper-tooltip-delay-out': timingDelay + 'ms' });
+        }
+      }
+      return this.animationConfig[type][0].name;
+    }
+  },
+
+  _removeListeners: function _removeListeners() {
+    if (this._target) {
+      this.unlisten(this._target, 'mouseenter', 'show');
+      this.unlisten(this._target, 'focus', 'show');
+      this.unlisten(this._target, 'mouseleave', 'hide');
+      this.unlisten(this._target, 'blur', 'hide');
+      this.unlisten(this._target, 'tap', 'hide');
+    }
+    this.unlisten(this.$.tooltip, 'animationend', '_onAnimationEnd');
+    this.unlisten(this, 'mouseenter', 'hide');
+  }
+});
 
 /***/ }),
 
@@ -37219,7 +38326,10 @@ __webpack_require__(/*! @polymer/paper-dialog/paper-dialog.js */ "./node_modules
 __webpack_require__(/*! @polymer/paper-button/paper-button.js */ "./node_modules/@polymer/paper-button/paper-button.js");
 __webpack_require__(/*! @polymer/paper-slider/paper-slider.js */ "./node_modules/@polymer/paper-slider/paper-slider.js");
 __webpack_require__(/*! @polymer/iron-fit-behavior/iron-fit-behavior.js */ "./node_modules/@polymer/iron-fit-behavior/iron-fit-behavior.js");
-var _ = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
+__webpack_require__(/*! @polymer/paper-input/paper-textarea.js */ "./node_modules/@polymer/paper-input/paper-textarea.js");
+__webpack_require__(/*! @polymer/paper-tooltip/paper-tooltip.js */ "./node_modules/@polymer/paper-tooltip/paper-tooltip.js");
+__webpack_require__(/*! @polymer/iron-localstorage/iron-localstorage.js */ "./node_modules/@polymer/iron-localstorage/iron-localstorage.js");
+var __ = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
 // local source
 var store_1 = __webpack_require__(/*! ../store/store */ "./src/nps-widget/store/store.ts");
 var StylingDispatcher_1 = __webpack_require__(/*! ../services/StylingDispatcher */ "./src/nps-widget/services/StylingDispatcher.ts");
@@ -37234,12 +38344,14 @@ var polymer_element_1 = __webpack_require__(/*! @polymer/polymer/polymer-element
 var Types = __webpack_require__(/*! ../store/settings/types */ "./src/nps-widget/store/settings/types.ts");
 var AnswerRange = Types.AnswerRange;
 var ReduxConnector_1 = __webpack_require__(/*! ../../utils/ReduxConnector */ "./src/utils/ReduxConnector.ts");
+var actions_2 = __webpack_require__(/*! ../store/userstate/actions */ "./src/nps-widget/store/userstate/actions.ts");
+var AnswerRangeQuestionFinder_1 = __webpack_require__(/*! ../services/AnswerRangeQuestionFinder */ "./src/nps-widget/services/AnswerRangeQuestionFinder.ts");
 var NpsWidget = /** @class */ (function (_super) {
     __extends(NpsWidget, _super);
     function NpsWidget(config) {
         var _this = _super.call(this) || this;
-        _this.store = store_1.configureStore(undefined);
         _this.iconType = 'feedback';
+        _this.store = store_1.configureStore(undefined);
         // log the state
         console.log(_this.store.getState());
         // NpsWidget.iconType = 'help';
@@ -37256,23 +38368,23 @@ var NpsWidget = /** @class */ (function (_super) {
                 if (config.settings.answerRanges != null) {
                     var answerRanges_1 = new Array();
                     // ReSharper disable once TsResolvedFromInaccessibleModule
-                    _.forEach(config.settings.answerRanges, function (item) {
+                    __.forEach(config.settings.answerRanges, function (item) {
                         // ReSharper disable once TsResolvedFromInaccessibleModule
-                        answerRanges_1.push(_.assign(new AnswerRange(), item));
+                        answerRanges_1.push(__.assign(new AnswerRange(), item));
                     });
                     _this.store.dispatch(
                     // TODO: Troubleshoot why type safety isn't workgin here - in the meantime cast to any
                     (actions_1.setAnswerRangesThunk(answerRanges_1, new AnswerValuesCreator_1.default())));
                 }
                 // ReSharper disable once TsResolvedFromInaccessibleModule
-                var miscSettings = _.assign(new types_1.MiscSettings(), {
+                var miscSettings = __.assign(new types_1.MiscSettings(), {
                     widgetName: config.settings.widgetName,
                     timeOutOnAnswer: config.settings.timeOutOnAnswer,
                     mainQuestion: config.settings.mainQuestion,
                     introductionStatement: config.settings.introductionStatement
                 });
                 // TODO: Troubleshoot why type safety isn't workgin here - in the meantime cast to any
-                _this.store.dispatch(actions_1.addMiscSettings(miscSettings));
+                _this.store.dispatch((actions_1.addMiscSettings(miscSettings)));
             }
         }
         // log the state
@@ -37285,22 +38397,35 @@ var NpsWidget = /** @class */ (function (_super) {
         configurable: true
     });
     NpsWidget.prototype.stateReceiver = function (state) {
+        // Items to be bound to UI that are NOT user input need a property to bind to.
+        // When they're changed via state management, they need to be populated back onto
+        // objects that can be one-way bound
+        // If there are any user inputs that need to be changed via state, (that's an anti-pattern)
+        // they will need to be added here so the state change is obsverved and can be written back to
+        // the bound propery and the UI element updated.
+        // The exception to this is the slider as I want to pick up the immediate-change-value
         this.introductionStatement = state.settings.miscSettings.introductionStatement;
         this.mainQuestion = state.settings.miscSettings.mainQuestion;
+        this.selectedAnswerRangeQuestion = state.userState.selectedAnswerRangeQuestion;
         // ReSharper disable TsResolvedFromInaccessibleModule
-        this.answerValueMin = _.first(state.settings.answerValues);
-        this.answerValueMax = _.last(state.settings.answerValues);
+        this.answerValueMin = __.first(state.settings.answerValues);
+        this.answerValueMax = __.last(state.settings.answerValues);
         // ReSharper restore TsResolvedFromInaccessibleModule
+        // I wanted a quick way to get user data into local storage, so just
+        // dump it in and we can pull it out selectively when hydrating
+        this.myLocalStorage = state.userState;
     };
     NpsWidget.prototype.connectedCallback = function () {
         _super.prototype.connectedCallback.call(this);
+        // The following hooks up the stateReceiver
         ReduxConnector_1.connectToRedux(this, this.store);
     };
     NpsWidget.prototype.render = function () {
+        // Get the styling config from the store and apply it to the UI
         var _this = this;
         var stylingConfig = this.store.getState().styling;
         // ReSharper disable once TsResolvedFromInaccessibleModule
-        _.forEach(stylingConfig, function (styleProperty) {
+        __.forEach(stylingConfig, function (styleProperty) {
             var jsonVariable = {};
             jsonVariable[styleProperty.styleVariableName] = styleProperty.value;
             _this.updateStyles(jsonVariable);
@@ -37309,17 +38434,41 @@ var NpsWidget = /** @class */ (function (_super) {
     };
     Object.defineProperty(NpsWidget, "template", {
         get: function () {
-            return polymer_element_1.html(templateObject_1 || (templateObject_1 = __makeTemplateObject(["\n\n      <style is=\"custom-style\">\n\n        paper-fab {\n          margin: var(--nps-margin, );\n          z-index: var(--nps-zindex, 99);\n          position: fixed;\n          top: var(--nps-top);\n          bottom: var(--nps-bottom, 10px);\n          left: var(--nps-left);\n          right: var(--nps-right, 10px);\n          --paper-fab-background: ", ";\n          color: ", ";\n        }\n\n        paper-fab:hover {\n          --paper-fab-background: ", ";\n          color: ", ";\n        }\n\n        paper-slider {\n          --paper-slider-knob-color: ", ";\n          --paper-slider-active-color: ", ";\n          width: 100%;\n          margin-top: 30px;\n          margin-bottom: 20px;\n          --paper-slider-container-color: ", ";\n--paper-slider-markers-color: ", ";\n--paper-slider-knob-start-color: ", ";\n--paper-slider-height: 7px;\n--paper-slider-pin-color: ", ";\n\n\n          \n        }\n\n      </style>\n\n      <paper-fab icon=\"icons:[[iconType]]\" on-click=\"dosm\"></paper-fab>\n\n      <paper-dialog id=\"modal\" modal>\n        <div class=\"container\">\n          <h3>{{introductionStatement}}</h3>\n            <span>[[mainQuestion]]</span>\n            <paper-slider id=\"ratings\" pin snaps min=\"[[answerValueMin]]\" max=\"[[answerValueMax]]\" max-markers=\"[[answerValueMax]]\" step=\"1\" value=\"\"></paper-slider>\n          <div class=\"buttons\">\n            <paper-button dialog-dismiss>Maybe later...</paper-button>\n            <paper-button dialog-confirm>Send my feedback</paper-button>\n          </div>\n        </div>\n      </paper-dialog>\n    "], ["\n\n      <style is=\"custom-style\">\n\n        paper-fab {\n          margin: var(--nps-margin, );\n          z-index: var(--nps-zindex, 99);\n          position: fixed;\n          top: var(--nps-top);\n          bottom: var(--nps-bottom, 10px);\n          left: var(--nps-left);\n          right: var(--nps-right, 10px);\n          --paper-fab-background: ", ";\n          color: ", ";\n        }\n\n        paper-fab:hover {\n          --paper-fab-background: ", ";\n          color: ", ";\n        }\n\n        paper-slider {\n          --paper-slider-knob-color: ", ";\n          --paper-slider-active-color: ", ";\n          width: 100%;\n          margin-top: 30px;\n          margin-bottom: 20px;\n          --paper-slider-container-color: ", ";\n--paper-slider-markers-color: ", ";\n--paper-slider-knob-start-color: ", ";\n--paper-slider-height: 7px;\n--paper-slider-pin-color: ", ";\n\n\n          \n        }\n\n      </style>\n\n      <paper-fab icon=\"icons:[[iconType]]\" on-click=\"dosm\"></paper-fab>\n\n      <paper-dialog id=\"modal\" modal>\n        <div class=\"container\">\n          <h3>{{introductionStatement}}</h3>\n            <span>[[mainQuestion]]</span>\n            <paper-slider id=\"ratings\" pin snaps min=\"[[answerValueMin]]\" max=\"[[answerValueMax]]\" max-markers=\"[[answerValueMax]]\" step=\"1\" value=\"\"></paper-slider>\n          <div class=\"buttons\">\n            <paper-button dialog-dismiss>Maybe later...</paper-button>\n            <paper-button dialog-confirm>Send my feedback</paper-button>\n          </div>\n        </div>\n      </paper-dialog>\n    "])), ColorHelper.backgroundColour(), ColorHelper.foregroundColour(), ColorHelper.backgroundColourHover(), ColorHelper.foregroundColourHover(), ColorHelper.backgroundColourHover(), ColorHelper.backgroundColourHover(), ColorHelper.backgroundColour(), ColorHelper.foregroundColour(), ColorHelper.foregroundColour(), ColorHelper.backgroundColourHover());
+            return polymer_element_1.html(templateObject_1 || (templateObject_1 = __makeTemplateObject(["\n\n      <style is=\"custom-style\">\n\n        paper-fab {\n          margin: var(--nps-margin, );\n          z-index: var(--nps-zindex, 99);\n          position: fixed;\n          top: var(--nps-top);\n          bottom: var(--nps-bottom, 10px);\n          left: var(--nps-left);\n          right: var(--nps-right, 10px);\n          --paper-fab-background: ", ";\n          color: ", ";\n        }\n\n        paper-fab:hover {\n          --paper-fab-background: ", ";\n          color: ", ";\n        }\n\n        paper-slider {\n        --paper-slider-knob-color: ", ";\n        --paper-slider-active-color: ", ";\n        margin-bottom: 20px;\n        --paper-slider-container-color: ", ";\n        --paper-slider-markers-color: ", ";\n        --paper-slider-knob-start-color: ", ";\n        --paper-slider-height: 7px;\n        --paper-slider-pin-color: ", ";\n        width: 95%;\n        margin-top: 30px;\n        float: left;\n        }\n\n      </style>\n\n      <iron-localstorage id=\"localstorage\" name=\"\" value=\"[[myLocalStorage]]\"></iron-localstorage>\n\n      <paper-fab id=\"paper-fab\" icon=\"icons:[[iconType]]\" on-click=\"onFabClick\"></paper-fab>\n\n      <paper-dialog id=\"modal\" modal>\n        <div class=\"container\">\n          <h3>[[introductionStatement]]</h3>\n            <div class=\"container\"  style=\"width: 100%\">\n              [[mainQuestion]]\n              <paper-slider id=\"ratings\" pin snaps min=\"[[answerValueMin]]\" max=\"[[answerValueMax]]\" max-markers=\"[[answerValueMax]]\" step=\"1\" immediate-value=\"{{rating}}\" on-immediate-value-changed=\"onSliderImmediateChange\"></paper-slider>\n              <div style=\"float: right; width: 5%; text-align: right; padding-top: 22px;\">\n                <h2>{{rating}}</h2>\n              </div>\n            </div>\n            <div class=\"container\" style=\"float: left; width: 100%;\">\n              <paper-textarea label$=\"[[selectedAnswerRangeQuestion]] (optional)\" on-value-changed=\"onAnswerRangeQuestionResponseChange\" value=\"{{answerRangeQuestionResponse}}\"></paper-textarea>\n              <br/>\n            </div>\n            <div class=\"container\" style=\"width: 100%\">\n              <div class=\"buttons\" style=\"float: right\">\n                <paper-button dialog-dismiss>Maybe later...</paper-button>\n                <paper-button dialog-confirm>Send my feedback</paper-button>\n              </div>\n            </div>\n            <br/>\n        </div>\n      </paper-dialog>\n    "], ["\n\n      <style is=\"custom-style\">\n\n        paper-fab {\n          margin: var(--nps-margin, );\n          z-index: var(--nps-zindex, 99);\n          position: fixed;\n          top: var(--nps-top);\n          bottom: var(--nps-bottom, 10px);\n          left: var(--nps-left);\n          right: var(--nps-right, 10px);\n          --paper-fab-background: ", ";\n          color: ", ";\n        }\n\n        paper-fab:hover {\n          --paper-fab-background: ", ";\n          color: ", ";\n        }\n\n        paper-slider {\n        --paper-slider-knob-color: ", ";\n        --paper-slider-active-color: ", ";\n        margin-bottom: 20px;\n        --paper-slider-container-color: ", ";\n        --paper-slider-markers-color: ", ";\n        --paper-slider-knob-start-color: ", ";\n        --paper-slider-height: 7px;\n        --paper-slider-pin-color: ", ";\n        width: 95%;\n        margin-top: 30px;\n        float: left;\n        }\n\n      </style>\n\n      <iron-localstorage id=\"localstorage\" name=\"\" value=\"[[myLocalStorage]]\"></iron-localstorage>\n\n      <paper-fab id=\"paper-fab\" icon=\"icons:[[iconType]]\" on-click=\"onFabClick\"></paper-fab>\n\n      <paper-dialog id=\"modal\" modal>\n        <div class=\"container\">\n          <h3>[[introductionStatement]]</h3>\n            <div class=\"container\"  style=\"width: 100%\">\n              [[mainQuestion]]\n              <paper-slider id=\"ratings\" pin snaps min=\"[[answerValueMin]]\" max=\"[[answerValueMax]]\" max-markers=\"[[answerValueMax]]\" step=\"1\" immediate-value=\"{{rating}}\" on-immediate-value-changed=\"onSliderImmediateChange\"></paper-slider>\n              <div style=\"float: right; width: 5%; text-align: right; padding-top: 22px;\">\n                <h2>{{rating}}</h2>\n              </div>\n            </div>\n            <div class=\"container\" style=\"float: left; width: 100%;\">\n              <paper-textarea label$=\"[[selectedAnswerRangeQuestion]] (optional)\" on-value-changed=\"onAnswerRangeQuestionResponseChange\" value=\"{{answerRangeQuestionResponse}}\"></paper-textarea>\n              <br/>\n            </div>\n            <div class=\"container\" style=\"width: 100%\">\n              <div class=\"buttons\" style=\"float: right\">\n                <paper-button dialog-dismiss>Maybe later...</paper-button>\n                <paper-button dialog-confirm>Send my feedback</paper-button>\n              </div>\n            </div>\n            <br/>\n        </div>\n      </paper-dialog>\n    "])), ColorHelper.backgroundColour(), ColorHelper.foregroundColour(), ColorHelper.backgroundColourHover(), ColorHelper.foregroundColourHover(), ColorHelper.backgroundColourHover(), ColorHelper.backgroundColourHover(), ColorHelper.backgroundColour(), ColorHelper.foregroundColour(), ColorHelper.foregroundColour(), ColorHelper.backgroundColourHover());
         },
         enumerable: true,
         configurable: true
     });
     NpsWidget.prototype.ready = function () {
         _super.prototype.ready.call(this);
+        // Get config to read the widget name and construct a unique id for local storage
+        var localStorageId = "nps-widget-nameof-" + this.store.getState().settings.miscSettings.widgetName;
+        this.$.localstorage.name = localStorageId;
+        // Check to see if there's any values to hydrate
+        var localStorageData = window.localStorage.getItem(localStorageId);
+        if (localStorageData != null) {
+            // ReSharper disable once TsResolvedFromInaccessibleModule
+            var localState = __.assign({}, { userState: JSON.parse(localStorageData) });
+            // We can't use the bound property here as it's bound to immediate-change, so let's
+            // call the directly value prop directly, which will change the immed-value
+            // which will call the changed event below and alter the state
+            this.$.ratings.value = localState.userState.rating;
+            this.answerRangeQuestionResponse = localState.userState.answerRangeQuestionResponse;
+        }
     };
-    NpsWidget.prototype.dosm = function () {
-        console.log('dosm clicked');
+    NpsWidget.prototype.onFabClick = function () {
         this.$.modal.open();
+    };
+    // UI items that are user input can be two-way bound but state management still needs to know about the change.
+    // Any programatic change will trigger the events below and will channge the store
+    NpsWidget.prototype.onSliderImmediateChange = function (e) {
+        // TODO: Troubleshoot why type safety isn't workgin here - in the meantime cast to any
+        this.store.dispatch((actions_2.setRatingValueThunk(e.target.immediateValue, new AnswerRangeQuestionFinder_1.AnswerRangeQuestionFinder())));
+        console.log(this.store.getState());
+    };
+    NpsWidget.prototype.onAnswerRangeQuestionResponseChange = function (e) {
+        this.store.dispatch((actions_2.setAnswerRangeQuestionResponse(e.target.value)));
+        console.log(this.store.getState());
     };
     return NpsWidget;
 }(PolymerElement));
@@ -37375,6 +38524,33 @@ var StyleDefinitionsDataHelper = /** @class */ (function () {
     return StyleDefinitionsDataHelper;
 }());
 exports.default = StyleDefinitionsDataHelper;
+
+
+/***/ }),
+
+/***/ "./src/nps-widget/services/AnswerRangeQuestionFinder.ts":
+/*!**************************************************************!*\
+  !*** ./src/nps-widget/services/AnswerRangeQuestionFinder.ts ***!
+  \**************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var _ = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
+var AnswerRangeQuestionFinder = /** @class */ (function () {
+    function AnswerRangeQuestionFinder() {
+    }
+    AnswerRangeQuestionFinder.prototype.findAnswerRangeByRangeValue = function (answerRanges, rangeValue) {
+        // ReSharper disable once TsResolvedFromInaccessibleModule
+        return _.find(answerRanges, function (answerRange) {
+            return answerRange.start <= rangeValue && rangeValue <= answerRange.end;
+        });
+    };
+    return AnswerRangeQuestionFinder;
+}());
+exports.AnswerRangeQuestionFinder = AnswerRangeQuestionFinder;
 
 
 /***/ }),
@@ -37480,9 +38656,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var redux_1 = __webpack_require__(/*! redux */ "./node_modules/redux/es/redux.js");
 var reducer_1 = __webpack_require__(/*! ./styling/reducer */ "./src/nps-widget/store/styling/reducer.ts");
 var reducer_2 = __webpack_require__(/*! ./settings/reducer */ "./src/nps-widget/store/settings/reducer.ts");
+var reducer_3 = __webpack_require__(/*! ./userstate/reducer */ "./src/nps-widget/store/userstate/reducer.ts");
 var reducers = redux_1.combineReducers({
     styling: reducer_1.default,
-    settings: reducer_2.default
+    settings: reducer_2.default,
+    userState: reducer_3.default
 });
 exports.default = reducers;
 
@@ -37555,7 +38733,7 @@ var MiscSettings = Types.MiscSettings;
 var Actions = __webpack_require__(/*! ./actions */ "./src/nps-widget/store/settings/actions.ts");
 var _ = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
 // Type-safe initialState!
-exports.initialState = new Settings(new Array(new AnswerRange(0, 10, 'Is there anything we can do to improve our service?')), new Array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10), new MiscSettings('Default widget', 'Hi there! We value your feedback on this service so we can better serve you. Could you please take a moment to answer this question?', 'On a scale of 0 - 10, how likely would you be to use this service again?', 90));
+exports.initialState = new Settings(new Array(new AnswerRange(0, 10, 'Is there anything we can do to improve our service?')), new Array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10), new MiscSettings('Default widget', 'We value your feedback on this service. It helps us better serve you. Please take a moment to answer the following,', 'On a scale of 0 - 10, how likely would you be to use this service again?', 90));
 var SettingsReducer = function (state, action) {
     if (state === void 0) { state = exports.initialState; }
     switch (action.type) {
@@ -37737,6 +38915,140 @@ var StyleProperty = /** @class */ (function () {
     return StyleProperty;
 }());
 exports.StyleProperty = StyleProperty;
+
+
+/***/ }),
+
+/***/ "./src/nps-widget/store/userstate/actions.ts":
+/*!***************************************************!*\
+  !*** ./src/nps-widget/store/userstate/actions.ts ***!
+  \***************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var UserStateActionTypeKeys;
+(function (UserStateActionTypeKeys) {
+    UserStateActionTypeKeys["SetRating"] = "SET_RATING";
+    UserStateActionTypeKeys["SetSelectedAnswerRangeQuestion"] = "SET_SELECTED_ANSWER_RANGE_QUESTION";
+    UserStateActionTypeKeys["SetAnswerRangeQuestionResponse"] = "SET_ANSWER_RANGE_RESPONSE";
+    UserStateActionTypeKeys["OtherAction"] = "___other_action____";
+})(UserStateActionTypeKeys = exports.UserStateActionTypeKeys || (exports.UserStateActionTypeKeys = {}));
+exports.setRatingValue = function (rating) { return ({
+    type: UserStateActionTypeKeys.SetRating,
+    rating: rating
+}); };
+var setSelectedAnswerRangeQuestion = function (question) { return ({
+    type: UserStateActionTypeKeys.SetSelectedAnswerRangeQuestion,
+    question: question
+}); };
+exports.setAnswerRangeQuestionResponse = function (response) { return ({
+    type: UserStateActionTypeKeys.SetAnswerRangeQuestionResponse,
+    response: response
+}); };
+exports.setRatingValueThunk = function (rating, AnswerRangeQuestionFinder) {
+    return function (dispatch, getState) {
+        // side effects here
+        // find the correct answer range from the selected rating
+        var selectedAnswerRange = AnswerRangeQuestionFinder.findAnswerRangeByRangeValue(getState().settings.answerRanges, rating);
+        if (selectedAnswerRange != null)
+            dispatch(setSelectedAnswerRangeQuestion(selectedAnswerRange.question));
+        return dispatch(exports.setRatingValue(rating));
+    };
+};
+//  export const addMiscSettings: ActionCreator<IAddMiscSettings> = (miscSettings: MiscSettings) => ({
+//    type: SettingActionTypeKeys.AddMiscSettings,
+//    miscSettings: miscSettings
+//  });
+//  export const setAnswerRangesThunk: ActionCreator<ThunkResult<Action>> =
+//  (
+//    answerRanges: Array<AnswerRange>,
+//    answerValuesCreator: IAnswerValuesCreator,
+//    answerValueValidator?: IAnswerValueValidator
+//  ) => {
+//    return (dispatch: Dispatch<ISetAnswerRangesAction>): Action  => {
+//      // side effects here
+//      if (answerValueValidator) {
+//        // TODO: invoke the validator here but it's NOT IMPLEMENTED
+//      }
+//      let answerValues: number[] = new Array<number>();
+//      // ReSharper disable once TsResolvedFromInaccessibleModule
+//      _.forEach(answerRanges, (item) => {
+//        // ReSharper disable once TsResolvedFromInaccessibleModule
+//        answerValues = _.concat(answerValues, answerValuesCreator.getValues(item.start, item.end));
+//      });
+//      (dispatch as Dispatch<ISetAnswerValues>)(setAnswerValues(answerValues));
+//      return dispatch({
+//        type: SettingActionTypeKeys.SetRange,
+//        answerRanges: answerRanges
+//      });
+//    };
+//  };
+
+
+/***/ }),
+
+/***/ "./src/nps-widget/store/userstate/reducer.ts":
+/*!***************************************************!*\
+  !*** ./src/nps-widget/store/userstate/reducer.ts ***!
+  \***************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var Actions = __webpack_require__(/*! ./actions */ "./src/nps-widget/store/userstate/actions.ts");
+var _ = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
+var types_1 = __webpack_require__(/*! ./types */ "./src/nps-widget/store/userstate/types.ts");
+// Type-safe initialState!
+exports.initialState = new types_1.UserState();
+var UserStateReducer = function (state, action) {
+    if (state === void 0) { state = exports.initialState; }
+    switch (action.type) {
+        case Actions.UserStateActionTypeKeys.SetRating:
+            state.rating = action.rating;
+            // ReSharper disable once TsResolvedFromInaccessibleModule
+            return _.assign({}, state);
+        case Actions.UserStateActionTypeKeys.SetSelectedAnswerRangeQuestion:
+            state.selectedAnswerRangeQuestion = action.question;
+            // ReSharper disable once TsResolvedFromInaccessibleModule
+            return _.assign({}, state);
+        case Actions.UserStateActionTypeKeys.SetAnswerRangeQuestionResponse:
+            state.answerRangeQuestionResponse = action.response;
+            // ReSharper disable once TsResolvedFromInaccessibleModule
+            return _.assign({}, state);
+        default:
+            return state;
+    }
+    ;
+};
+exports.default = UserStateReducer;
+
+
+/***/ }),
+
+/***/ "./src/nps-widget/store/userstate/types.ts":
+/*!*************************************************!*\
+  !*** ./src/nps-widget/store/userstate/types.ts ***!
+  \*************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var UserState = /** @class */ (function () {
+    function UserState(rating, selectedAnswerRangeQuestion, answerRangeQuestionResponse) {
+        this.rating = rating;
+        this.selectedAnswerRangeQuestion = selectedAnswerRangeQuestion;
+        this.answerRangeQuestionResponse = answerRangeQuestionResponse;
+    }
+    return UserState;
+}());
+exports.UserState = UserState;
 
 
 /***/ }),

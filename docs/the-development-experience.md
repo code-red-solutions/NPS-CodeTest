@@ -21,7 +21,10 @@ order: 2
         foregroundColour: 'white', 
         top: '20px', 
         right: '20px'
-      } 
+      },
+	  settings: {
+		name: purple-widget
+	  }
     };
 
     initialzeCodeRedNpsWidget(npsConfig);

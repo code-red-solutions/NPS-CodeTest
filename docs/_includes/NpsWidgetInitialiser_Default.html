@@ -1,32 +1,43 @@
 <script type="text/javascript">
 
-    /*
+	var npsConfig = {
+	  /*
+	  Possible values for styling are:
+		zindex
+		backgroundColour
+		backgroundHoverColour
+		foregroundColour
+		foregroundHoverColour
+		top
+		bottom
+		left
+		right
+		margin
+	  */
+	  styling: {},
+	  settings: {
+		introductionStatement: 'Thank you for using this service. We would appreciate your feedback by answering this question.',
+		mainQuestion: 'How likely would you be to recommend this service to others?',
+		answerRanges: [
+		  {
+			start: 1,
+			end: 4,
+			question: 'What can we do to improve?'
+		  },
+		  {
+			start: 5,
+			end: 8,
+			question: 'Is there anything we can do to improve?'
+		  },
+		  {
+			start: 9,
+			end: 10,
+			question: 'Is there anything you particularly like?'
+		  }
+		],
+		timeOutOnAnswer: 180
+	  }
+	};
+	initialzeCodeRedNpsWidget(npsConfig);
 
-    Possible values are:
-      zindex
-      backgroundColour
-      backgroundHoverColour
-      foregroundColour
-      foregroundHoverColour
-      top
-      bottom
-      left
-      right
-      margin
-
-    */
-
-    var npsConfig = { 
-      // styling: { 
-      //   backgroundHoverColour: '#FFE787', 
-      //   foregroundHoverColour: 'black', 
-      //   backgroundColour: '#f2c40e',
-      //   foregroundColour: 'black', 
-      //   bottom: '20px', 
-      //   right: '20px'
-      // } 
-    };
-
-    initialzeCodeRedNpsWidget(npsConfig);
-
-  </script>
+</script>
