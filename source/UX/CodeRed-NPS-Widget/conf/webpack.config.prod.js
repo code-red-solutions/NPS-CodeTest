@@ -86,7 +86,10 @@ optimization: {
         uglifyOptions: {
           compress: true,
           ecma: 5,
-          mangle: true
+          mangle: true,
+          output: {
+            comments: false
+          }
         },
         sourceMap: false
       })

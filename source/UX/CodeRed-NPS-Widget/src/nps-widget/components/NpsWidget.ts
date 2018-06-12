@@ -1,5 +1,5 @@
 // external libraries
-import { PolymerElement, html } from '@polymer/polymer/polymer-element.js';
+// import { PolymerElement, html } from '@polymer/polymer/polymer-element.js';
 import '@polymer/paper-fab/paper-fab.js';
 import '@polymer/iron-icons/iron-icons.js';
 import '@polymer/paper-styles/color.js';
@@ -8,26 +8,39 @@ import '@polymer/paper-button/paper-button.js';
 import * as _ from 'lodash';
 
 // local source
-import { configureStore } from '../store/store';
-import StylingDispatcher from '../services/StylingDispatcher.ts';
-import StyleDefinitionsMapper from '../services/StyleDefinitionsMapper.ts';
-import StyleDefinitionsDataHelper from '../data/StyleDefinitionsDataHelper.ts';
-import AnswerValuesCreator from '../services/AnswerValuesCreator.ts';
-import { MiscSettings } from '../store/settings/types.ts';
-import { addMiscSettings, setAnswerRangesThunk } from '../store/settings/actions.ts';
+import { configureStore, IApplicationState  } from '../store/store';
+import StylingDispatcher from '../services/StylingDispatcher';
+import StyleDefinitionsMapper from '../services/StyleDefinitionsMapper';
+import StyleDefinitionsDataHelper from '../data/StyleDefinitionsDataHelper';
+import AnswerValuesCreator from '../services/AnswerValuesCreator';
+import { MiscSettings } from '../store/settings/types';
+import { addMiscSettings, setAnswerRangesThunk } from '../store/settings/actions';
+import Polymerpolymerpolymerelement = require('@polymer/polymer/polymer-element');
+import PolymerElement = Polymerpolymerpolymerelement.PolymerElement;
+import ReduxConnector = require('../../utils/ReduxConnector');
+import IReduxBindable = ReduxConnector.IReduxBindable;
+import { Store } from 'redux';
+import { html } from '@polymer/polymer/polymer-element';
+import Types = require('../store/settings/types');
+import AnswerRange = Types.AnswerRange;
+import { connectToRedux } from '../../utils/ReduxConnector';
 
-export default class NpsWidget extends PolymerElement {
+export default class NpsWidget extends PolymerElement implements IReduxBindable {
+
+  private store: Store<IApplicationState> = configureStore(undefined);
+  private introductionStatement: string;
+  private iconType: string = 'feedback';
+  private mainQuestion: string;
 
   static get is() { return 'nps-widget'; }
 
   constructor(config) {
 
     super();
-    this.iconType = 'feedback';
-    this.store = configureStore();
 
     // log the state
     console.log(this.store.getState());
+    // NpsWidget.iconType = 'help';
 
     // Check to see if there's custom config to apply
     if (config != null) {
@@ -48,13 +61,25 @@ export default class NpsWidget extends PolymerElement {
         // Apply any answer settings config
         if (config.settings.answerRanges != null) {
 
+          const answerRanges = new Array<AnswerRange>();
+          // ReSharper disable once TsResolvedFromInaccessibleModule
+          _.forEach(
+            config.settings.answerRanges,
+            (item) => {
+              // ReSharper disable once TsResolvedFromInaccessibleModule
+              answerRanges.push(_.assign(new AnswerRange(), item));
+            }
+          );
+
           this.store.dispatch(
-            setAnswerRangesThunk(config.settings.answerRanges, new AnswerValuesCreator())
+            // TODO: Troubleshoot why type safety isn't workgin here - in the meantime cast to any
+            (setAnswerRangesThunk(answerRanges, new AnswerValuesCreator())) as any
           );
 
         }
 
-        const miscSettings = _.assign(
+        // ReSharper disable once TsResolvedFromInaccessibleModule
+        const miscSettings: MiscSettings = _.assign(
           new MiscSettings(),
           {
             widgetName: config.settings.widgetName,
@@ -64,6 +89,7 @@ export default class NpsWidget extends PolymerElement {
           }
         );
 
+        // TODO: Troubleshoot why type safety isn't workgin here - in the meantime cast to any
         this.store.dispatch(addMiscSettings(miscSettings));
 
       }
@@ -75,26 +101,27 @@ export default class NpsWidget extends PolymerElement {
 
   }
 
-  static get properties() {
-    return {
-      iconType: {
-        type: String,
-        value: this.iconType
-      }
-    };
+  stateReceiver(state: IApplicationState): void {
+    this.introductionStatement = state.settings.miscSettings.introductionStatement;
+    this.mainQuestion = state.settings.miscSettings.mainQuestion;
+  }
+
+  connectedCallback() {
+    super.connectedCallback();
+    connectToRedux(this, this.store);
   }
 
   render() {
 
     const stylingConfig = this.store.getState().styling;
-    const widget = this;
 
-    _.forEach(stylingConfig, function (styleProperty) {
+    // ReSharper disable once TsResolvedFromInaccessibleModule
+    _.forEach(stylingConfig, styleProperty => {
 
       const jsonVariable = {};
 
       jsonVariable[styleProperty.styleVariableName] = styleProperty.value;
-      widget.updateStyles(jsonVariable);
+      this.updateStyles(jsonVariable);
       console.log(`Called "this.updateStyles(${styleProperty.styleVariableName}: ${styleProperty.value})"`);
 
     });
@@ -125,11 +152,11 @@ export default class NpsWidget extends PolymerElement {
 
       </style>
 
-      <paper-fab icon="icons:{{iconType}}" on-click="dosm"></paper-fab>
+      <paper-fab icon="icons:[[iconType]]" on-click="dosm"></paper-fab>
 
       <paper-dialog id="modal" modal>
-        <h2>Header</h2>
-          Lorem ipsum...
+        <h2>{{introductionStatement}}</h2>
+          <div>[[mainQuestion]]</div>
         <div class="buttons">
           <paper-button dialog-dismiss>Cancel</paper-button>
           <paper-button dialog-confirm autofocus>Accept</paper-button>
@@ -146,7 +173,6 @@ export default class NpsWidget extends PolymerElement {
   dosm() {
     console.log('dosm clicked');
     this.$.modal.open();
-    this.iconType = this.iconType === 'help' ? 'feedback' : 'help';
   }
 }
 

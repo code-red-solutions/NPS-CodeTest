@@ -1,3 +1,3 @@
-import NpsWidget from './nps-widget/index.ts';
+import NpsWidget from './nps-widget/components/NpsWidget.ts';
 
 export { NpsWidget };

@@ -34158,199 +34158,151 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.NpsWidget = undefined;
 
-var _index = __webpack_require__(/*! ./nps-widget/index.ts */ "./src/nps-widget/index.ts");
+var _NpsWidget = __webpack_require__(/*! ./nps-widget/components/NpsWidget.ts */ "./src/nps-widget/components/NpsWidget.ts");
 
-var _index2 = _interopRequireDefault(_index);
+var _NpsWidget2 = _interopRequireDefault(_NpsWidget);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-exports.NpsWidget = _index2.default;
+exports.NpsWidget = _NpsWidget2.default;
 
 /***/ }),
 
-/***/ "./src/nps-widget/components/NpsWidget.js":
+/***/ "./src/nps-widget/components/NpsWidget.ts":
 /*!************************************************!*\
-  !*** ./src/nps-widget/components/NpsWidget.js ***!
+  !*** ./src/nps-widget/components/NpsWidget.ts ***!
   \************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _templateObject = _taggedTemplateLiteral(['\n\n      <style is="custom-style">\n\n        paper-fab {\n          margin: var(--nps-margin, );\n          z-index: var(--nps-zindex, 99);\n          position: fixed;\n          top: var(--nps-top);\n          bottom: var(--nps-bottom, 10px);\n          left: var(--nps-left);\n          right: var(--nps-right, 10px);\n          --paper-fab-background: var(--nps-background-color, #FFE787);\n          color: var(--nps-foreground-color, lightgrey);\n        }\n\n        paper-fab:hover {\n          --paper-fab-background: var(--nps-background-hover-colour, #f2c40e);\n          color: var(--nps-foreground-hover-colour, black);\n        }\n\n      </style>\n\n      <paper-fab icon="icons:{{iconType}}" on-click="dosm"></paper-fab>\n\n      <paper-dialog id="modal" modal>\n        <h2>Header</h2>\n          Lorem ipsum...\n        <div class="buttons">\n          <paper-button dialog-dismiss>Cancel</paper-button>\n          <paper-button dialog-confirm autofocus>Accept</paper-button>\n        </div>\n      </paper-dialog>\n    '], ['\n\n      <style is="custom-style">\n\n        paper-fab {\n          margin: var(--nps-margin, );\n          z-index: var(--nps-zindex, 99);\n          position: fixed;\n          top: var(--nps-top);\n          bottom: var(--nps-bottom, 10px);\n          left: var(--nps-left);\n          right: var(--nps-right, 10px);\n          --paper-fab-background: var(--nps-background-color, #FFE787);\n          color: var(--nps-foreground-color, lightgrey);\n        }\n\n        paper-fab:hover {\n          --paper-fab-background: var(--nps-background-hover-colour, #f2c40e);\n          color: var(--nps-foreground-hover-colour, black);\n        }\n\n      </style>\n\n      <paper-fab icon="icons:{{iconType}}" on-click="dosm"></paper-fab>\n\n      <paper-dialog id="modal" modal>\n        <h2>Header</h2>\n          Lorem ipsum...\n        <div class="buttons">\n          <paper-button dialog-dismiss>Cancel</paper-button>\n          <paper-button dialog-confirm autofocus>Accept</paper-button>\n        </div>\n      </paper-dialog>\n    ']);
-
-var _polymerElement = __webpack_require__(/*! @polymer/polymer/polymer-element.js */ "./node_modules/@polymer/polymer/polymer-element.js");
-
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __makeTemplateObject = (this && this.__makeTemplateObject) || function (cooked, raw) {
+    if (Object.defineProperty) { Object.defineProperty(cooked, "raw", { value: raw }); } else { cooked.raw = raw; }
+    return cooked;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+// external libraries
+// import { PolymerElement, html } from '@polymer/polymer/polymer-element.js';
 __webpack_require__(/*! @polymer/paper-fab/paper-fab.js */ "./node_modules/@polymer/paper-fab/paper-fab.js");
-
 __webpack_require__(/*! @polymer/iron-icons/iron-icons.js */ "./node_modules/@polymer/iron-icons/iron-icons.js");
-
 __webpack_require__(/*! @polymer/paper-styles/color.js */ "./node_modules/@polymer/paper-styles/color.js");
-
 __webpack_require__(/*! @polymer/paper-dialog/paper-dialog.js */ "./node_modules/@polymer/paper-dialog/paper-dialog.js");
-
 __webpack_require__(/*! @polymer/paper-button/paper-button.js */ "./node_modules/@polymer/paper-button/paper-button.js");
-
-var _lodash = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
-
-var _ = _interopRequireWildcard(_lodash);
-
-var _store = __webpack_require__(/*! ../store/store */ "./src/nps-widget/store/store.ts");
-
-var _StylingDispatcher = __webpack_require__(/*! ../services/StylingDispatcher.ts */ "./src/nps-widget/services/StylingDispatcher.ts");
-
-var _StylingDispatcher2 = _interopRequireDefault(_StylingDispatcher);
-
-var _StyleDefinitionsMapper = __webpack_require__(/*! ../services/StyleDefinitionsMapper.ts */ "./src/nps-widget/services/StyleDefinitionsMapper.ts");
-
-var _StyleDefinitionsMapper2 = _interopRequireDefault(_StyleDefinitionsMapper);
-
-var _StyleDefinitionsDataHelper = __webpack_require__(/*! ../data/StyleDefinitionsDataHelper.ts */ "./src/nps-widget/data/StyleDefinitionsDataHelper.ts");
-
-var _StyleDefinitionsDataHelper2 = _interopRequireDefault(_StyleDefinitionsDataHelper);
-
-var _AnswerValuesCreator = __webpack_require__(/*! ../services/AnswerValuesCreator.ts */ "./src/nps-widget/services/AnswerValuesCreator.ts");
-
-var _AnswerValuesCreator2 = _interopRequireDefault(_AnswerValuesCreator);
-
-var _types = __webpack_require__(/*! ../store/settings/types.ts */ "./src/nps-widget/store/settings/types.ts");
-
-var _actions = __webpack_require__(/*! ../store/settings/actions.ts */ "./src/nps-widget/store/settings/actions.ts");
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
-function _taggedTemplateLiteral(strings, raw) { return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } // external libraries
-
-
+var _ = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
 // local source
-
-
-var NpsWidget = function (_PolymerElement) {
-  _inherits(NpsWidget, _PolymerElement);
-
-  _createClass(NpsWidget, null, [{
-    key: 'is',
-    get: function get() {
-      return 'nps-widget';
-    }
-  }]);
-
-  function NpsWidget(config) {
-    _classCallCheck(this, NpsWidget);
-
-    var _this = _possibleConstructorReturn(this, (NpsWidget.__proto__ || Object.getPrototypeOf(NpsWidget)).call(this));
-
-    _this.iconType = 'feedback';
-    _this.store = (0, _store.configureStore)();
-
-    // log the state
-    console.log(_this.store.getState());
-
-    // Check to see if there's custom config to apply
-    if (config != null) {
-
-      // Apply any styling config
-      if (config.styling != null) {
-        var stylingDispatcher = new _StylingDispatcher2.default(_this.store, new _StyleDefinitionsMapper2.default(_StyleDefinitionsDataHelper2.default.GetData()));
-
-        stylingDispatcher.dispatchStyles(config.styling);
-      }
-
-      // Check to see if there's any settings config
-      if (config.settings != null) {
-
-        // Apply any answer settings config
-        if (config.settings.answerRanges != null) {
-
-          _this.store.dispatch((0, _actions.setAnswerRangesThunk)(config.settings.answerRanges, new _AnswerValuesCreator2.default()));
+var store_1 = __webpack_require__(/*! ../store/store */ "./src/nps-widget/store/store.ts");
+var StylingDispatcher_1 = __webpack_require__(/*! ../services/StylingDispatcher */ "./src/nps-widget/services/StylingDispatcher.ts");
+var StyleDefinitionsMapper_1 = __webpack_require__(/*! ../services/StyleDefinitionsMapper */ "./src/nps-widget/services/StyleDefinitionsMapper.ts");
+var StyleDefinitionsDataHelper_1 = __webpack_require__(/*! ../data/StyleDefinitionsDataHelper */ "./src/nps-widget/data/StyleDefinitionsDataHelper.ts");
+var AnswerValuesCreator_1 = __webpack_require__(/*! ../services/AnswerValuesCreator */ "./src/nps-widget/services/AnswerValuesCreator.ts");
+var types_1 = __webpack_require__(/*! ../store/settings/types */ "./src/nps-widget/store/settings/types.ts");
+var actions_1 = __webpack_require__(/*! ../store/settings/actions */ "./src/nps-widget/store/settings/actions.ts");
+var Polymerpolymerpolymerelement = __webpack_require__(/*! @polymer/polymer/polymer-element */ "./node_modules/@polymer/polymer/polymer-element.js");
+var PolymerElement = Polymerpolymerpolymerelement.PolymerElement;
+var polymer_element_1 = __webpack_require__(/*! @polymer/polymer/polymer-element */ "./node_modules/@polymer/polymer/polymer-element.js");
+var Types = __webpack_require__(/*! ../store/settings/types */ "./src/nps-widget/store/settings/types.ts");
+var AnswerRange = Types.AnswerRange;
+var ReduxConnector_1 = __webpack_require__(/*! ../../utils/ReduxConnector */ "./src/utils/ReduxConnector.ts");
+var NpsWidget = /** @class */ (function (_super) {
+    __extends(NpsWidget, _super);
+    function NpsWidget(config) {
+        var _this = _super.call(this) || this;
+        _this.store = store_1.configureStore(undefined);
+        _this.iconType = 'feedback';
+        // log the state
+        console.log(_this.store.getState());
+        // NpsWidget.iconType = 'help';
+        // Check to see if there's custom config to apply
+        if (config != null) {
+            // Apply any styling config
+            if (config.styling != null) {
+                var stylingDispatcher = new StylingDispatcher_1.default(_this.store, new StyleDefinitionsMapper_1.default(StyleDefinitionsDataHelper_1.default.GetData()));
+                stylingDispatcher.dispatchStyles(config.styling);
+            }
+            // Check to see if there's any settings config
+            if (config.settings != null) {
+                // Apply any answer settings config
+                if (config.settings.answerRanges != null) {
+                    var answerRanges_1 = new Array();
+                    // ReSharper disable once TsResolvedFromInaccessibleModule
+                    _.forEach(config.settings.answerRanges, function (item) {
+                        // ReSharper disable once TsResolvedFromInaccessibleModule
+                        answerRanges_1.push(_.assign(new AnswerRange(), item));
+                    });
+                    _this.store.dispatch(
+                    // TODO: Troubleshoot why type safety isn't workgin here - in the meantime cast to any
+                    (actions_1.setAnswerRangesThunk(answerRanges_1, new AnswerValuesCreator_1.default())));
+                }
+                // ReSharper disable once TsResolvedFromInaccessibleModule
+                var miscSettings = _.assign(new types_1.MiscSettings(), {
+                    widgetName: config.settings.widgetName,
+                    timeOutOnAnswer: config.settings.timeOutOnAnswer,
+                    mainQuestion: config.settings.mainQuestion,
+                    introductionStatement: config.settings.introductionStatement
+                });
+                // TODO: Troubleshoot why type safety isn't workgin here - in the meantime cast to any
+                _this.store.dispatch(actions_1.addMiscSettings(miscSettings));
+            }
         }
-
-        var miscSettings = _.assign(new _types.MiscSettings(), {
-          widgetName: config.settings.widgetName,
-          timeOutOnAnswer: config.settings.timeOutOnAnswer,
-          mainQuestion: config.settings.mainQuestion,
-          introductionStatement: config.settings.introductionStatement
+        // log the state
+        console.log(_this.store.getState());
+        return _this;
+    }
+    Object.defineProperty(NpsWidget, "is", {
+        get: function () { return 'nps-widget'; },
+        enumerable: true,
+        configurable: true
+    });
+    NpsWidget.prototype.stateReceiver = function (state) {
+        this.introductionStatement = state.settings.miscSettings.introductionStatement;
+        this.mainQuestion = state.settings.miscSettings.mainQuestion;
+    };
+    NpsWidget.prototype.connectedCallback = function () {
+        _super.prototype.connectedCallback.call(this);
+        ReduxConnector_1.connectToRedux(this, this.store);
+    };
+    NpsWidget.prototype.render = function () {
+        var _this = this;
+        var stylingConfig = this.store.getState().styling;
+        // ReSharper disable once TsResolvedFromInaccessibleModule
+        _.forEach(stylingConfig, function (styleProperty) {
+            var jsonVariable = {};
+            jsonVariable[styleProperty.styleVariableName] = styleProperty.value;
+            _this.updateStyles(jsonVariable);
+            console.log("Called \"this.updateStyles(" + styleProperty.styleVariableName + ": " + styleProperty.value + ")\"");
         });
-
-        _this.store.dispatch((0, _actions.addMiscSettings)(miscSettings));
-      }
-    }
-
-    // log the state
-    console.log(_this.store.getState());
-
-    return _this;
-  }
-
-  _createClass(NpsWidget, [{
-    key: 'render',
-    value: function render() {
-
-      var stylingConfig = this.store.getState().styling;
-      var widget = this;
-
-      _.forEach(stylingConfig, function (styleProperty) {
-
-        var jsonVariable = {};
-
-        jsonVariable[styleProperty.styleVariableName] = styleProperty.value;
-        widget.updateStyles(jsonVariable);
-        console.log('Called "this.updateStyles(' + styleProperty.styleVariableName + ': ' + styleProperty.value + ')"');
-      });
-    }
-  }, {
-    key: 'ready',
-    value: function ready() {
-      _get(NpsWidget.prototype.__proto__ || Object.getPrototypeOf(NpsWidget.prototype), 'ready', this).call(this);
-    }
-  }, {
-    key: 'dosm',
-    value: function dosm() {
-      console.log('dosm clicked');
-      this.$.modal.open();
-      this.iconType = this.iconType === 'help' ? 'feedback' : 'help';
-    }
-  }], [{
-    key: 'properties',
-    get: function get() {
-      return {
-        iconType: {
-          type: String,
-          value: this.iconType
-        }
-      };
-    }
-  }, {
-    key: 'template',
-    get: function get() {
-      return (0, _polymerElement.html)(_templateObject);
-    }
-  }]);
-
-  return NpsWidget;
-}(_polymerElement.PolymerElement);
-
+    };
+    Object.defineProperty(NpsWidget, "template", {
+        get: function () {
+            return polymer_element_1.html(templateObject_1 || (templateObject_1 = __makeTemplateObject(["\n\n      <style is=\"custom-style\">\n\n        paper-fab {\n          margin: var(--nps-margin, );\n          z-index: var(--nps-zindex, 99);\n          position: fixed;\n          top: var(--nps-top);\n          bottom: var(--nps-bottom, 10px);\n          left: var(--nps-left);\n          right: var(--nps-right, 10px);\n          --paper-fab-background: var(--nps-background-color, #FFE787);\n          color: var(--nps-foreground-color, lightgrey);\n        }\n\n        paper-fab:hover {\n          --paper-fab-background: var(--nps-background-hover-colour, #f2c40e);\n          color: var(--nps-foreground-hover-colour, black);\n        }\n\n      </style>\n\n      <paper-fab icon=\"icons:[[iconType]]\" on-click=\"dosm\"></paper-fab>\n\n      <paper-dialog id=\"modal\" modal>\n        <h2>{{introductionStatement}}</h2>\n          <div>[[mainQuestion]]</div>\n        <div class=\"buttons\">\n          <paper-button dialog-dismiss>Cancel</paper-button>\n          <paper-button dialog-confirm autofocus>Accept</paper-button>\n        </div>\n      </paper-dialog>\n    "], ["\n\n      <style is=\"custom-style\">\n\n        paper-fab {\n          margin: var(--nps-margin, );\n          z-index: var(--nps-zindex, 99);\n          position: fixed;\n          top: var(--nps-top);\n          bottom: var(--nps-bottom, 10px);\n          left: var(--nps-left);\n          right: var(--nps-right, 10px);\n          --paper-fab-background: var(--nps-background-color, #FFE787);\n          color: var(--nps-foreground-color, lightgrey);\n        }\n\n        paper-fab:hover {\n          --paper-fab-background: var(--nps-background-hover-colour, #f2c40e);\n          color: var(--nps-foreground-hover-colour, black);\n        }\n\n      </style>\n\n      <paper-fab icon=\"icons:[[iconType]]\" on-click=\"dosm\"></paper-fab>\n\n      <paper-dialog id=\"modal\" modal>\n        <h2>{{introductionStatement}}</h2>\n          <div>[[mainQuestion]]</div>\n        <div class=\"buttons\">\n          <paper-button dialog-dismiss>Cancel</paper-button>\n          <paper-button dialog-confirm autofocus>Accept</paper-button>\n        </div>\n      </paper-dialog>\n    "])));
+        },
+        enumerable: true,
+        configurable: true
+    });
+    NpsWidget.prototype.ready = function () {
+        _super.prototype.ready.call(this);
+    };
+    NpsWidget.prototype.dosm = function () {
+        console.log('dosm clicked');
+        this.$.modal.open();
+    };
+    return NpsWidget;
+}(PolymerElement));
 exports.default = NpsWidget;
-
-
 window.customElements.define(NpsWidget.is, NpsWidget);
+var templateObject_1;
+
 
 /***/ }),
 
@@ -34386,22 +34338,6 @@ var StyleDefinitionsDataHelper = /** @class */ (function () {
     return StyleDefinitionsDataHelper;
 }());
 exports.default = StyleDefinitionsDataHelper;
-
-
-/***/ }),
-
-/***/ "./src/nps-widget/index.ts":
-/*!*********************************!*\
-  !*** ./src/nps-widget/index.ts ***!
-  \*********************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var NpsWidget_1 = __webpack_require__(/*! ./components/NpsWidget */ "./src/nps-widget/components/NpsWidget.js");
-exports.default = NpsWidget_1.default;
 
 
 /***/ }),
@@ -34582,7 +34518,7 @@ var MiscSettings = Types.MiscSettings;
 var Actions = __webpack_require__(/*! ./actions */ "./src/nps-widget/store/settings/actions.ts");
 var _ = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
 // Type-safe initialState!
-exports.initialState = new Settings(new Array(new AnswerRange(0, 10, 'Is there anything we can do to improve our service?')), new Array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10), new MiscSettings('Default widget', 'Hi there! We value your feedback on this service so we can better serve you. Cpuld you please take a moment to answer this question?', 'On a scale of 0 - 10, how likely would you be to use this service again?', 90));
+exports.initialState = new Settings(new Array(new AnswerRange(0, 10, 'Is there anything we can do to improve our service?')), new Array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10), new MiscSettings('Default widget', 'Hi there! We value your feedback on this service so we can better serve you. Could you please take a moment to answer this question?', 'On a scale of 0 - 10, how likely would you be to use this service again?', 90));
 var SettingsReducer = function (state, action) {
     if (state === void 0) { state = exports.initialState; }
     switch (action.type) {
@@ -34805,6 +34741,43 @@ var Dictionary = /** @class */ (function () {
     return Dictionary;
 }());
 exports.Dictionary = Dictionary;
+
+
+/***/ }),
+
+/***/ "./src/utils/ReduxConnector.ts":
+/*!*************************************!*\
+  !*** ./src/utils/ReduxConnector.ts ***!
+  \*************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+/**
+ * Intended to be used in element inside the method
+ * connectedCallback
+ *
+ * <pre>
+ * <strong>
+ *   connectedCallback() {
+ *       super.connectedCallback();
+ *       connectToRedux(this);
+ *   }
+ * </strong>
+ * </pre>
+ *
+ * @param {ReduxBindable} elm
+ * @param {Store<IApplicationState>} store
+ */
+function connectToRedux(elm, store) {
+    elm.stateReceiver(store.getState());
+    store.subscribe(function () {
+        elm.stateReceiver(store.getState());
+    });
+}
+exports.connectToRedux = connectToRedux;
 
 
 /***/ })

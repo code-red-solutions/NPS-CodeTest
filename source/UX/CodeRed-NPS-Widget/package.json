@@ -8,7 +8,6 @@
     "build-prod": "webpack --config conf/webpack.config.prod.js --colors",
     "build-dev": "webpack --config conf/webpack.config.dev.js --colors",
     "build-dev:watch": "webpack --config conf/webpack.config.dev.js -w --colors",
-    "build-test:watch": "webpack --config conf/webpack.config.test.js -w --progress --colors --watch",
     "run-tests": "mocha --require ts-node/register --colors --recursive ./test/**/*.spec.ts",
     "run-tests:watch": "mocha --require ts-node/register --colors --watch-extensions ts --watch --recursive ./test/**/*.spec.ts"
   },

@@ -52,7 +52,7 @@ export const addMiscSettings: ActionCreator<IAddMiscSettings> = (miscSettings: M
 
 export const setAnswerRangesThunk: ActionCreator<ThunkResult<Action>> =
 (
-  answerRanges: AnswerRange[],
+  answerRanges: Array<AnswerRange>,
   answerValuesCreator: IAnswerValuesCreator,
   answerValueValidator?: IAnswerValueValidator
 ) => {
