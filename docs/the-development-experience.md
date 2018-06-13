@@ -23,7 +23,7 @@ order: 2
         right: '20px'
       },
 	  settings: {
-		name: purple-widget
+		name: 'purple-widget'
 	  }
     };
 
