@@ -8,7 +8,7 @@ sectionName: devexp
 icon: fa-road
 excludeDefaultWidget: true
 onlyRawContent: true
-order: 3
+order: 4
 ---
 
 <script type="text/javascript">
@@ -48,7 +48,7 @@ order: 3
           }
         ],
         timeOutOnAnswer: 180,
-	widgetName: 'purple-widget'
+	      widgetName: 'purple-widget'
       }
     };
 
