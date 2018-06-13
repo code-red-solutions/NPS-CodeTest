@@ -20,7 +20,7 @@ namespace CodeRed.NPS.API.Functions
 	{
 		[FunctionName("NPSSubmission")]
 		public static async Task<HttpResponseMessage> Run(
-			[HttpTrigger(AuthorizationLevel.Anonymous, "GET")] HttpRequestMessage req,
+			[HttpTrigger(AuthorizationLevel.Anonymous, "POST")] HttpRequestMessage req,
             [Resolve] ILogger log,
 			[Resolve] IService service)
 		{
