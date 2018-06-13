@@ -63,6 +63,7 @@ author: Paul Sorauer
 company: Code Red Solutions Pty Ltd
 email: paul@codered.com.au
 avatar: assets/images/feedback-avatar.png
+avatar_media_type: image/png
 
 # You'll want to customize url and baseurl for your own site:
 baseurl: "NPS-CodeTest/" # the subpath of your site, e.g. /blog
