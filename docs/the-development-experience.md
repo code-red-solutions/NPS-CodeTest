@@ -48,9 +48,7 @@ order: 2
           }
         ],
         timeOutOnAnswer: 180,
-	miscSettings: {
-		widgetName: 'purple-widget'
-	}
+	widgetName: 'purple-widget'
       }
     };
 
