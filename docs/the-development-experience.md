@@ -23,7 +23,7 @@ order: 2
         right: '20px'
       },
       settings: {
-        introductionStatement: 'Thank you for reading this far! Please let us know how it's going...',
+        introductionStatement: 'Thank you for reading this far! Please let us know how it\'s going...',
         mainQuestion: 'On a scale of 1 - 100, how easy is this documentation to understand? (100 being 100% easy)',
         answerRanges: [
           {
