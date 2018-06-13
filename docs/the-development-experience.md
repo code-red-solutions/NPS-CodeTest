@@ -24,26 +24,26 @@ order: 2
       },
       settings: {
         introductionStatement: 'Thank you for reading this far! Please let us know how it\'s going...',
-        mainQuestion: 'On a scale of 1 - 100, how easy is this documentation to understand? (100 being 100% easy)',
+        mainQuestion: 'On a scale of 1 - 10, how easy is this documentation to understand? (10 being best)',
         answerRanges: [
           {
             start: 1,
-            end: 40,
+            end: 4,
             question: 'How would you do it, starting from scratch?'
           },
           {
-            start: 41,
-            end: 60,
+            start: 5,
+            end: 6,
             question: 'What types of things are missing from the documentation?'
           },
           {
-            start: 61,
-            end: 80,
+            start: 7,
+            end: 8,
             question: 'Do we need to include any specific information that\'s been missed?'
           },
           {
-            start: 81,
-            end: 100,
+            start: 9,
+            end: 10,
             question: 'What would complete this documentation and make it perfect?'
           }
         ],
