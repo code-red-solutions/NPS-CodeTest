@@ -40049,7 +40049,7 @@ var NpsWidget = /** @class */ (function (_super) {
             this.pageName = state.userState.pageState.toString().toLowerCase();
         // I wanted a quick way to get user data into local storage, so just
         // dump it in and we can pull it out selectively when hydrating
-        // this.myLocalStorage = state.userState;
+        this.myLocalStorage = state.userState;
     };
     NpsWidget.prototype.connectedCallback = function () {
         _super.prototype.connectedCallback.call(this);
@@ -40126,7 +40126,21 @@ var NpsWidget = /** @class */ (function (_super) {
         }
     };
     NpsWidget.prototype.handleSubmissionResponse = function (e) {
-        console.log(e);
+        var httpRequestResponse = e.detail;
+        var response = {
+            status: httpRequestResponse.status,
+            statusText: httpRequestResponse.statusText,
+            responseText: httpRequestResponse.response
+        };
+        if (response.status === 200) {
+            // TODO: below is just quick and dirty - do this properly with a new ActionThunk
+            // succeeded
+            this.pageName = actions_2.PageStateKeys.Submitted.toString().toLowerCase();
+        }
+        else {
+            // failed
+            this.pageName = actions_2.PageStateKeys.Retry.toString().toLowerCase();
+        }
     };
     NpsWidget.prototype.onDialogCancelled = function (e) {
     };
@@ -40759,8 +40773,8 @@ var ConfigHelper = /** @class */ (function () {
     }
     Object.defineProperty(ConfigHelper, "nps_Service_API_URL", {
         get: function () {
-            return 'http://localhost:7071/api/';
-            // return 'https://code-red-npp.azurewebsites.net/api/';
+            // return 'http://localhost:7071/api/';
+            return 'https://code-red-npp.azurewebsites.net/api/';
         },
         enumerable: true,
         configurable: true

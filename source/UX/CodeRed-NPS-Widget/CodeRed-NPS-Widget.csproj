@@ -90,7 +90,7 @@
     <None Include="favicon.ico" />
     <None Include=".gitignore" />
     <None Include="static\Capture.PNG" />
-    <Content Include="scripts\system-production.0.21.3.js" />
+    <None Include="scripts\system-production.0.21.3.js" />
     <Content Include="src\nps-widget\store\settings\actions.ts" />
     <TypeScriptCompile Include="src\custom-types.d.ts" />
     <TypeScriptCompile Include="src\nps-widget\services\AnswerRangeQuestionFinder.ts" />

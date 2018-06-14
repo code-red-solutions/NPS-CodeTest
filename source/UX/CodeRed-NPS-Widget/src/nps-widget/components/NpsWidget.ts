@@ -149,7 +149,7 @@ export default class NpsWidget extends PolymerElement implements IReduxBindable 
 
     // I wanted a quick way to get user data into local storage, so just
     // dump it in and we can pull it out selectively when hydrating
-    // this.myLocalStorage = state.userState;
+    this.myLocalStorage = state.userState;
 
   }
 
@@ -361,7 +361,20 @@ export default class NpsWidget extends PolymerElement implements IReduxBindable 
   }
 
   handleSubmissionResponse(e) {
-    console.log(e);
+    const httpRequestResponse = e.detail;
+    const response = {
+      status: httpRequestResponse.status,
+      statusText: httpRequestResponse.statusText,
+      responseText: httpRequestResponse.response
+    }
+    if (response.status === 200) {
+      // TODO: below is just quick and dirty - do this properly with a new ActionThunk
+      // succeeded
+      this.pageName = PageStateKeys.Submitted.toString().toLowerCase();
+    } else {
+      // failed
+      this.pageName = PageStateKeys.Retry.toString().toLowerCase();
+    }
   }
 
   onDialogCancelled(e) {

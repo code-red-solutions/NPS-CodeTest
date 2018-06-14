@@ -40126,7 +40126,21 @@ var NpsWidget = /** @class */ (function (_super) {
         }
     };
     NpsWidget.prototype.handleSubmissionResponse = function (e) {
-        console.log(e);
+        var httpRequestResponse = e.detail;
+        var response = {
+            status: httpRequestResponse.status,
+            statusText: httpRequestResponse.statusText,
+            responseText: httpRequestResponse.response
+        };
+        if (response.status === 200) {
+            // TODO: below is just quick and dirty - do this properly with a new ActionThunk
+            // succeeded
+            this.pageName = actions_2.PageStateKeys.Submitted.toString().toLowerCase();
+        }
+        else {
+            // failed
+            this.pageName = actions_2.PageStateKeys.Retry.toString().toLowerCase();
+        }
     };
     NpsWidget.prototype.onDialogCancelled = function (e) {
     };
