@@ -16,7 +16,7 @@ Once you know where to place the widget, you can just add the JavaScript to your
 > Don't worry if the JavaScript code below looks a little daunting... We'll explain it in a later section...
 
 
-It's best to place the widget code towards the end of your HTML. Find the closing `</body>` tag and add the follow just before it:
+It's best to place the widget code towards the end of your HTML. Find the closing `</body>` tag and add the following just before it:
 
 
 ```js

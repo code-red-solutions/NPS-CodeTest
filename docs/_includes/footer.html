@@ -4,7 +4,7 @@
   <!-- Copyright -->
   <ul class="copyright">
     {% if site.company or site.title or site.author %}
-      <li>&copy;&nbsp;{{ site.time | date: '%Y' }}&nbsp;{{- site.company | site.title | default: site.author -}}. All rights reserved.</li>
+      <li>&copy;&nbsp;{{ site.time | date: '%Y' }}&nbsp;{{- site.company | site.title | default: site.author -}}. All rights reserved. NPS website {{- site.release -}}</li>
     {% endif %}
   </ul>
 
