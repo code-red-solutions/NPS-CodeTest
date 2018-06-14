@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
@@ -20,38 +21,53 @@ namespace CodeRed.NPS.API.Functions
 	{
 		[FunctionName("NPSSubmission")]
 		public static async Task<HttpResponseMessage> Run(
-			[HttpTrigger(AuthorizationLevel.Anonymous, "POST")] HttpRequestMessage req,
+			[HttpTrigger(AuthorizationLevel.Anonymous, "POST", "OPTIONS")] HttpRequestMessage req,
             [Resolve] ILogger log,
 			[Resolve] IService service)
 		{
 
 		    try
 		    {
-		        SubmissionDetails data;
+		        var workResult = "";
 
-		        try
-                {
-                    var content = await req.Content.ReadAsStringAsync();
-		            data = JsonConvert.DeserializeObject<SubmissionDetails>(content);
-		        }
-		        catch (JsonReaderException ex)
+		        if (req.Method == HttpMethod.Post)
 		        {
-		            log.Error($"{ex.GetType()} occured trying to deserialize the content: {ex.Message}");
-		            return CreateResponseHelper.CreateErrorReponse(HttpStatusCode.BadRequest,
-		                "Please check the validity of your submission and try again");
-                }
+		            SubmissionDetails data;
+		            try
+		            {
+		                var content = await req.Content.ReadAsStringAsync();
+		                data = JsonConvert.DeserializeObject<SubmissionDetails>(content);
+		            }
+		            catch (JsonReaderException ex)
+		            {
+		                log.Error($"{ex.GetType()} occured trying to deserialize the content: {ex.Message}");
+		                return CreateResponseHelper.CreateErrorReponse(HttpStatusCode.BadRequest,
+		                    "Please check the validity of your submission and try again");
+		            }
 
-		        var user = data.UserId ?? "None supplied";
+		            var user = data.UserId ?? "None supplied";
 
-                log.Information("Got the following submission....");
-                log.Information($"UserId: {user}");
-                log.Information($"Rating: {data.Rating}");
-                log.Information($"Comment Question: '{data.CommentQuestion}'");
-                log.Information($"Comment: '{data.Comment}'");
+		            log.Information("Got the following submission....");
+		            log.Information($"UserId: {user}");
+		            log.Information($"Rating: {data.rating}");
+		            log.Information($"Comment Question: '{data.selectedAnswerRangeQuestion}'");
+		            log.Information($"Comment: '{data.Comment}'");
 
-                var t = await service.DoWorkAsync();
+		            workResult = await service.DoWorkAsync();
+		        }
 
-		        return CreateResponseHelper.CreateReponse(HttpStatusCode.OK, t);
+                var response = CreateResponseHelper.CreateReponse(HttpStatusCode.OK, workResult);
+
+                if (req.Headers.Contains("Origin"))
+		        {
+		            var origin = req.Headers.GetValues("Origin").FirstOrDefault();
+                    response.Headers.Add("Access-Control-Allow-Credentials", "true");
+		            response.Headers.Add("Access-Control-Allow-Origin", origin);
+		            response.Headers.Add("Access-Control-Allow-Methods", "GET, OPTIONS");
+                    response.Headers.Add("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
+		        }
+
+		        return response;
 
 		    }
 		    catch (Exception ex)

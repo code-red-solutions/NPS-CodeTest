@@ -741,6 +741,993 @@ var IronA11yKeysBehavior = exports.IronA11yKeysBehavior = {
 
 /***/ }),
 
+/***/ "./node_modules/@polymer/iron-ajax/iron-ajax.js":
+/*!******************************************************!*\
+  !*** ./node_modules/@polymer/iron-ajax/iron-ajax.js ***!
+  \******************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; /**
+                                                                                                                                                                                                                                                                              @license
+                                                                                                                                                                                                                                                                              Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+                                                                                                                                                                                                                                                                              This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+                                                                                                                                                                                                                                                                              The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+                                                                                                                                                                                                                                                                              The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+                                                                                                                                                                                                                                                                              Code distributed by Google as part of the polymer project is also
+                                                                                                                                                                                                                                                                              subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+                                                                                                                                                                                                                                                                              */
+/**
+The `iron-ajax` element exposes network request functionality.
+
+    <iron-ajax
+        auto
+        url="https://www.googleapis.com/youtube/v3/search"
+        params='{"part":"snippet", "q":"polymer", "key": "YOUTUBE_API_KEY", "type": "video"}'
+        handle-as="json"
+        on-response="handleResponse"
+        debounce-duration="300"></iron-ajax>
+
+With `auto` set to `true`, the element performs a request whenever
+its `url`, `params` or `body` properties are changed. Automatically generated
+requests will be debounced in the case that multiple attributes are changed
+sequentially.
+
+Note: The `params` attribute must be double quoted JSON.
+
+You can trigger a request explicitly by calling `generateRequest` on the
+element.
+
+@demo demo/index.html
+@hero hero.svg
+*/
+/*
+  FIXME(polymer-modulizer): the above comments were extracted
+  from HTML and may be out of place here. Review them and
+  then delete this comment!
+*/
+
+
+var _polymerLegacy = __webpack_require__(/*! @polymer/polymer/polymer-legacy.js */ "./node_modules/@polymer/polymer/polymer-legacy.js");
+
+__webpack_require__(/*! ./iron-request.js */ "./node_modules/@polymer/iron-ajax/iron-request.js");
+
+var _polymerFn = __webpack_require__(/*! @polymer/polymer/lib/legacy/polymer-fn.js */ "./node_modules/@polymer/polymer/lib/legacy/polymer-fn.js");
+
+(0, _polymerFn.Polymer)({
+
+  is: 'iron-ajax',
+
+  /**
+   * Fired before a request is sent.
+   *
+   * @event iron-ajax-presend
+   */
+
+  /**
+   * Fired when a request is sent.
+   *
+   * @event request
+   */
+
+  /**
+   * Fired when a request is sent.
+   *
+   * @event iron-ajax-request
+   */
+
+  /**
+   * Fired when a response is received.
+   *
+   * @event response
+   */
+
+  /**
+   * Fired when a response is received.
+   *
+   * @event iron-ajax-response
+   */
+
+  /**
+   * Fired when an error is received.
+   *
+   * @event error
+   */
+
+  /**
+   * Fired when an error is received.
+   *
+   * @event iron-ajax-error
+   */
+
+  hostAttributes: { hidden: true },
+
+  properties: {
+    /**
+     * The URL target of the request.
+     */
+    url: { type: String },
+
+    /**
+     * An object that contains query parameters to be appended to the
+     * specified `url` when generating a request. If you wish to set the body
+     * content when making a POST request, you should use the `body` property
+     * instead.
+     */
+    params: {
+      type: Object,
+      value: function value() {
+        return {};
+      }
+    },
+
+    /**
+     * The HTTP method to use such as 'GET', 'POST', 'PUT', or 'DELETE'.
+     * Default is 'GET'.
+     */
+    method: { type: String, value: 'GET' },
+
+    /**
+     * HTTP request headers to send.
+     *
+     * Example:
+     *
+     *     <iron-ajax
+     *         auto
+     *         url="http://somesite.com"
+     *         headers='{"X-Requested-With": "XMLHttpRequest"}'
+     *         handle-as="json"></iron-ajax>
+     *
+     * Note: setting a `Content-Type` header here will override the value
+     * specified by the `contentType` property of this element.
+     */
+    headers: {
+      type: Object,
+      value: function value() {
+        return {};
+      }
+    },
+
+    /**
+     * Content type to use when sending data. If the `contentType` property
+     * is set and a `Content-Type` header is specified in the `headers`
+     * property, the `headers` property value will take precedence.
+     *
+     * Varies the handling of the `body` param.
+     */
+    contentType: { type: String, value: null },
+
+    /**
+     * Body content to send with the request, typically used with "POST"
+     * requests.
+     *
+     * If body is a string it will be sent unmodified.
+     *
+     * If Content-Type is set to a value listed below, then
+     * the body will be encoded accordingly.
+     *
+     *    * `content-type="application/json"`
+     *      * body is encoded like `{"foo":"bar baz","x":1}`
+     *    * `content-type="application/x-www-form-urlencoded"`
+     *      * body is encoded like `foo=bar+baz&x=1`
+     *
+     * Otherwise the body will be passed to the browser unmodified, and it
+     * will handle any encoding (e.g. for FormData, Blob, ArrayBuffer).
+     *
+     * @type
+     * (ArrayBuffer|ArrayBufferView|Blob|Document|FormData|null|string|undefined|Object)
+     */
+    body: { type: Object, value: null },
+
+    /**
+     * Toggle whether XHR is synchronous or asynchronous. Don't change this
+     * to true unless You Know What You Are Doing™.
+     */
+    sync: { type: Boolean, value: false },
+
+    /**
+     * Specifies what data to store in the `response` property, and
+     * to deliver as `event.detail.response` in `response` events.
+     *
+     * One of:
+     *
+     *    `text`: uses `XHR.responseText`.
+     *
+     *    `xml`: uses `XHR.responseXML`.
+     *
+     *    `json`: uses `XHR.responseText` parsed as JSON.
+     *
+     *    `arraybuffer`: uses `XHR.response`.
+     *
+     *    `blob`: uses `XHR.response`.
+     *
+     *    `document`: uses `XHR.response`.
+     */
+    handleAs: { type: String, value: 'json' },
+
+    /**
+     * Set the withCredentials flag on the request.
+     */
+    withCredentials: { type: Boolean, value: false },
+
+    /**
+     * Set the timeout flag on the request.
+     */
+    timeout: { type: Number, value: 0 },
+
+    /**
+     * If true, automatically performs an Ajax request when either `url` or
+     * `params` changes.
+     */
+    auto: { type: Boolean, value: false },
+
+    /**
+     * If true, error messages will automatically be logged to the console.
+     */
+    verbose: { type: Boolean, value: false },
+
+    /**
+     * The most recent request made by this iron-ajax element.
+     *
+     * @type {Object|undefined}
+     */
+    lastRequest: { type: Object, notify: true, readOnly: true },
+
+    /**
+     * The `progress` property of this element's `lastRequest`.
+     *
+     * @type {Object|undefined}
+     */
+    lastProgress: { type: Object, notify: true, readOnly: true },
+
+    /**
+     * True while lastRequest is in flight.
+     */
+    loading: { type: Boolean, notify: true, readOnly: true },
+
+    /**
+     * lastRequest's response.
+     *
+     * Note that lastResponse and lastError are set when lastRequest finishes,
+     * so if loading is true, then lastResponse and lastError will correspond
+     * to the result of the previous request.
+     *
+     * The type of the response is determined by the value of `handleAs` at
+     * the time that the request was generated.
+     *
+     * @type {Object}
+     */
+    lastResponse: { type: Object, notify: true, readOnly: true },
+
+    /**
+     * lastRequest's error, if any.
+     *
+     * @type {Object}
+     */
+    lastError: { type: Object, notify: true, readOnly: true },
+
+    /**
+     * An Array of all in-flight requests originating from this iron-ajax
+     * element.
+     */
+    activeRequests: {
+      type: Array,
+      notify: true,
+      readOnly: true,
+      value: function value() {
+        return [];
+      }
+    },
+
+    /**
+     * Length of time in milliseconds to debounce multiple automatically
+     * generated requests.
+     */
+    debounceDuration: { type: Number, value: 0, notify: true },
+
+    /**
+     * Prefix to be stripped from a JSON response before parsing it.
+     *
+     * In order to prevent an attack using CSRF with Array responses
+     * (http://haacked.com/archive/2008/11/20/anatomy-of-a-subtle-json-vulnerability.aspx/)
+     * many backends will mitigate this by prefixing all JSON response bodies
+     * with a string that would be nonsensical to a JavaScript parser.
+     *
+     */
+    jsonPrefix: { type: String, value: '' },
+
+    /**
+     * By default, iron-ajax's events do not bubble. Setting this attribute will
+     * cause its request and response events as well as its iron-ajax-request,
+     * -response,  and -error events to bubble to the window object. The vanilla
+     * error event never bubbles when using shadow dom even if this.bubbles is
+     * true because a scoped flag is not passed with it (first link) and because
+     * the shadow dom spec did not used to allow certain events, including
+     * events named error, to leak outside of shadow trees (second link).
+     * https://www.w3.org/TR/shadow-dom/#scoped-flag
+     * https://www.w3.org/TR/2015/WD-shadow-dom-20151215/#events-that-are-not-leaked-into-ancestor-trees
+     */
+    bubbles: { type: Boolean, value: false },
+
+    /**
+     * Changes the [`completes`](iron-request#property-completes) promise chain
+     * from `generateRequest` to reject with an object
+     * containing the original request, as well an error message.
+     * If false (default), the promise rejects with an error message only.
+     */
+    rejectWithRequest: { type: Boolean, value: false },
+
+    _boundHandleResponse: {
+      type: Function,
+      value: function value() {
+        return this._handleResponse.bind(this);
+      }
+    }
+  },
+
+  observers: ['_requestOptionsChanged(url, method, params.*, headers, contentType, ' + 'body, sync, handleAs, jsonPrefix, withCredentials, timeout, auto)'],
+
+  created: function created() {
+    this._boundOnProgressChanged = this._onProgressChanged.bind(this);
+  },
+
+  /**
+   * The query string that should be appended to the `url`, serialized from
+   * the current value of `params`.
+   *
+   * @return {string}
+   */
+  get queryString() {
+    var queryParts = [];
+    var param;
+    var value;
+
+    for (param in this.params) {
+      value = this.params[param];
+      param = window.encodeURIComponent(param);
+
+      if (Array.isArray(value)) {
+        for (var i = 0; i < value.length; i++) {
+          queryParts.push(param + '=' + window.encodeURIComponent(value[i]));
+        }
+      } else if (value !== null) {
+        queryParts.push(param + '=' + window.encodeURIComponent(value));
+      } else {
+        queryParts.push(param);
+      }
+    }
+
+    return queryParts.join('&');
+  },
+
+  /**
+   * The `url` with query string (if `params` are specified), suitable for
+   * providing to an `iron-request` instance.
+   *
+   * @return {string}
+   */
+  get requestUrl() {
+    var queryString = this.queryString;
+    var url = this.url || '';
+
+    if (queryString) {
+      var bindingChar = url.indexOf('?') >= 0 ? '&' : '?';
+      return url + bindingChar + queryString;
+    }
+
+    return url;
+  },
+
+  /**
+   * An object that maps header names to header values, first applying the
+   * the value of `Content-Type` and then overlaying the headers specified
+   * in the `headers` property.
+   *
+   * @return {Object}
+   */
+  get requestHeaders() {
+    var headers = {};
+    var contentType = this.contentType;
+    if (contentType == null && typeof this.body === 'string') {
+      contentType = 'application/x-www-form-urlencoded';
+    }
+    if (contentType) {
+      headers['content-type'] = contentType;
+    }
+    var header;
+
+    if (_typeof(this.headers) === 'object') {
+      for (header in this.headers) {
+        headers[header] = this.headers[header].toString();
+      }
+    }
+
+    return headers;
+  },
+
+  _onProgressChanged: function _onProgressChanged(event) {
+    this._setLastProgress(event.detail.value);
+  },
+
+  /**
+   * Request options suitable for generating an `iron-request` instance based
+   * on the current state of the `iron-ajax` instance's properties.
+   *
+   * @return {{
+   *   url: string,
+   *   method: (string|undefined),
+   *   async: (boolean|undefined),
+   *   body:
+   * (ArrayBuffer|ArrayBufferView|Blob|Document|FormData|null|string|undefined|Object),
+   *   headers: (Object|undefined),
+   *   handleAs: (string|undefined),
+   *   jsonPrefix: (string|undefined),
+   *   withCredentials: (boolean|undefined)}}
+   */
+  toRequestOptions: function toRequestOptions() {
+    return {
+      url: this.requestUrl || '',
+      method: this.method,
+      headers: this.requestHeaders,
+      body: this.body,
+      async: !this.sync,
+      handleAs: this.handleAs,
+      jsonPrefix: this.jsonPrefix,
+      withCredentials: this.withCredentials,
+      timeout: this.timeout,
+      rejectWithRequest: this.rejectWithRequest
+    };
+  },
+
+  /**
+   * Performs an AJAX request to the specified URL.
+   *
+   * @return {!IronRequestElement}
+   */
+  generateRequest: function generateRequest() {
+    var request = /** @type {!IronRequestElement} */document.createElement('iron-request');
+    var requestOptions = this.toRequestOptions();
+
+    this.push('activeRequests', request);
+
+    request.completes.then(this._boundHandleResponse).catch(this._handleError.bind(this, request)).then(this._discardRequest.bind(this, request));
+
+    var evt = this.fire('iron-ajax-presend', { request: request, options: requestOptions }, { bubbles: this.bubbles, cancelable: true });
+
+    if (evt.defaultPrevented) {
+      request.abort();
+      request.rejectCompletes(request);
+      return request;
+    }
+
+    if (this.lastRequest) {
+      this.lastRequest.removeEventListener('iron-request-progress-changed', this._boundOnProgressChanged);
+    }
+
+    request.addEventListener('iron-request-progress-changed', this._boundOnProgressChanged);
+
+    request.send(requestOptions);
+    this._setLastProgress(null);
+    this._setLastRequest(request);
+    this._setLoading(true);
+
+    this.fire('request', { request: request, options: requestOptions }, { bubbles: this.bubbles, composed: true });
+
+    this.fire('iron-ajax-request', { request: request, options: requestOptions }, { bubbles: this.bubbles, composed: true });
+
+    return request;
+  },
+
+  _handleResponse: function _handleResponse(request) {
+    if (request === this.lastRequest) {
+      this._setLastResponse(request.response);
+      this._setLastError(null);
+      this._setLoading(false);
+    }
+    this.fire('response', request, { bubbles: this.bubbles, composed: true });
+    this.fire('iron-ajax-response', request, { bubbles: this.bubbles, composed: true });
+  },
+
+  _handleError: function _handleError(request, error) {
+    if (this.verbose) {
+      _polymerLegacy.Base._error(error);
+    }
+
+    if (request === this.lastRequest) {
+      this._setLastError({
+        request: request,
+        error: error,
+        status: request.xhr.status,
+        statusText: request.xhr.statusText,
+        response: request.xhr.response
+      });
+      this._setLastResponse(null);
+      this._setLoading(false);
+    }
+
+    // Tests fail if this goes after the normal this.fire('error', ...)
+    this.fire('iron-ajax-error', { request: request, error: error }, { bubbles: this.bubbles, composed: true });
+
+    this.fire('error', { request: request, error: error }, { bubbles: this.bubbles, composed: true });
+  },
+
+  _discardRequest: function _discardRequest(request) {
+    var requestIndex = this.activeRequests.indexOf(request);
+
+    if (requestIndex > -1) {
+      this.splice('activeRequests', requestIndex, 1);
+    }
+  },
+
+  _requestOptionsChanged: function _requestOptionsChanged() {
+    this.debounce('generate-request', function () {
+      if (this.url == null) {
+        return;
+      }
+
+      if (this.auto) {
+        this.generateRequest();
+      }
+    }, this.debounceDuration);
+  }
+
+});
+
+/***/ }),
+
+/***/ "./node_modules/@polymer/iron-ajax/iron-request.js":
+/*!*********************************************************!*\
+  !*** ./node_modules/@polymer/iron-ajax/iron-request.js ***!
+  \*********************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _polymerLegacy = __webpack_require__(/*! @polymer/polymer/polymer-legacy.js */ "./node_modules/@polymer/polymer/polymer-legacy.js");
+
+var _polymerFn = __webpack_require__(/*! @polymer/polymer/lib/legacy/polymer-fn.js */ "./node_modules/@polymer/polymer/lib/legacy/polymer-fn.js");
+
+/**
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+*/
+/*
+iron-request can be used to perform XMLHttpRequests.
+
+    <iron-request id="xhr"></iron-request>
+    ...
+    this.$.xhr.send({url: url, body: params});
+*/
+/*
+  FIXME(polymer-modulizer): the above comments were extracted
+  from HTML and may be out of place here. Review them and
+  then delete this comment!
+*/
+(0, _polymerFn.Polymer)({
+  is: 'iron-request',
+
+  hostAttributes: { hidden: true },
+
+  properties: {
+
+    /**
+     * A reference to the XMLHttpRequest instance used to generate the
+     * network request.
+     *
+     * @type {XMLHttpRequest}
+     */
+    xhr: {
+      type: Object,
+      notify: true,
+      readOnly: true,
+      value: function value() {
+        return new XMLHttpRequest();
+      }
+    },
+
+    /**
+     * A reference to the parsed response body, if the `xhr` has completely
+     * resolved.
+     *
+     * @type {*}
+     * @default null
+     */
+    response: {
+      type: Object,
+      notify: true,
+      readOnly: true,
+      value: function value() {
+        return null;
+      }
+    },
+
+    /**
+     * A reference to the status code, if the `xhr` has completely resolved.
+     */
+    status: { type: Number, notify: true, readOnly: true, value: 0 },
+
+    /**
+     * A reference to the status text, if the `xhr` has completely resolved.
+     */
+    statusText: { type: String, notify: true, readOnly: true, value: '' },
+
+    /**
+     * A promise that resolves when the `xhr` response comes back, or rejects
+     * if there is an error before the `xhr` completes.
+     * The resolve callback is called with the original request as an argument.
+     * By default, the reject callback is called with an `Error` as an argument.
+     * If `rejectWithRequest` is true, the reject callback is called with an
+     * object with two keys: `request`, the original request, and `error`, the
+     * error object.
+     *
+     * @type {Promise}
+     */
+    completes: {
+      type: Object,
+      readOnly: true,
+      notify: true,
+      value: function value() {
+        return new Promise(function (resolve, reject) {
+          this.resolveCompletes = resolve;
+          this.rejectCompletes = reject;
+        }.bind(this));
+      }
+    },
+
+    /**
+     * An object that contains progress information emitted by the XHR if
+     * available.
+     *
+     * @default {}
+     */
+    progress: {
+      type: Object,
+      notify: true,
+      readOnly: true,
+      value: function value() {
+        return {};
+      }
+    },
+
+    /**
+     * Aborted will be true if an abort of the request is attempted.
+     */
+    aborted: {
+      type: Boolean,
+      notify: true,
+      readOnly: true,
+      value: false
+    },
+
+    /**
+     * Errored will be true if the browser fired an error event from the
+     * XHR object (mainly network errors).
+     */
+    errored: { type: Boolean, notify: true, readOnly: true, value: false },
+
+    /**
+     * TimedOut will be true if the XHR threw a timeout event.
+     */
+    timedOut: { type: Boolean, notify: true, readOnly: true, value: false }
+  },
+
+  /**
+   * Succeeded is true if the request succeeded. The request succeeded if it
+   * loaded without error, wasn't aborted, and the status code is ≥ 200, and
+   * < 300, or if the status code is 0.
+   *
+   * The status code 0 is accepted as a success because some schemes - e.g.
+   * file:// - don't provide status codes.
+   *
+   * @return {boolean}
+   */
+  get succeeded() {
+    if (this.errored || this.aborted || this.timedOut) {
+      return false;
+    }
+    var status = this.xhr.status || 0;
+
+    // Note: if we are using the file:// protocol, the status code will be 0
+    // for all outcomes (successful or otherwise).
+    return status === 0 || status >= 200 && status < 300;
+  },
+
+  /**
+   * Sends an HTTP request to the server and returns a promise (see the
+   * `completes` property for details).
+   *
+   * The handling of the `body` parameter will vary based on the Content-Type
+   * header. See the docs for iron-ajax's `body` property for details.
+   *
+   * @param {{
+   *   url: string,
+   *   method: (string|undefined),
+   *   async: (boolean|undefined),
+   *   body:
+   * (ArrayBuffer|ArrayBufferView|Blob|Document|FormData|null|string|undefined|Object),
+   *   headers: (Object|undefined),
+   *   handleAs: (string|undefined),
+   *   jsonPrefix: (string|undefined),
+   *   withCredentials: (boolean|undefined),
+   *   timeout: (Number|undefined),
+   *   rejectWithRequest: (boolean|undefined)}} options -
+   *   - url The url to which the request is sent.
+   *   - method The HTTP method to use, default is GET.
+   *   - async By default, all requests are sent asynchronously. To send
+   * synchronous requests, set to false.
+   *   -  body The content for the request body for POST method.
+   *   -  headers HTTP request headers.
+   *   -  handleAs The response type. Default is 'text'.
+   *   -  withCredentials Whether or not to send credentials on the request.
+   * Default is false.
+   *   -  timeout - Timeout for request, in milliseconds.
+   *   -  rejectWithRequest Set to true to include the request object with
+   * promise rejections.
+   * @return {Promise}
+   */
+  send: function send(options) {
+    var xhr = this.xhr;
+
+    if (xhr.readyState > 0) {
+      return null;
+    }
+
+    xhr.addEventListener('progress', function (progress) {
+      this._setProgress({
+        lengthComputable: progress.lengthComputable,
+        loaded: progress.loaded,
+        total: progress.total
+      });
+
+      // Webcomponents v1 spec does not fire *-changed events when not connected
+      this.fire('iron-request-progress-changed', { value: this.progress });
+    }.bind(this));
+
+    xhr.addEventListener('error', function (error) {
+      this._setErrored(true);
+      this._updateStatus();
+      var response = options.rejectWithRequest ? { error: error, request: this } : error;
+      this.rejectCompletes(response);
+    }.bind(this));
+
+    xhr.addEventListener('timeout', function (error) {
+      this._setTimedOut(true);
+      this._updateStatus();
+      var response = options.rejectWithRequest ? { error: error, request: this } : error;
+      this.rejectCompletes(response);
+    }.bind(this));
+
+    xhr.addEventListener('abort', function () {
+      this._setAborted(true);
+      this._updateStatus();
+      var error = new Error('Request aborted.');
+      var response = options.rejectWithRequest ? { error: error, request: this } : error;
+      this.rejectCompletes(response);
+    }.bind(this));
+
+    // Called after all of the above.
+    xhr.addEventListener('loadend', function () {
+      this._updateStatus();
+      this._setResponse(this.parseResponse());
+
+      if (!this.succeeded) {
+        var error = new Error('The request failed with status code: ' + this.xhr.status);
+        var response = options.rejectWithRequest ? { error: error, request: this } : error;
+        this.rejectCompletes(response);
+        return;
+      }
+
+      this.resolveCompletes(this);
+    }.bind(this));
+
+    this.url = options.url;
+    var isXHRAsync = options.async !== false;
+    xhr.open(options.method || 'GET', options.url, isXHRAsync);
+
+    var acceptType = {
+      'json': 'application/json',
+      'text': 'text/plain',
+      'html': 'text/html',
+      'xml': 'application/xml',
+      'arraybuffer': 'application/octet-stream'
+    }[options.handleAs];
+    var headers = options.headers || Object.create(null);
+    var newHeaders = Object.create(null);
+    for (var key in headers) {
+      newHeaders[key.toLowerCase()] = headers[key];
+    }
+    headers = newHeaders;
+
+    if (acceptType && !headers['accept']) {
+      headers['accept'] = acceptType;
+    }
+    Object.keys(headers).forEach(function (requestHeader) {
+      if (/[A-Z]/.test(requestHeader)) {
+        _polymerLegacy.Base._error('Headers must be lower case, got', requestHeader);
+      }
+      xhr.setRequestHeader(requestHeader, headers[requestHeader]);
+    }, this);
+
+    if (isXHRAsync) {
+      xhr.timeout = options.timeout;
+
+      var handleAs = options.handleAs;
+
+      // If a JSON prefix is present, the responseType must be 'text' or the
+      // browser won’t be able to parse the response.
+      if (!!options.jsonPrefix || !handleAs) {
+        handleAs = 'text';
+      }
+
+      // In IE, `xhr.responseType` is an empty string when the response
+      // returns. Hence, caching it as `xhr._responseType`.
+      xhr.responseType = xhr._responseType = handleAs;
+
+      // Cache the JSON prefix, if it exists.
+      if (!!options.jsonPrefix) {
+        xhr._jsonPrefix = options.jsonPrefix;
+      }
+    }
+
+    xhr.withCredentials = !!options.withCredentials;
+
+    var body = this._encodeBodyObject(options.body, headers['content-type']);
+
+    xhr.send(
+    /**
+       @type {ArrayBuffer|ArrayBufferView|Blob|Document|FormData|
+               null|string|undefined}
+     */
+    body);
+
+    return this.completes;
+  },
+
+  /**
+   * Attempts to parse the response body of the XHR. If parsing succeeds,
+   * the value returned will be deserialized based on the `responseType`
+   * set on the XHR.
+   *
+   * @return {*} The parsed response,
+   * or undefined if there was an empty response or parsing failed.
+   */
+  parseResponse: function parseResponse() {
+    var xhr = this.xhr;
+    var responseType = xhr.responseType || xhr._responseType;
+    var preferResponseText = !this.xhr.responseType;
+    var prefixLen = xhr._jsonPrefix && xhr._jsonPrefix.length || 0;
+
+    try {
+      switch (responseType) {
+        case 'json':
+          // If the xhr object doesn't have a natural `xhr.responseType`,
+          // we can assume that the browser hasn't parsed the response for us,
+          // and so parsing is our responsibility. Likewise if response is
+          // undefined, as there's no way to encode undefined in JSON.
+          if (preferResponseText || xhr.response === undefined) {
+            // Try to emulate the JSON section of the response body section of
+            // the spec: https://xhr.spec.whatwg.org/#response-body
+            // That is to say, we try to parse as JSON, but if anything goes
+            // wrong return null.
+            try {
+              return JSON.parse(xhr.responseText);
+            } catch (_) {
+              console.warn('Failed to parse JSON sent from ' + xhr.responseURL);
+              return null;
+            }
+          }
+
+          return xhr.response;
+        case 'xml':
+          return xhr.responseXML;
+        case 'blob':
+        case 'document':
+        case 'arraybuffer':
+          return xhr.response;
+        case 'text':
+        default:
+          {
+            // If `prefixLen` is set, it implies the response should be parsed
+            // as JSON once the prefix of length `prefixLen` is stripped from
+            // it. Emulate the behavior above where null is returned on failure
+            // to parse.
+            if (prefixLen) {
+              try {
+                return JSON.parse(xhr.responseText.substring(prefixLen));
+              } catch (_) {
+                console.warn('Failed to parse JSON sent from ' + xhr.responseURL);
+                return null;
+              }
+            }
+            return xhr.responseText;
+          }
+      }
+    } catch (e) {
+      this.rejectCompletes(new Error('Could not parse response. ' + e.message));
+    }
+  },
+
+  /**
+   * Aborts the request.
+   */
+  abort: function abort() {
+    this._setAborted(true);
+    this.xhr.abort();
+  },
+
+  /**
+   * @param {*} body The given body of the request to try and encode.
+   * @param {?string} contentType The given content type, to infer an encoding
+   *     from.
+   * @return {*} Either the encoded body as a string, if successful,
+   *     or the unaltered body object if no encoding could be inferred.
+   */
+  _encodeBodyObject: function _encodeBodyObject(body, contentType) {
+    if (typeof body == 'string') {
+      return body; // Already encoded.
+    }
+    var bodyObj = /** @type {Object} */body;
+    switch (contentType) {
+      case 'application/json':
+        return JSON.stringify(bodyObj);
+      case 'application/x-www-form-urlencoded':
+        return this._wwwFormUrlEncode(bodyObj);
+    }
+    return body;
+  },
+
+  /**
+   * @param {Object} object The object to encode as x-www-form-urlencoded.
+   * @return {string} .
+   */
+  _wwwFormUrlEncode: function _wwwFormUrlEncode(object) {
+    if (!object) {
+      return '';
+    }
+    var pieces = [];
+    Object.keys(object).forEach(function (key) {
+      // TODO(rictic): handle array values here, in a consistent way with
+      //   iron-ajax params.
+      pieces.push(this._wwwFormUrlEncodePiece(key) + '=' + this._wwwFormUrlEncodePiece(object[key]));
+    }, this);
+    return pieces.join('&');
+  },
+
+  /**
+   * @param {*} str A key or value to encode as x-www-form-urlencoded.
+   * @return {string} .
+   */
+  _wwwFormUrlEncodePiece: function _wwwFormUrlEncodePiece(str) {
+    // Spec says to normalize newlines to \r\n and replace %20 spaces with +.
+    // jQuery does this as well, so this is likely to be widely compatible.
+    if (str === null || str === undefined || !str.toString) {
+      return '';
+    }
+
+    return encodeURIComponent(str.toString().replace(/\r?\n/g, '\r\n')).replace(/%20/g, '+');
+  },
+
+  /**
+   * Updates the status code and status text.
+   */
+  _updateStatus: function _updateStatus() {
+    this._setStatus(this.xhr.status);
+    this._setStatusText(this.xhr.statusText === undefined ? '' : this.xhr.statusText);
+  }
+});
+
+/***/ }),
+
 /***/ "./node_modules/@polymer/iron-autogrow-textarea/iron-autogrow-textarea.js":
 /*!********************************************************************************!*\
   !*** ./node_modules/@polymer/iron-autogrow-textarea/iron-autogrow-textarea.js ***!
@@ -5652,6 +6639,92 @@ function _getScrollInfo(event) {
 
 /***/ }),
 
+/***/ "./node_modules/@polymer/iron-pages/iron-pages.js":
+/*!********************************************************!*\
+  !*** ./node_modules/@polymer/iron-pages/iron-pages.js ***!
+  \********************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _templateObject = _taggedTemplateLiteral(['\n    <style>\n      :host {\n        display: block;\n      }\n\n      :host > ::slotted(:not(slot):not(.iron-selected)) {\n        display: none !important;\n      }\n    </style>\n\n    <slot></slot>\n'], ['\n    <style>\n      :host {\n        display: block;\n      }\n\n      :host > ::slotted(:not(slot):not(.iron-selected)) {\n        display: none !important;\n      }\n    </style>\n\n    <slot></slot>\n']);
+
+__webpack_require__(/*! @polymer/polymer/polymer-legacy.js */ "./node_modules/@polymer/polymer/polymer-legacy.js");
+
+var _ironResizableBehavior = __webpack_require__(/*! @polymer/iron-resizable-behavior/iron-resizable-behavior.js */ "./node_modules/@polymer/iron-resizable-behavior/iron-resizable-behavior.js");
+
+var _ironSelectable = __webpack_require__(/*! @polymer/iron-selector/iron-selectable.js */ "./node_modules/@polymer/iron-selector/iron-selectable.js");
+
+var _polymerFn = __webpack_require__(/*! @polymer/polymer/lib/legacy/polymer-fn.js */ "./node_modules/@polymer/polymer/lib/legacy/polymer-fn.js");
+
+var _htmlTag = __webpack_require__(/*! @polymer/polymer/lib/utils/html-tag.js */ "./node_modules/@polymer/polymer/lib/utils/html-tag.js");
+
+function _taggedTemplateLiteral(strings, raw) { return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); } /**
+                                                                                                                                                  @license
+                                                                                                                                                  Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+                                                                                                                                                  This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+                                                                                                                                                  The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+                                                                                                                                                  The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+                                                                                                                                                  Code distributed by Google as part of the polymer project is also
+                                                                                                                                                  subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+                                                                                                                                                  */
+/**
+`iron-pages` is used to select one of its children to show. One use is to cycle through a list of
+children "pages".
+
+Example:
+
+    <iron-pages selected="0">
+      <div>One</div>
+      <div>Two</div>
+      <div>Three</div>
+    </iron-pages>
+
+    <script>
+      document.addEventListener('click', function(e) {
+        var pages = document.querySelector('iron-pages');
+        pages.selectNext();
+      });
+    </script>
+
+@group Iron Elements
+@hero hero.svg
+@demo demo/index.html
+*/
+/*
+  FIXME(polymer-modulizer): the above comments were extracted
+  from HTML and may be out of place here. Review them and
+  then delete this comment!
+*/
+
+
+(0, _polymerFn.Polymer)({
+  _template: (0, _htmlTag.html)(_templateObject),
+
+  is: 'iron-pages',
+  behaviors: [_ironResizableBehavior.IronResizableBehavior, _ironSelectable.IronSelectableBehavior],
+
+  properties: {
+
+    // as the selected page is the only one visible, activateEvent
+    // is both non-sensical and problematic; e.g. in cases where a user
+    // handler attempts to change the page and the activateEvent
+    // handler immediately changes it back
+    activateEvent: { type: String, value: null }
+
+  },
+
+  observers: ['_selectedPageChanged(selected)'],
+
+  _selectedPageChanged: function _selectedPageChanged(selected, old) {
+    this.async(this.notifyResize);
+  }
+});
+
+/***/ }),
+
 /***/ "./node_modules/@polymer/iron-range-behavior/iron-range-behavior.js":
 /*!**************************************************************************!*\
   !*** ./node_modules/@polymer/iron-range-behavior/iron-range-behavior.js ***!
@@ -5981,6 +7054,562 @@ var IronResizableBehavior = exports.IronResizableBehavior = {
    Code distributed by Google as part of the polymer project is also
    subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
    */
+
+/***/ }),
+
+/***/ "./node_modules/@polymer/iron-selector/iron-selectable.js":
+/*!****************************************************************!*\
+  !*** ./node_modules/@polymer/iron-selector/iron-selectable.js ***!
+  \****************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.IronSelectableBehavior = undefined;
+
+__webpack_require__(/*! @polymer/polymer/polymer-legacy.js */ "./node_modules/@polymer/polymer/polymer-legacy.js");
+
+var _ironSelection = __webpack_require__(/*! ./iron-selection.js */ "./node_modules/@polymer/iron-selector/iron-selection.js");
+
+var _polymerDom = __webpack_require__(/*! @polymer/polymer/lib/legacy/polymer.dom.js */ "./node_modules/@polymer/polymer/lib/legacy/polymer.dom.js");
+
+var _caseMap = __webpack_require__(/*! @polymer/polymer/lib/utils/case-map.js */ "./node_modules/@polymer/polymer/lib/utils/case-map.js");
+
+/**
+ * @polymerBehavior Polymer.IronSelectableBehavior
+ */
+/**
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+*/
+var IronSelectableBehavior = exports.IronSelectableBehavior = {
+
+  /**
+   * Fired when iron-selector is activated (selected or deselected).
+   * It is fired before the selected items are changed.
+   * Cancel the event to abort selection.
+   *
+   * @event iron-activate
+   */
+
+  /**
+   * Fired when an item is selected
+   *
+   * @event iron-select
+   */
+
+  /**
+   * Fired when an item is deselected
+   *
+   * @event iron-deselect
+   */
+
+  /**
+   * Fired when the list of selectable items changes (e.g., items are
+   * added or removed). The detail of the event is a mutation record that
+   * describes what changed.
+   *
+   * @event iron-items-changed
+   */
+
+  properties: {
+
+    /**
+     * If you want to use an attribute value or property of an element for
+     * `selected` instead of the index, set this to the name of the attribute
+     * or property. Hyphenated values are converted to camel case when used to
+     * look up the property of a selectable element. Camel cased values are
+     * *not* converted to hyphenated values for attribute lookup. It's
+     * recommended that you provide the hyphenated form of the name so that
+     * selection works in both cases. (Use `attr-or-property-name` instead of
+     * `attrOrPropertyName`.)
+     */
+    attrForSelected: {
+      type: String,
+      value: null
+    },
+
+    /**
+     * Gets or sets the selected element. The default is to use the index of the item.
+     * @type {string|number}
+     */
+    selected: {
+      type: String,
+      notify: true
+    },
+
+    /**
+     * Returns the currently selected item.
+     *
+     * @type {?Object}
+     */
+    selectedItem: {
+      type: Object,
+      readOnly: true,
+      notify: true
+    },
+
+    /**
+     * The event that fires from items when they are selected. Selectable
+     * will listen for this event from items and update the selection state.
+     * Set to empty string to listen to no events.
+     */
+    activateEvent: {
+      type: String,
+      value: 'tap',
+      observer: '_activateEventChanged'
+    },
+
+    /**
+     * This is a CSS selector string.  If this is set, only items that match the CSS selector
+     * are selectable.
+     */
+    selectable: String,
+
+    /**
+     * The class to set on elements when selected.
+     */
+    selectedClass: {
+      type: String,
+      value: 'iron-selected'
+    },
+
+    /**
+     * The attribute to set on elements when selected.
+     */
+    selectedAttribute: {
+      type: String,
+      value: null
+    },
+
+    /**
+     * Default fallback if the selection based on selected with `attrForSelected`
+     * is not found.
+     */
+    fallbackSelection: {
+      type: String,
+      value: null
+    },
+
+    /**
+     * The list of items from which a selection can be made.
+     */
+    items: {
+      type: Array,
+      readOnly: true,
+      notify: true,
+      value: function value() {
+        return [];
+      }
+    },
+
+    /**
+     * The set of excluded elements where the key is the `localName`
+     * of the element that will be ignored from the item list.
+     *
+     * @default {template: 1}
+     */
+    _excludedLocalNames: {
+      type: Object,
+      value: function value() {
+        return {
+          'template': 1,
+          'dom-bind': 1,
+          'dom-if': 1,
+          'dom-repeat': 1
+        };
+      }
+    }
+  },
+
+  observers: ['_updateAttrForSelected(attrForSelected)', '_updateSelected(selected)', '_checkFallback(fallbackSelection)'],
+
+  created: function created() {
+    this._bindFilterItem = this._filterItem.bind(this);
+    this._selection = new _ironSelection.IronSelection(this._applySelection.bind(this));
+  },
+
+  attached: function attached() {
+    this._observer = this._observeItems(this);
+    this._addListener(this.activateEvent);
+  },
+
+  detached: function detached() {
+    if (this._observer) {
+      (0, _polymerDom.dom)(this).unobserveNodes(this._observer);
+    }
+    this._removeListener(this.activateEvent);
+  },
+
+  /**
+   * Returns the index of the given item.
+   *
+   * @method indexOf
+   * @param {Object} item
+   * @returns Returns the index of the item
+   */
+  indexOf: function indexOf(item) {
+    return this.items ? this.items.indexOf(item) : -1;
+  },
+
+  /**
+   * Selects the given value.
+   *
+   * @method select
+   * @param {string|number} value the value to select.
+   */
+  select: function select(value) {
+    this.selected = value;
+  },
+
+  /**
+   * Selects the previous item.
+   *
+   * @method selectPrevious
+   */
+  selectPrevious: function selectPrevious() {
+    var length = this.items.length;
+    var index = (Number(this._valueToIndex(this.selected)) - 1 + length) % length;
+    this.selected = this._indexToValue(index);
+  },
+
+  /**
+   * Selects the next item.
+   *
+   * @method selectNext
+   */
+  selectNext: function selectNext() {
+    var index = (Number(this._valueToIndex(this.selected)) + 1) % this.items.length;
+    this.selected = this._indexToValue(index);
+  },
+
+  /**
+   * Selects the item at the given index.
+   *
+   * @method selectIndex
+   */
+  selectIndex: function selectIndex(index) {
+    this.select(this._indexToValue(index));
+  },
+
+  /**
+   * Force a synchronous update of the `items` property.
+   *
+   * NOTE: Consider listening for the `iron-items-changed` event to respond to
+   * updates to the set of selectable items after updates to the DOM list and
+   * selection state have been made.
+   *
+   * WARNING: If you are using this method, you should probably consider an
+   * alternate approach. Synchronously querying for items is potentially
+   * slow for many use cases. The `items` property will update asynchronously
+   * on its own to reflect selectable items in the DOM.
+   */
+  forceSynchronousItemUpdate: function forceSynchronousItemUpdate() {
+    if (this._observer && typeof this._observer.flush === "function") {
+      // NOTE(bicknellr): `Polymer.dom.flush` above is no longer sufficient to
+      // trigger `observeNodes` callbacks. Polymer 2.x returns an object from
+      // `observeNodes` with a `flush` that synchronously gives the callback
+      // any pending MutationRecords (retrieved with `takeRecords`). Any case
+      // where ShadyDOM flushes were expected to synchronously trigger item
+      // updates will now require calling `forceSynchronousItemUpdate`.
+      this._observer.flush();
+    } else {
+      this._updateItems();
+    }
+  },
+
+  // UNUSED, FOR API COMPATIBILITY
+  get _shouldUpdateSelection() {
+    return this.selected != null;
+  },
+
+  _checkFallback: function _checkFallback() {
+    this._updateSelected();
+  },
+
+  _addListener: function _addListener(eventName) {
+    this.listen(this, eventName, '_activateHandler');
+  },
+
+  _removeListener: function _removeListener(eventName) {
+    this.unlisten(this, eventName, '_activateHandler');
+  },
+
+  _activateEventChanged: function _activateEventChanged(eventName, old) {
+    this._removeListener(old);
+    this._addListener(eventName);
+  },
+
+  _updateItems: function _updateItems() {
+    var nodes = (0, _polymerDom.dom)(this).queryDistributedElements(this.selectable || '*');
+    nodes = Array.prototype.filter.call(nodes, this._bindFilterItem);
+    this._setItems(nodes);
+  },
+
+  _updateAttrForSelected: function _updateAttrForSelected() {
+    if (this.selectedItem) {
+      this.selected = this._valueForItem(this.selectedItem);
+    }
+  },
+
+  _updateSelected: function _updateSelected() {
+    this._selectSelected(this.selected);
+  },
+
+  _selectSelected: function _selectSelected(selected) {
+    if (!this.items) {
+      return;
+    }
+
+    var item = this._valueToItem(this.selected);
+    if (item) {
+      this._selection.select(item);
+    } else {
+      this._selection.clear();
+    }
+    // Check for items, since this array is populated only when attached
+    // Since Number(0) is falsy, explicitly check for undefined
+    if (this.fallbackSelection && this.items.length && this._selection.get() === undefined) {
+      this.selected = this.fallbackSelection;
+    }
+  },
+
+  _filterItem: function _filterItem(node) {
+    return !this._excludedLocalNames[node.localName];
+  },
+
+  _valueToItem: function _valueToItem(value) {
+    return value == null ? null : this.items[this._valueToIndex(value)];
+  },
+
+  _valueToIndex: function _valueToIndex(value) {
+    if (this.attrForSelected) {
+      for (var i = 0, item; item = this.items[i]; i++) {
+        if (this._valueForItem(item) == value) {
+          return i;
+        }
+      }
+    } else {
+      return Number(value);
+    }
+  },
+
+  _indexToValue: function _indexToValue(index) {
+    if (this.attrForSelected) {
+      var item = this.items[index];
+      if (item) {
+        return this._valueForItem(item);
+      }
+    } else {
+      return index;
+    }
+  },
+
+  _valueForItem: function _valueForItem(item) {
+    if (!item) {
+      return null;
+    }
+    if (!this.attrForSelected) {
+      var i = this.indexOf(item);
+      return i === -1 ? null : i;
+    }
+    var propValue = item[(0, _caseMap.dashToCamelCase)(this.attrForSelected)];
+    return propValue != undefined ? propValue : item.getAttribute(this.attrForSelected);
+  },
+
+  _applySelection: function _applySelection(item, isSelected) {
+    if (this.selectedClass) {
+      this.toggleClass(this.selectedClass, isSelected, item);
+    }
+    if (this.selectedAttribute) {
+      this.toggleAttribute(this.selectedAttribute, isSelected, item);
+    }
+    this._selectionChange();
+    this.fire('iron-' + (isSelected ? 'select' : 'deselect'), { item: item });
+  },
+
+  _selectionChange: function _selectionChange() {
+    this._setSelectedItem(this._selection.get());
+  },
+
+  // observe items change under the given node.
+  _observeItems: function _observeItems(node) {
+    return (0, _polymerDom.dom)(node).observeNodes(function (mutation) {
+      this._updateItems();
+      this._updateSelected();
+
+      // Let other interested parties know about the change so that
+      // we don't have to recreate mutation observers everywhere.
+      this.fire('iron-items-changed', mutation, {
+        bubbles: false,
+        cancelable: false
+      });
+    });
+  },
+
+  _activateHandler: function _activateHandler(e) {
+    var t = e.target;
+    var items = this.items;
+    while (t && t != this) {
+      var i = items.indexOf(t);
+      if (i >= 0) {
+        var value = this._indexToValue(i);
+        this._itemActivate(value, t);
+        return;
+      }
+      t = t.parentNode;
+    }
+  },
+
+  _itemActivate: function _itemActivate(value, item) {
+    if (!this.fire('iron-activate', { selected: value, item: item }, { cancelable: true }).defaultPrevented) {
+      this.select(value);
+    }
+  }
+
+};
+
+/***/ }),
+
+/***/ "./node_modules/@polymer/iron-selector/iron-selection.js":
+/*!***************************************************************!*\
+  !*** ./node_modules/@polymer/iron-selector/iron-selection.js ***!
+  \***************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.IronSelection = undefined;
+
+__webpack_require__(/*! @polymer/polymer/polymer-legacy.js */ "./node_modules/@polymer/polymer/polymer-legacy.js");
+
+/**
+ * @param {!Function} selectCallback
+ * @constructor
+ * @suppress {missingProvide}
+ */
+var IronSelection = exports.IronSelection = function IronSelection(selectCallback) {
+  this.selection = [];
+  this.selectCallback = selectCallback;
+}; /**
+   @license
+   Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+   This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+   The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+   The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+   Code distributed by Google as part of the polymer project is also
+   subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+   */
+
+
+IronSelection.prototype = {
+
+  /**
+   * Retrieves the selected item(s).
+   *
+   * @method get
+   * @returns Returns the selected item(s). If the multi property is true,
+   * `get` will return an array, otherwise it will return
+   * the selected item or undefined if there is no selection.
+   */
+  get: function get() {
+    return this.multi ? this.selection.slice() : this.selection[0];
+  },
+
+  /**
+   * Clears all the selection except the ones indicated.
+   *
+   * @method clear
+   * @param {Array} excludes items to be excluded.
+   */
+  clear: function clear(excludes) {
+    this.selection.slice().forEach(function (item) {
+      if (!excludes || excludes.indexOf(item) < 0) {
+        this.setItemSelected(item, false);
+      }
+    }, this);
+  },
+
+  /**
+   * Indicates if a given item is selected.
+   *
+   * @method isSelected
+   * @param {*} item The item whose selection state should be checked.
+   * @returns Returns true if `item` is selected.
+   */
+  isSelected: function isSelected(item) {
+    return this.selection.indexOf(item) >= 0;
+  },
+
+  /**
+   * Sets the selection state for a given item to either selected or deselected.
+   *
+   * @method setItemSelected
+   * @param {*} item The item to select.
+   * @param {boolean} isSelected True for selected, false for deselected.
+   */
+  setItemSelected: function setItemSelected(item, isSelected) {
+    if (item != null) {
+      if (isSelected !== this.isSelected(item)) {
+        // proceed to update selection only if requested state differs from current
+        if (isSelected) {
+          this.selection.push(item);
+        } else {
+          var i = this.selection.indexOf(item);
+          if (i >= 0) {
+            this.selection.splice(i, 1);
+          }
+        }
+        if (this.selectCallback) {
+          this.selectCallback(item, isSelected);
+        }
+      }
+    }
+  },
+
+  /**
+   * Sets the selection state for a given item. If the `multi` property
+   * is true, then the selected state of `item` will be toggled; otherwise
+   * the `item` will be selected.
+   *
+   * @method select
+   * @param {*} item The item to select.
+   */
+  select: function select(item) {
+    if (this.multi) {
+      this.toggle(item);
+    } else if (this.get() !== item) {
+      this.setItemSelected(this.get(), false);
+      this.setItemSelected(item, true);
+    }
+  },
+
+  /**
+   * Toggles the selection state for `item`.
+   *
+   * @method toggle
+   * @param {*} item The item to toggle.
+   */
+  toggle: function toggle(item) {
+    this.setItemSelected(item, !this.isSelected(item));
+  }
+
+};
 
 /***/ }),
 
@@ -38329,6 +39958,8 @@ __webpack_require__(/*! @polymer/iron-fit-behavior/iron-fit-behavior.js */ "./no
 __webpack_require__(/*! @polymer/paper-input/paper-textarea.js */ "./node_modules/@polymer/paper-input/paper-textarea.js");
 __webpack_require__(/*! @polymer/paper-tooltip/paper-tooltip.js */ "./node_modules/@polymer/paper-tooltip/paper-tooltip.js");
 __webpack_require__(/*! @polymer/iron-localstorage/iron-localstorage.js */ "./node_modules/@polymer/iron-localstorage/iron-localstorage.js");
+__webpack_require__(/*! @polymer/iron-pages/iron-pages.js */ "./node_modules/@polymer/iron-pages/iron-pages.js");
+__webpack_require__(/*! @polymer/iron-ajax/iron-ajax.js */ "./node_modules/@polymer/iron-ajax/iron-ajax.js");
 var __ = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
 // local source
 var store_1 = __webpack_require__(/*! ../store/store */ "./src/nps-widget/store/store.ts");
@@ -38346,11 +39977,13 @@ var AnswerRange = Types.AnswerRange;
 var ReduxConnector_1 = __webpack_require__(/*! ../../utils/ReduxConnector */ "./src/utils/ReduxConnector.ts");
 var actions_2 = __webpack_require__(/*! ../store/userstate/actions */ "./src/nps-widget/store/userstate/actions.ts");
 var AnswerRangeQuestionFinder_1 = __webpack_require__(/*! ../services/AnswerRangeQuestionFinder */ "./src/nps-widget/services/AnswerRangeQuestionFinder.ts");
+var ConfigHelper_1 = __webpack_require__(/*! ../../utils/ConfigHelper */ "./src/utils/ConfigHelper.ts");
 var NpsWidget = /** @class */ (function (_super) {
     __extends(NpsWidget, _super);
     function NpsWidget(config) {
         var _this = _super.call(this) || this;
         _this.iconType = 'feedback';
+        _this.APISubmissionURL = "" + ConfigHelper_1.ConfigHelper.nps_Service_API_URL + ConfigHelper_1.ConfigHelper.nps_Service_API_Route_feedback;
         _this.store = store_1.configureStore(undefined);
         // log the state
         console.log(_this.store.getState());
@@ -38411,9 +40044,12 @@ var NpsWidget = /** @class */ (function (_super) {
         this.answerValueMin = __.first(state.settings.answerValues);
         this.answerValueMax = __.last(state.settings.answerValues);
         // ReSharper restore TsResolvedFromInaccessibleModule
+        // only set this if it's there
+        if (state.userState.pageState != null)
+            this.pageName = state.userState.pageState.toString().toLowerCase();
         // I wanted a quick way to get user data into local storage, so just
         // dump it in and we can pull it out selectively when hydrating
-        this.myLocalStorage = state.userState;
+        // this.myLocalStorage = state.userState;
     };
     NpsWidget.prototype.connectedCallback = function () {
         _super.prototype.connectedCallback.call(this);
@@ -38434,7 +40070,7 @@ var NpsWidget = /** @class */ (function (_super) {
     };
     Object.defineProperty(NpsWidget, "template", {
         get: function () {
-            return polymer_element_1.html(templateObject_1 || (templateObject_1 = __makeTemplateObject(["\n\n      <style is=\"custom-style\">\n\n        paper-fab {\n          margin: var(--nps-margin, );\n          z-index: var(--nps-zindex, 99);\n          position: fixed;\n          top: var(--nps-top);\n          bottom: var(--nps-bottom, 10px);\n          left: var(--nps-left);\n          right: var(--nps-right, 10px);\n          --paper-fab-background: ", ";\n          color: ", ";\n        }\n\n        paper-fab:hover {\n          --paper-fab-background: ", ";\n          color: ", ";\n        }\n\n        paper-slider {\n        --paper-slider-knob-color: ", ";\n        --paper-slider-active-color: ", ";\n        margin-bottom: 20px;\n        --paper-slider-container-color: ", ";\n        --paper-slider-markers-color: ", ";\n        --paper-slider-knob-start-color: ", ";\n        --paper-slider-height: 7px;\n        --paper-slider-pin-color: ", ";\n        width: 95%;\n        margin-top: 30px;\n        float: left;\n        }\n\n      </style>\n\n      <iron-localstorage id=\"localstorage\" name=\"\" value=\"[[myLocalStorage]]\"></iron-localstorage>\n\n      <paper-fab id=\"paper-fab\" icon=\"icons:[[iconType]]\" on-click=\"onFabClick\"></paper-fab>\n\n      <paper-dialog id=\"modal\" modal>\n        <div class=\"container\">\n          <h3>[[introductionStatement]]</h3>\n            <div class=\"container\"  style=\"width: 100%\">\n              [[mainQuestion]]\n              <paper-slider id=\"ratings\" pin snaps min=\"[[answerValueMin]]\" max=\"[[answerValueMax]]\" max-markers=\"[[answerValueMax]]\" step=\"1\" immediate-value=\"{{rating}}\" on-immediate-value-changed=\"onSliderImmediateChange\"></paper-slider>\n              <div style=\"float: right; width: 5%; text-align: right; padding-top: 22px;\">\n                <h2>{{rating}}</h2>\n              </div>\n            </div>\n            <div class=\"container\" style=\"float: left; width: 100%;\">\n              <paper-textarea label$=\"[[selectedAnswerRangeQuestion]] (optional)\" on-value-changed=\"onAnswerRangeQuestionResponseChange\" value=\"{{answerRangeQuestionResponse}}\"></paper-textarea>\n              <br/>\n            </div>\n            <div class=\"container\" style=\"width: 100%\">\n              <div class=\"buttons\" style=\"float: right\">\n                <paper-button dialog-dismiss>Maybe later...</paper-button>\n                <paper-button dialog-confirm>Send my feedback</paper-button>\n              </div>\n            </div>\n            <br/>\n        </div>\n      </paper-dialog>\n    "], ["\n\n      <style is=\"custom-style\">\n\n        paper-fab {\n          margin: var(--nps-margin, );\n          z-index: var(--nps-zindex, 99);\n          position: fixed;\n          top: var(--nps-top);\n          bottom: var(--nps-bottom, 10px);\n          left: var(--nps-left);\n          right: var(--nps-right, 10px);\n          --paper-fab-background: ", ";\n          color: ", ";\n        }\n\n        paper-fab:hover {\n          --paper-fab-background: ", ";\n          color: ", ";\n        }\n\n        paper-slider {\n        --paper-slider-knob-color: ", ";\n        --paper-slider-active-color: ", ";\n        margin-bottom: 20px;\n        --paper-slider-container-color: ", ";\n        --paper-slider-markers-color: ", ";\n        --paper-slider-knob-start-color: ", ";\n        --paper-slider-height: 7px;\n        --paper-slider-pin-color: ", ";\n        width: 95%;\n        margin-top: 30px;\n        float: left;\n        }\n\n      </style>\n\n      <iron-localstorage id=\"localstorage\" name=\"\" value=\"[[myLocalStorage]]\"></iron-localstorage>\n\n      <paper-fab id=\"paper-fab\" icon=\"icons:[[iconType]]\" on-click=\"onFabClick\"></paper-fab>\n\n      <paper-dialog id=\"modal\" modal>\n        <div class=\"container\">\n          <h3>[[introductionStatement]]</h3>\n            <div class=\"container\"  style=\"width: 100%\">\n              [[mainQuestion]]\n              <paper-slider id=\"ratings\" pin snaps min=\"[[answerValueMin]]\" max=\"[[answerValueMax]]\" max-markers=\"[[answerValueMax]]\" step=\"1\" immediate-value=\"{{rating}}\" on-immediate-value-changed=\"onSliderImmediateChange\"></paper-slider>\n              <div style=\"float: right; width: 5%; text-align: right; padding-top: 22px;\">\n                <h2>{{rating}}</h2>\n              </div>\n            </div>\n            <div class=\"container\" style=\"float: left; width: 100%;\">\n              <paper-textarea label$=\"[[selectedAnswerRangeQuestion]] (optional)\" on-value-changed=\"onAnswerRangeQuestionResponseChange\" value=\"{{answerRangeQuestionResponse}}\"></paper-textarea>\n              <br/>\n            </div>\n            <div class=\"container\" style=\"width: 100%\">\n              <div class=\"buttons\" style=\"float: right\">\n                <paper-button dialog-dismiss>Maybe later...</paper-button>\n                <paper-button dialog-confirm>Send my feedback</paper-button>\n              </div>\n            </div>\n            <br/>\n        </div>\n      </paper-dialog>\n    "])), ColorHelper.backgroundColour(), ColorHelper.foregroundColour(), ColorHelper.backgroundColourHover(), ColorHelper.foregroundColourHover(), ColorHelper.backgroundColourHover(), ColorHelper.backgroundColourHover(), ColorHelper.backgroundColour(), ColorHelper.foregroundColour(), ColorHelper.foregroundColour(), ColorHelper.backgroundColourHover());
+            return polymer_element_1.html(templateObject_1 || (templateObject_1 = __makeTemplateObject(["\n\n      <style is=\"custom-style\">\n\n        paper-fab {\n          margin: var(--nps-margin, );\n          z-index: var(--nps-zindex, 99);\n          position: fixed;\n          top: var(--nps-top);\n          bottom: var(--nps-bottom, 10px);\n          left: var(--nps-left);\n          right: var(--nps-right, 10px);\n          --paper-fab-background: ", ";\n          color: ", ";\n        }\n\n        paper-fab:hover {\n          --paper-fab-background: ", ";\n          color: ", ";\n        }\n\n        paper-slider {\n        --paper-slider-knob-color: ", ";\n        --paper-slider-active-color: ", ";\n        margin-bottom: 20px;\n        --paper-slider-container-color: ", ";\n        --paper-slider-markers-color: ", ";\n        --paper-slider-knob-start-color: ", ";\n        --paper-slider-height: 7px;\n        --paper-slider-pin-color: ", ";\n        width: 95%;\n        margin-top: 30px;\n        float: left;\n        }\n\n      </style>\n\n      <iron-localstorage id=\"localstorage\" name=\"\" value=\"[[myLocalStorage]]\"></iron-localstorage>\n\n      <paper-fab id=\"paper-fab\" icon=\"icons:[[iconType]]\" on-click=\"onFabClick\"></paper-fab>\n\n      <paper-dialog id=\"modal\" modal on-iron-overlay-closed=\"onDialogClosed\" oniron-overlay-canceled=\"onDialogCancelled\">\n        <div class=\"container\">\n          <iron-pages selected$=\"{{pageName}}\" attr-for-selected=\"page-name\" on-iron-select=\"onSelectedPageChanged\">\n            <div page-name=\"feedback\">\n              <h3>[[introductionStatement]]</h3>\n              <div class=\"container\"  style=\"width: 100%\">\n                [[mainQuestion]]\n                <paper-slider id=\"ratings\" pin snaps min=\"[[answerValueMin]]\" max=\"[[answerValueMax]]\" max-markers=\"[[answerValueMax]]\" step=\"1\" immediate-value=\"{{rating}}\" on-immediate-value-changed=\"onSliderImmediateChange\"></paper-slider>\n                <div style=\"float: right; width: 5%; text-align: right; padding-top: 22px;\">\n                  <h2>{{rating}}</h2>\n                </div>\n              </div>\n              <div class=\"container\" style=\"float: left; width: 100%;\">\n                <paper-textarea label$=\"[[selectedAnswerRangeQuestion]] (optional)\" on-value-changed=\"onAnswerRangeQuestionResponseChange\" value=\"{{answerRangeQuestionResponse}}\"></paper-textarea>\n                <br/>\n              </div>\n              <div class=\"container\" style=\"width: 100%\">\n                <div class=\"buttons\" style=\"float: right\">\n                  <paper-button dialog-dismiss>Maybe later...</paper-button>\n                  <paper-button dialog-confirm>Send my feedback</paper-button>\n                </div>\n              </div>\n            </div>\n            <div page-name=\"submitting\">\n              <h3>Your feedback is being submitted</h3>\n              We're submitting your feedback. Come back and check in a moment.\n              <br/>\n                <div class=\"buttons\" style=\"float: right\">\n                  <paper-button dialog-dismiss>OK</paper-button>\n                </div>\n            </div>\n            <div page-name=\"submitted\">\n              <h3>Your feedback has been submitted</h3>\n              You won't be asked again for a while\n              <br/>\n                <div class=\"buttons\" style=\"float: right\">\n                  <paper-button dialog-dismiss>OK</paper-button>\n                </div>\n            </div>\n            <div page-name=\"retry\">\n              <h3>Your feedback has failed submission</h3>\n              Please try again\n              <br/>\n                <div class=\"buttons\" style=\"float: right\">\n                  <paper-button dialog-confirm>Resend my feedback</paper-button>\n                </div>\n            </div>\n          </iron-pages>\n          <br/>\n        </div>\n\n      <iron-ajax id=ajax\n          url$=\"[[APISubmissionURL]]\"\n          handle-as=\"json\"\n          method=\"post\"\n          on-response=\"handleSubmissionResponse\"\n          content-type=\"application/json\"\n          debounce-duration=\"300\"></iron-ajax>\n\n      </paper-dialog>\n    "], ["\n\n      <style is=\"custom-style\">\n\n        paper-fab {\n          margin: var(--nps-margin, );\n          z-index: var(--nps-zindex, 99);\n          position: fixed;\n          top: var(--nps-top);\n          bottom: var(--nps-bottom, 10px);\n          left: var(--nps-left);\n          right: var(--nps-right, 10px);\n          --paper-fab-background: ", ";\n          color: ", ";\n        }\n\n        paper-fab:hover {\n          --paper-fab-background: ", ";\n          color: ", ";\n        }\n\n        paper-slider {\n        --paper-slider-knob-color: ", ";\n        --paper-slider-active-color: ", ";\n        margin-bottom: 20px;\n        --paper-slider-container-color: ", ";\n        --paper-slider-markers-color: ", ";\n        --paper-slider-knob-start-color: ", ";\n        --paper-slider-height: 7px;\n        --paper-slider-pin-color: ", ";\n        width: 95%;\n        margin-top: 30px;\n        float: left;\n        }\n\n      </style>\n\n      <iron-localstorage id=\"localstorage\" name=\"\" value=\"[[myLocalStorage]]\"></iron-localstorage>\n\n      <paper-fab id=\"paper-fab\" icon=\"icons:[[iconType]]\" on-click=\"onFabClick\"></paper-fab>\n\n      <paper-dialog id=\"modal\" modal on-iron-overlay-closed=\"onDialogClosed\" oniron-overlay-canceled=\"onDialogCancelled\">\n        <div class=\"container\">\n          <iron-pages selected$=\"{{pageName}}\" attr-for-selected=\"page-name\" on-iron-select=\"onSelectedPageChanged\">\n            <div page-name=\"feedback\">\n              <h3>[[introductionStatement]]</h3>\n              <div class=\"container\"  style=\"width: 100%\">\n                [[mainQuestion]]\n                <paper-slider id=\"ratings\" pin snaps min=\"[[answerValueMin]]\" max=\"[[answerValueMax]]\" max-markers=\"[[answerValueMax]]\" step=\"1\" immediate-value=\"{{rating}}\" on-immediate-value-changed=\"onSliderImmediateChange\"></paper-slider>\n                <div style=\"float: right; width: 5%; text-align: right; padding-top: 22px;\">\n                  <h2>{{rating}}</h2>\n                </div>\n              </div>\n              <div class=\"container\" style=\"float: left; width: 100%;\">\n                <paper-textarea label$=\"[[selectedAnswerRangeQuestion]] (optional)\" on-value-changed=\"onAnswerRangeQuestionResponseChange\" value=\"{{answerRangeQuestionResponse}}\"></paper-textarea>\n                <br/>\n              </div>\n              <div class=\"container\" style=\"width: 100%\">\n                <div class=\"buttons\" style=\"float: right\">\n                  <paper-button dialog-dismiss>Maybe later...</paper-button>\n                  <paper-button dialog-confirm>Send my feedback</paper-button>\n                </div>\n              </div>\n            </div>\n            <div page-name=\"submitting\">\n              <h3>Your feedback is being submitted</h3>\n              We're submitting your feedback. Come back and check in a moment.\n              <br/>\n                <div class=\"buttons\" style=\"float: right\">\n                  <paper-button dialog-dismiss>OK</paper-button>\n                </div>\n            </div>\n            <div page-name=\"submitted\">\n              <h3>Your feedback has been submitted</h3>\n              You won't be asked again for a while\n              <br/>\n                <div class=\"buttons\" style=\"float: right\">\n                  <paper-button dialog-dismiss>OK</paper-button>\n                </div>\n            </div>\n            <div page-name=\"retry\">\n              <h3>Your feedback has failed submission</h3>\n              Please try again\n              <br/>\n                <div class=\"buttons\" style=\"float: right\">\n                  <paper-button dialog-confirm>Resend my feedback</paper-button>\n                </div>\n            </div>\n          </iron-pages>\n          <br/>\n        </div>\n\n      <iron-ajax id=ajax\n          url$=\"[[APISubmissionURL]]\"\n          handle-as=\"json\"\n          method=\"post\"\n          on-response=\"handleSubmissionResponse\"\n          content-type=\"application/json\"\n          debounce-duration=\"300\"></iron-ajax>\n\n      </paper-dialog>\n    "])), ColorHelper.backgroundColour(), ColorHelper.foregroundColour(), ColorHelper.backgroundColourHover(), ColorHelper.foregroundColourHover(), ColorHelper.backgroundColourHover(), ColorHelper.backgroundColourHover(), ColorHelper.backgroundColour(), ColorHelper.foregroundColour(), ColorHelper.foregroundColour(), ColorHelper.backgroundColourHover());
         },
         enumerable: true,
         configurable: true
@@ -38454,6 +40090,17 @@ var NpsWidget = /** @class */ (function (_super) {
             // which will call the changed event below and alter the state
             this.$.ratings.value = localState.userState.rating;
             this.answerRangeQuestionResponse = localState.userState.answerRangeQuestionResponse;
+            // If there's page state in localstorage then set it
+            if (localState.userState.pageState != null) {
+                this.setPageState(localState.userState.pageState);
+            }
+            else {
+                // otherwise let's default to feedback
+                this.setPageState('feedback');
+            }
+        }
+        else {
+            this.setPageState('feedback');
         }
     };
     NpsWidget.prototype.onFabClick = function () {
@@ -38469,6 +40116,27 @@ var NpsWidget = /** @class */ (function (_super) {
     NpsWidget.prototype.onAnswerRangeQuestionResponseChange = function (e) {
         this.store.dispatch((actions_2.setAnswerRangeQuestionResponse(e.target.value)));
         console.log(this.store.getState());
+    };
+    NpsWidget.prototype.onDialogClosed = function (e) {
+        if (e.target.closingReason.confirmed) {
+            this.pageName = actions_2.PageStateKeys.Submitting.toString().toLowerCase();
+            var ajax = this.$.ajax;
+            ajax.body = JSON.stringify(this.store.getState().userState);
+            ajax.generateRequest();
+        }
+    };
+    NpsWidget.prototype.handleSubmissionResponse = function (e) {
+        console.log(e);
+    };
+    NpsWidget.prototype.onDialogCancelled = function (e) {
+    };
+    NpsWidget.prototype.onSelectedPageChanged = function (e) {
+        this.setPageState(e.target.selected);
+    };
+    NpsWidget.prototype.setPageState = function (state) {
+        var pageState = state.toUpperCase();
+        // TODO: Troubleshoot why type safety isn't workgin here - in the meantime cast to any
+        this.store.dispatch((actions_2.setPageStateThunk(pageState)));
     };
     return NpsWidget;
 }(PolymerElement));
@@ -38934,8 +40602,16 @@ var UserStateActionTypeKeys;
     UserStateActionTypeKeys["SetRating"] = "SET_RATING";
     UserStateActionTypeKeys["SetSelectedAnswerRangeQuestion"] = "SET_SELECTED_ANSWER_RANGE_QUESTION";
     UserStateActionTypeKeys["SetAnswerRangeQuestionResponse"] = "SET_ANSWER_RANGE_RESPONSE";
+    UserStateActionTypeKeys["SetPageState"] = "SET_PAGE_STATE";
     UserStateActionTypeKeys["OtherAction"] = "___other_action____";
 })(UserStateActionTypeKeys = exports.UserStateActionTypeKeys || (exports.UserStateActionTypeKeys = {}));
+var PageStateKeys;
+(function (PageStateKeys) {
+    PageStateKeys["Feedback"] = "FEEDBACK";
+    PageStateKeys["Submitting"] = "SUBMITTING";
+    PageStateKeys["Submitted"] = "SUBMITTED";
+    PageStateKeys["Retry"] = "RETRY";
+})(PageStateKeys = exports.PageStateKeys || (exports.PageStateKeys = {}));
 exports.setRatingValue = function (rating) { return ({
     type: UserStateActionTypeKeys.SetRating,
     rating: rating
@@ -38943,6 +40619,10 @@ exports.setRatingValue = function (rating) { return ({
 var setSelectedAnswerRangeQuestion = function (question) { return ({
     type: UserStateActionTypeKeys.SetSelectedAnswerRangeQuestion,
     question: question
+}); };
+var setPageState = function (state) { return ({
+    type: UserStateActionTypeKeys.SetPageState,
+    state: state
 }); };
 exports.setAnswerRangeQuestionResponse = function (response) { return ({
     type: UserStateActionTypeKeys.SetAnswerRangeQuestionResponse,
@@ -38956,6 +40636,12 @@ exports.setRatingValueThunk = function (rating, AnswerRangeQuestionFinder) {
         if (selectedAnswerRange != null)
             dispatch(setSelectedAnswerRangeQuestion(selectedAnswerRange.question));
         return dispatch(exports.setRatingValue(rating));
+    };
+};
+exports.setPageStateThunk = function (state) {
+    return function (dispatch) {
+        // side effects here
+        return dispatch(setPageState(state));
     };
 };
 //  export const addMiscSettings: ActionCreator<IAddMiscSettings> = (miscSettings: MiscSettings) => ({
@@ -39020,6 +40706,10 @@ var UserStateReducer = function (state, action) {
             state.answerRangeQuestionResponse = action.response;
             // ReSharper disable once TsResolvedFromInaccessibleModule
             return _.assign({}, state);
+        case Actions.UserStateActionTypeKeys.SetPageState:
+            state.pageState = action.state;
+            // ReSharper disable once TsResolvedFromInaccessibleModule
+            return _.assign({}, state);
         default:
             return state;
     }
@@ -39041,14 +40731,50 @@ exports.default = UserStateReducer;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var UserState = /** @class */ (function () {
-    function UserState(rating, selectedAnswerRangeQuestion, answerRangeQuestionResponse) {
+    function UserState(pageState, rating, selectedAnswerRangeQuestion, answerRangeQuestionResponse) {
         this.rating = rating;
         this.selectedAnswerRangeQuestion = selectedAnswerRangeQuestion;
         this.answerRangeQuestionResponse = answerRangeQuestionResponse;
+        this.pageState = pageState;
     }
     return UserState;
 }());
 exports.UserState = UserState;
+
+
+/***/ }),
+
+/***/ "./src/utils/ConfigHelper.ts":
+/*!***********************************!*\
+  !*** ./src/utils/ConfigHelper.ts ***!
+  \***********************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var ConfigHelper = /** @class */ (function () {
+    function ConfigHelper() {
+    }
+    Object.defineProperty(ConfigHelper, "nps_Service_API_URL", {
+        get: function () {
+            return 'http://localhost:7071/api/';
+            // return 'https://code-red-npp.azurewebsites.net/api/';
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(ConfigHelper, "nps_Service_API_Route_feedback", {
+        get: function () {
+            return 'NPSSubmission';
+        },
+        enumerable: true,
+        configurable: true
+    });
+    return ConfigHelper;
+}());
+exports.ConfigHelper = ConfigHelper;
 
 
 /***/ }),

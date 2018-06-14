@@ -101,6 +101,7 @@
     <TypeScriptCompile Include="src\nps-widget\store\userstate\actions.ts" />
     <Content Include="src\nps-widget\store\userstate\reducer.ts" />
     <TypeScriptCompile Include="src\nps-widget\store\userstate\types.ts" />
+    <TypeScriptCompile Include="src\utils\ConfigHelper.ts" />
     <TypeScriptCompile Include="src\utils\ReduxConnector.ts" />
     <TypeScriptCompile Include="test\nps-widget\services\index.spec.ts" />
     <Content Include="Web.config" />

@@ -11,7 +11,15 @@ export enum UserStateActionTypeKeys {
   SetRating = 'SET_RATING',
   SetSelectedAnswerRangeQuestion = 'SET_SELECTED_ANSWER_RANGE_QUESTION',
   SetAnswerRangeQuestionResponse = 'SET_ANSWER_RANGE_RESPONSE',
+  SetPageState = 'SET_PAGE_STATE',
   OtherAction = '___other_action____'
+}
+
+export enum PageStateKeys {
+  Feedback = 'FEEDBACK',
+  Submitting = 'SUBMITTING',
+  Submitted = 'SUBMITTED',
+  Retry = 'RETRY',
 }
 
 export interface ISetRatingAction extends Action {
@@ -22,6 +30,11 @@ export interface ISetRatingAction extends Action {
 export interface ISetSelectedAnswerRangeQuestionAction extends Action {
   type: UserStateActionTypeKeys.SetSelectedAnswerRangeQuestion;
   question: string;
+}
+
+export interface ISetPageStateAction extends Action {
+  type: UserStateActionTypeKeys.SetPageState;
+  state: PageStateKeys;
 }
 
 export interface ISetAnswerRangeQuestionResponseAction extends Action {
@@ -37,6 +50,7 @@ export type ActionTypes =
   | ISetRatingAction
   | ISetSelectedAnswerRangeQuestionAction
   | ISetAnswerRangeQuestionResponseAction
+  | ISetPageStateAction
   | IOtherAction;
 
 export const setRatingValue: ActionCreator<ISetRatingAction> = (rating: number) => ({
@@ -49,6 +63,11 @@ const setSelectedAnswerRangeQuestion: ActionCreator<ISetSelectedAnswerRangeQuest
   question: question
 });
 
+const setPageState: ActionCreator<ISetPageStateAction> = (state: PageStateKeys) => ({
+  type: UserStateActionTypeKeys.SetPageState,
+  state: state
+});
+
 export const setAnswerRangeQuestionResponse: ActionCreator<ISetAnswerRangeQuestionResponseAction> = (response: string) => ({
   type: UserStateActionTypeKeys.SetAnswerRangeQuestionResponse,
   response: response
@@ -56,19 +75,32 @@ export const setAnswerRangeQuestionResponse: ActionCreator<ISetAnswerRangeQuesti
 
 export const setRatingValueThunk: ActionCreator<ThunkResult<Action>> = (rating: number, AnswerRangeQuestionFinder: IAnswerRangeQuestionFinder) => {
 
-  return (dispatch: Dispatch<ISetRatingAction>, getState): Action  => {
-     
-      // side effects here
+  return (dispatch: Dispatch<ISetRatingAction>, getState): Action => {
 
-      // find the correct answer range from the selected rating
+    // side effects here
+
+    // find the correct answer range from the selected rating
     const selectedAnswerRange = AnswerRangeQuestionFinder.findAnswerRangeByRangeValue(getState().settings.answerRanges, rating);
     if (selectedAnswerRange != null)
       (dispatch as Dispatch<ISetSelectedAnswerRangeQuestionAction>)(setSelectedAnswerRangeQuestion(selectedAnswerRange.question));
 
-      return dispatch(setRatingValue(rating));
+    return dispatch(setRatingValue(rating));
 
-    };
   };
+};
+
+export const setPageStateThunk: ActionCreator<ThunkResult<Action>> = (state: PageStateKeys) => {
+
+  return (dispatch: Dispatch<ISetPageStateAction>): Action => {
+
+    // side effects here
+
+    
+
+    return dispatch(setPageState(state));
+
+  };
+};
 
 
 //  export const addMiscSettings: ActionCreator<IAddMiscSettings> = (miscSettings: MiscSettings) => ({

@@ -10,6 +10,9 @@ import '@polymer/iron-fit-behavior/iron-fit-behavior.js';
 import '@polymer/paper-input/paper-textarea.js';
 import '@polymer/paper-tooltip/paper-tooltip.js';
 import '@polymer/iron-localstorage/iron-localstorage.js';
+import '@polymer/iron-pages/iron-pages.js';
+import '@polymer/iron-ajax/iron-ajax.js';
+
 import * as __ from 'lodash';
 
 // local source
@@ -29,9 +32,10 @@ import { html } from '@polymer/polymer/polymer-element';
 import Types = require('../store/settings/types');
 import AnswerRange = Types.AnswerRange;
 import { connectToRedux } from '../../utils/ReduxConnector';
-import { setRatingValueThunk, setAnswerRangeQuestionResponse, setRatingValue } from '../store/userstate/actions';
+import { setRatingValueThunk, setAnswerRangeQuestionResponse, setPageStateThunk, PageStateKeys } from '../store/userstate/actions';
 import { AnswerRangeQuestionFinder } from '../services/AnswerRangeQuestionFinder';
 import { UserState } from '../store/userstate/types';
+import { ConfigHelper } from '../../utils/ConfigHelper';
 
 export default class NpsWidget extends PolymerElement implements IReduxBindable {
 
@@ -45,6 +49,8 @@ export default class NpsWidget extends PolymerElement implements IReduxBindable 
   private selectedAnswerRangeQuestion: string;
   private answerRangeQuestionResponse: string;
   private myLocalStorage: UserState;
+  private pageName: string;
+  private APISubmissionURL: string = `${ConfigHelper.nps_Service_API_URL}${ConfigHelper.nps_Service_API_Route_feedback}`;
 
   static get is() { return 'nps-widget'; }
 
@@ -137,9 +143,13 @@ export default class NpsWidget extends PolymerElement implements IReduxBindable 
     this.answerValueMax = __.last(state.settings.answerValues);
     // ReSharper restore TsResolvedFromInaccessibleModule
 
+    // only set this if it's there
+    if (state.userState.pageState != null)
+      this.pageName = state.userState.pageState.toString().toLowerCase();
+
     // I wanted a quick way to get user data into local storage, so just
     // dump it in and we can pull it out selectively when hydrating
-    this.myLocalStorage = state.userState;
+    // this.myLocalStorage = state.userState;
 
   }
 
@@ -214,28 +224,65 @@ export default class NpsWidget extends PolymerElement implements IReduxBindable 
 
       <paper-fab id="paper-fab" icon="icons:[[iconType]]" on-click="onFabClick"></paper-fab>
 
-      <paper-dialog id="modal" modal>
+      <paper-dialog id="modal" modal on-iron-overlay-closed="onDialogClosed" oniron-overlay-canceled="onDialogCancelled">
         <div class="container">
-          <h3>[[introductionStatement]]</h3>
-            <div class="container"  style="width: 100%">
-              [[mainQuestion]]
-              <paper-slider id="ratings" pin snaps min="[[answerValueMin]]" max="[[answerValueMax]]" max-markers="[[answerValueMax]]" step="1" immediate-value="{{rating}}" on-immediate-value-changed="onSliderImmediateChange"></paper-slider>
-              <div style="float: right; width: 5%; text-align: right; padding-top: 22px;">
-                <h2>{{rating}}</h2>
+          <iron-pages selected$="{{pageName}}" attr-for-selected="page-name" on-iron-select="onSelectedPageChanged">
+            <div page-name="feedback">
+              <h3>[[introductionStatement]]</h3>
+              <div class="container"  style="width: 100%">
+                [[mainQuestion]]
+                <paper-slider id="ratings" pin snaps min="[[answerValueMin]]" max="[[answerValueMax]]" max-markers="[[answerValueMax]]" step="1" immediate-value="{{rating}}" on-immediate-value-changed="onSliderImmediateChange"></paper-slider>
+                <div style="float: right; width: 5%; text-align: right; padding-top: 22px;">
+                  <h2>{{rating}}</h2>
+                </div>
+              </div>
+              <div class="container" style="float: left; width: 100%;">
+                <paper-textarea label$="[[selectedAnswerRangeQuestion]] (optional)" on-value-changed="onAnswerRangeQuestionResponseChange" value="{{answerRangeQuestionResponse}}"></paper-textarea>
+                <br/>
+              </div>
+              <div class="container" style="width: 100%">
+                <div class="buttons" style="float: right">
+                  <paper-button dialog-dismiss>Maybe later...</paper-button>
+                  <paper-button dialog-confirm>Send my feedback</paper-button>
+                </div>
               </div>
             </div>
-            <div class="container" style="float: left; width: 100%;">
-              <paper-textarea label$="[[selectedAnswerRangeQuestion]] (optional)" on-value-changed="onAnswerRangeQuestionResponseChange" value="{{answerRangeQuestionResponse}}"></paper-textarea>
+            <div page-name="submitting">
+              <h3>Your feedback is being submitted</h3>
+              We're submitting your feedback. Come back and check in a moment.
               <br/>
+                <div class="buttons" style="float: right">
+                  <paper-button dialog-dismiss>OK</paper-button>
+                </div>
             </div>
-            <div class="container" style="width: 100%">
-              <div class="buttons" style="float: right">
-                <paper-button dialog-dismiss>Maybe later...</paper-button>
-                <paper-button dialog-confirm>Send my feedback</paper-button>
-              </div>
+            <div page-name="submitted">
+              <h3>Your feedback has been submitted</h3>
+              You won't be asked again for a while
+              <br/>
+                <div class="buttons" style="float: right">
+                  <paper-button dialog-dismiss>OK</paper-button>
+                </div>
             </div>
-            <br/>
+            <div page-name="retry">
+              <h3>Your feedback has failed submission</h3>
+              Please try again
+              <br/>
+                <div class="buttons" style="float: right">
+                  <paper-button dialog-confirm>Resend my feedback</paper-button>
+                </div>
+            </div>
+          </iron-pages>
+          <br/>
         </div>
+
+      <iron-ajax id=ajax
+          url$="[[APISubmissionURL]]"
+          handle-as="json"
+          method="post"
+          on-response="handleSubmissionResponse"
+          content-type="application/json"
+          debounce-duration="300"></iron-ajax>
+
       </paper-dialog>
     `;
 
@@ -256,7 +303,7 @@ export default class NpsWidget extends PolymerElement implements IReduxBindable 
       // ReSharper disable once TsResolvedFromInaccessibleModule
       const localState: IApplicationState = __.assign(
         <IApplicationState>{},
-        {userState: JSON.parse(localStorageData) as UserState}
+        { userState: JSON.parse(localStorageData) as UserState }
       );
 
       // We can't use the bound property here as it's bound to immediate-change, so let's
@@ -264,9 +311,21 @@ export default class NpsWidget extends PolymerElement implements IReduxBindable 
       // which will call the changed event below and alter the state
       this.$.ratings.value = localState.userState.rating;
       this.answerRangeQuestionResponse = localState.userState.answerRangeQuestionResponse;
+
+      // If there's page state in localstorage then set it
+      if (localState.userState.pageState != null) {
+        this.setPageState(localState.userState.pageState);
+      } else {
+        // otherwise let's default to feedback
+        this.setPageState('feedback');
+      }
+    } else {
+      this.setPageState('feedback');
     }
 
   }
+
+
 
   onFabClick() {
     this.$.modal.open();
@@ -292,6 +351,35 @@ export default class NpsWidget extends PolymerElement implements IReduxBindable 
     console.log(this.store.getState());
   }
 
+  onDialogClosed(e) {
+    if (e.target.closingReason.confirmed) {
+      this.pageName = PageStateKeys.Submitting.toString().toLowerCase();
+      const ajax = this.$.ajax;
+      ajax.body = JSON.stringify(this.store.getState().userState);
+      ajax.generateRequest();
+    }
+  }
+
+  handleSubmissionResponse(e) {
+    console.log(e);
+  }
+
+  onDialogCancelled(e) {
+  }
+
+  onSelectedPageChanged(e) {
+
+    this.setPageState(e.target.selected);
+
+  }
+
+  setPageState(state: string) {
+    const pageState: PageStateKeys = <keyof typeof PageStateKeys>state.toUpperCase() as PageStateKeys;
+    // TODO: Troubleshoot why type safety isn't workgin here - in the meantime cast to any
+    this.store.dispatch((setPageStateThunk(pageState)) as any);
+  }
+
+
 }
 
 class ColorHelper {
@@ -302,3 +390,4 @@ class ColorHelper {
 }
 
 window.customElements.define(NpsWidget.is, NpsWidget);
+
