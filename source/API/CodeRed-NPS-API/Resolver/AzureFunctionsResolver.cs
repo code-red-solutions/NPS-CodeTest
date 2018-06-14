@@ -1,6 +1,6 @@
 ﻿using CodeRed.NPS.API.ContextResolver.Interfaces;
 using CodeRed.NPS.API.Logging;
-using CodeRed.NPS.API.Service;
+using CodeRed.NPS.API.Services;
 using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Azure.WebJobs.Host.Bindings;
 using Microsoft.Practices.Unity;
@@ -15,8 +15,9 @@ namespace CodeRed.NPS.API.Resolver
 		{
 			_container = new UnityContainer();
 
-			_container.RegisterType<IService, SampleService>();
+			_container.RegisterType<IRepository, NpsWidgetFeedbackRepository>();
 		    _container.RegisterType<ILogger, AzureFunctionLogger>();
+		    _container.RegisterType<IApplicationSettings, ApplicationSettings>();
 
 		}
 

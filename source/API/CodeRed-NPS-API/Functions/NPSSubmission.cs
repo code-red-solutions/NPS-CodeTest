@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using CodeRed.NPS.API.ContextResolver.Attributes;
 using CodeRed.NPS.API.Logging;
 using CodeRed.NPS.API.Resolver;
-using CodeRed.NPS.API.Service;
+using CodeRed.NPS.API.Services;
 using CodeRed.NPS.Core.Entities;
 using CodeRed.NPS.Core.Helpers;
 using Microsoft.Azure.WebJobs;
@@ -23,20 +23,20 @@ namespace CodeRed.NPS.API.Functions
 		public static async Task<HttpResponseMessage> Run(
 			[HttpTrigger(AuthorizationLevel.Anonymous, "POST", "OPTIONS")] HttpRequestMessage req,
             [Resolve] ILogger log,
-			[Resolve] IService service)
+			[Resolve] IRepository repository)
 		{
 
 		    try
 		    {
-		        var workResult = "";
+		        var feedbackId = string.Empty;
 
 		        if (req.Method == HttpMethod.Post)
 		        {
-		            SubmissionDetails data;
+		            FeedbackSubmissionDetails data;
 		            try
 		            {
 		                var content = await req.Content.ReadAsStringAsync();
-		                data = JsonConvert.DeserializeObject<SubmissionDetails>(content);
+		                data = JsonConvert.DeserializeObject<FeedbackSubmissionDetails>(content);
 		            }
 		            catch (JsonReaderException ex)
 		            {
@@ -45,18 +45,16 @@ namespace CodeRed.NPS.API.Functions
 		                    "Please check the validity of your submission and try again");
 		            }
 
-		            var user = data.UserId ?? "None supplied";
-
 		            log.Information("Got the following submission....");
-		            log.Information($"UserId: {user}");
-		            log.Information($"Rating: {data.rating}");
-		            log.Information($"Comment Question: '{data.selectedAnswerRangeQuestion}'");
-		            log.Information($"Comment: '{data.Comment}'");
+		            log.Information($"Rating: {data.Rating}");
+		            log.Information($"Comment Question: '{data.SelectedAnswerRangeQuestion}'");
+		            log.Information($"Comment: '{data.AnswerRangeQuestionResponse}'");
 
-		            workResult = await service.DoWorkAsync();
+		            feedbackId = await repository.SaveFeedbackAsync(data);
+
 		        }
 
-                var response = CreateResponseHelper.CreateReponse(HttpStatusCode.OK, workResult);
+                var response = CreateResponseHelper.CreateReponse(HttpStatusCode.OK, !string.IsNullOrEmpty(feedbackId) ? $"Saved the document with an id of '{feedbackId}'" : "");
 
                 if (req.Headers.Contains("Origin"))
 		        {

@@ -8,6 +8,7 @@
     <OutputPath>bin\Debug\</OutputPath>
   </PropertyGroup>
   <ItemGroup>    
+    <PackageReference Include="Microsoft.Azure.DocumentDB" Version="1.22.0" />    
     <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="1.0.13" />    
     <PackageReference Include="Unity" Version="4.0.1" />
     <PackageReference Include="Microsoft.Azure.KeyVault.Core" version="1.0.0" />
@@ -71,6 +72,7 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Configuration" />
   </ItemGroup>
   <ItemGroup>
     <None Update="host.json">
@@ -79,6 +81,9 @@
     <None Update="local.settings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+    </None>
+    <None Update="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
     </None>
   </ItemGroup>
 </Project>

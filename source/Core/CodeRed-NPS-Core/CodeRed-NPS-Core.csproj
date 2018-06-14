@@ -57,7 +57,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Entities\SubmissionDetails.cs" />
+    <Compile Include="Entities\FeedbackSubmissionDetails.cs" />
+    <Compile Include="Entities\IFeedbackSubmissionDetails.cs" />
     <Compile Include="Helpers\CreateResponseHelper.cs" />
     <Compile Include="Helpers\CreateRequestHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

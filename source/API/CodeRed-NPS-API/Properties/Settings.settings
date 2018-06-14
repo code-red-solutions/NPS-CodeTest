@@ -1,0 +1,12 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="CodeRed.NPS.API.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="EndpointUrl" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">https://codered-nps-db.documents.azure.com:443/</Value>
+    </Setting>
+    <Setting Name="PrimaryKey" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">jDXifZ7VK2Y5mrNTsMVUwqzXTiZM6zH8jWUwgEVJmDxzs2TdwVkFBkyXAk3iFIQbUT1PF4omTWKZ5eHznE9X9w==</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>
