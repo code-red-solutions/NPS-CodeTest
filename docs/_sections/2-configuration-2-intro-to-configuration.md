@@ -1,5 +1,5 @@
 ---
-title: Basic Configuration
+title: Intro to Configuration
 icon: fa-cog
 sectionName: configuration
 order: 2
@@ -10,7 +10,6 @@ The NPS widget works well without you having to specify any configuration. You c
 From the 'Get Started' section you'll remember how we invoked the widget:
 
 ```js
-</script>
 <script type="text/javascript">
 
 	initialzeCodeRedNpsWidget();
@@ -25,7 +24,7 @@ But you can specify your own configuration by creating a 'config' object and pus
 
     var npsConfig = {
         styling: {},
-        settings: {
+        settings: {}
     };
 
     initialzeCodeRedNpsWidget(npsConfig);
@@ -33,4 +32,4 @@ But you can specify your own configuration by creating a 'config' object and pus
 </script>
 ```
 
-Some of the things that yoiu can specify
+Some of the things that you can specify are listed in the [Features](index.html#features) section of the homepage but include the position and colour of the widget and the questions that it asks.
