@@ -18,3 +18,5 @@ source/Core/CodeRed-NPS-Core/obj/
 source/Core/CodeRed-NPS-Core/bin/
 
 source/API/CodeRed-NPS-API/bin/
+
+source/Tests/CodeRed-NPS-API-Tests/bin/
