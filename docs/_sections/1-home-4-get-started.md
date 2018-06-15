@@ -2,11 +2,11 @@
 title: Get Started
 icon: fa-briefcase
 sectionName: home
-order: 3
+order: 4
 ---
 
 ### Add the widget code to your site
-
+<br/>
 Adding the Code Red NPS Widget to your site couldn't be easier. You'll need access to your website source files and the ability to publish the changes.
 
 All we'll be doing is adding some JavaScript `<script>` tags which will load the widget. What you need to do is decide where you want to show the widget (i.e. a different one on specific pages or one universal widget across your entire site).
@@ -14,8 +14,7 @@ All we'll be doing is adding some JavaScript `<script>` tags which will load the
 Once you know where to place the widget, you can just add the JavaScript to your source and publish the changes.
 
 > Don't worry if the JavaScript code below looks a little daunting... We'll explain it in a later section...
-
-
+<br/>
 It's best to place the widget code towards the end of your HTML. Find the closing `</body>` tag and add the following just before it:
 
 
@@ -67,13 +66,15 @@ function initialzeCodeRedNpsWidget(config) {
 </script>
 <script type="text/javascript">
 
-	initialzeCodeRedNpsWidget(npsConfig);
+	initialzeCodeRedNpsWidget();
 
 </script>
 ```
 
 ### That's it
-
+<br/>
 Publish your changed file and you're done. It's that simple!
 
 There is a more advanced set of instructions in the next section should you wish to configure the widget to suit your needs. In the meantime, you should be able to see the widget on your site. Try it out! You should see the widget in the bottom right of your page, just as on this very page.
+
+<a href="./configuration.html" class="button">Go to Configuration</a>
