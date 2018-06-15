@@ -3,7 +3,7 @@ layout: home
 title: Tech Stuff
 sectionName: techie
 icon: fa-terminal
-order: 3
+order: 4
 excludeDefaultWidget: true
 onlyRawContent: true
 ---
