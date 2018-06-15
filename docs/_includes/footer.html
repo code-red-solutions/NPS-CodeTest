@@ -4,7 +4,7 @@
   <!-- Copyright -->
   <ul class="copyright">
     {% if site.company or site.title or site.author %}
-      <li>&copy;&nbsp;{{ site.time | date: '%Y' }}&nbsp;{{- site.company | site.title | default: site.author -}}. All rights reserved. NPS website {{- site.release -}}</li>
+      <li>&copy;&nbsp;{{ site.time | date: '%Y' }}&nbsp;{{- site.company | site.title | default: site.author -}}. All rights reserved. &nbsp;Website:&nbsp;{{- site.release -}}</li>
     {% endif %}
   </ul>
 
@@ -12,5 +12,5 @@
 
 {% if page.excludeDefaultWidget and page.excludeDefaultWidget != nil and page.excludeDefaultWidget == true %} 
 {% else %} 
-{% include NpsWidgetInitialiser_Default.html %} 
+    {% include NpsWidgetInitialiser_Default.html %} 
 {% endif %} 

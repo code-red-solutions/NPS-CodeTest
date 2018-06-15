@@ -61,7 +61,7 @@ description: >- # this means to ignore newlines until "baseurl:"
   (done as a code test for a job application).
 author: Paul Sorauer
 company: Code Red Solutions Pty Ltd
-release: v.1.00.001
+release: v.1.00.013
 email: paul@codered.com.au
 avatar: assets/images/feedback-avatar.png
 avatar_media_type: image/png

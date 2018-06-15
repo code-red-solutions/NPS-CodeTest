@@ -12,6 +12,7 @@ import '@polymer/paper-tooltip/paper-tooltip.js';
 import '@polymer/iron-localstorage/iron-localstorage.js';
 import '@polymer/iron-pages/iron-pages.js';
 import '@polymer/iron-ajax/iron-ajax.js';
+import '@polymer/iron-fit-behavior/iron-fit-behavior.js';
 
 import * as __ from 'lodash';
 
@@ -192,11 +193,15 @@ export default class NpsWidget extends PolymerElement implements IReduxBindable 
           z-index: var(--nps-zindex, 99);
           position: fixed;
           top: var(--nps-top);
-          bottom: var(--nps-bottom, 10px);
+          bottom: var(--nps-bottom, 25px);
           left: var(--nps-left);
-          right: var(--nps-right, 10px);
+          right: var(--nps-right, 25px);
           --paper-fab-background: ${ColorHelper.backgroundColour()};
           color: ${ColorHelper.foregroundColour()};
+        }
+
+        h3 {
+          margin-bottom: 20px;
         }
 
         paper-fab:hover {
@@ -225,55 +230,61 @@ export default class NpsWidget extends PolymerElement implements IReduxBindable 
       <paper-fab id="paper-fab" icon="icons:[[iconType]]" on-click="onFabClick"></paper-fab>
 
       <paper-dialog id="modal" modal on-iron-overlay-closed="onDialogClosed" oniron-overlay-canceled="onDialogCancelled">
-        <div class="container">
-          <iron-pages selected$="{{pageName}}" attr-for-selected="page-name" on-iron-select="onSelectedPageChanged">
-            <div page-name="feedback">
+        <iron-pages selected$="{{pageName}}" attr-for-selected="page-name" on-iron-select="onSelectedPageChanged">
+          <div page-name="feedback" class="container">
+            <iron-fit-impl vertical-align="top">
               <h3>[[introductionStatement]]</h3>
-              <div class="container"  style="width: 100%">
+              <div>
                 [[mainQuestion]]
                 <paper-slider id="ratings" pin snaps min="[[answerValueMin]]" max="[[answerValueMax]]" max-markers="[[answerValueMax]]" step="1" immediate-value="{{rating}}" on-immediate-value-changed="onSliderImmediateChange"></paper-slider>
                 <div style="float: right; width: 5%; text-align: right; padding-top: 22px;">
-                  <h2>{{rating}}</h2>
+                  <h3>{{rating}}</h3>
                 </div>
               </div>
-              <div class="container" style="float: left; width: 100%;">
+              <div  style="float: left; width: 100%">
                 <paper-textarea label$="[[selectedAnswerRangeQuestion]] (optional)" on-value-changed="onAnswerRangeQuestionResponseChange" value="{{answerRangeQuestionResponse}}"></paper-textarea>
                 <br/>
               </div>
-              <div class="container" style="width: 100%">
+              <div>
                 <div class="buttons" style="float: right">
                   <paper-button dialog-dismiss>Maybe later...</paper-button>
                   <paper-button dialog-confirm>Send my feedback</paper-button>
                 </div>
               </div>
-            </div>
-            <div page-name="submitting">
+            </iron-fit-impl>
+          </div>
+          <div page-name="submitting" class="container">
+            <iron-fit-impl vertical-align="top">
               <h3>Your feedback is being submitted</h3>
               We're submitting your feedback. Come back and check in a moment.
               <br/>
-                <div class="buttons" style="float: right">
-                  <paper-button dialog-dismiss>OK</paper-button>
-                </div>
-            </div>
-            <div page-name="submitted">
+              <div class="buttons" style="float: right">
+                <paper-button dialog-dismiss>OK</paper-button>
+              </div>
+            </iron-fit-impl>
+          </div>
+          <div page-name="submitted" class="container">
+            <iron-fit-impl vertical-align="top">
               <h3>Your feedback has been submitted</h3>
               You won't be asked again for a while
               <br/>
-                <div class="buttons" style="float: right">
-                  <paper-button dialog-dismiss>OK</paper-button>
-                </div>
-            </div>
-            <div page-name="retry">
+              <div class="buttons" style="float: right">
+                <paper-button dialog-dismiss>OK</paper-button>
+              </div>
+            </iron-fit-impl>
+          </div>
+          <div page-name="retry" class="container">
+            <iron-fit-impl vertical-align="top">
               <h3>Your feedback has failed submission</h3>
               Please try again
               <br/>
-                <div class="buttons" style="float: right">
-                  <paper-button dialog-confirm>Resend my feedback</paper-button>
-                </div>
-            </div>
-          </iron-pages>
-          <br/>
-        </div>
+              <div class="buttons" style="float: right">
+                <paper-button dialog-confirm>Resend my feedback</paper-button>
+              </div>
+            </iron-fit-impl>
+          </div>
+        </iron-pages>
+      </paper-dialog>
 
       <iron-ajax id=ajax
           url$="[[APISubmissionURL]]"
@@ -283,7 +294,6 @@ export default class NpsWidget extends PolymerElement implements IReduxBindable 
           content-type="application/json"
           debounce-duration="300"></iron-ajax>
 
-      </paper-dialog>
     `;
 
   }
