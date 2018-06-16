@@ -16,7 +16,7 @@ In terms of the front-end technology stack, the widget uses:
 
 - Modules (specified as a library in Webpack) to keep the widget fully encapsulated and abstracted;
 - Polymer and Webcomponents to provide the UI elements within Shaddow DOM to further isolate the widget and prevent leaky CSS. This protects both the widget code and the code on the host page from interference from each other;
-- Redux for application state management.
+- Redux for application state management. Thunk Redux as middleware for side-effects and async requirements.
 
 ### Back-end
 
