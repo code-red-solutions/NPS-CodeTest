@@ -71,10 +71,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="indexBundleViaDocumentCreateElement.html" />
+    <None Include="index-Pure-JS-example.html" />
     <None Include="conf\webpack.config.dev.js" />
     <None Include="conf\webpack.config.prod.js" />
-    <Content Include="index.html" />
     <None Include="lib\dev\custom-elements-es5-adapter.js" />
     <None Include="lib\dev\static\Capture.PNG" />
     <None Include="lib\dev\webcomponents-loader.js" />
@@ -91,6 +90,7 @@
     <None Include=".gitignore" />
     <None Include="static\Capture.PNG" />
     <None Include="scripts\system-production.0.21.3.js" />
+    <Content Include="index-SystemJS-example.html" />
     <Content Include="src\nps-widget\store\settings\actions.ts" />
     <TypeScriptCompile Include="src\custom-types.d.ts" />
     <TypeScriptCompile Include="src\nps-widget\services\AnswerRangeQuestionFinder.ts" />
