@@ -3,7 +3,7 @@
 # Edit theme's home layout instead if you wanna make some changes
 # See: https://jekyllrb.com/docs/themes/#overriding-theme-defaults
 layout: home
-title: The Development Experience
+title: Development Experience
 sectionName: devexp
 icon: fa-road
 excludeDefaultWidget: true
