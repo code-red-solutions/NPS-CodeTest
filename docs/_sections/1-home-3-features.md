@@ -22,7 +22,7 @@ The most important aspect of the NPS widget is the questions you ask of your cus
 
 Lastly you can specify what optional comments you'd like from your users. Not only can you specify a question to ask your users when calling for extra comments, but you can provide any number of ranges within the rating scale where you can ask for a different comment (e,g, between 1-5 you can ask one question and 5-10 ask another).
 
-### User Interacion Saved Across Browser Refreshes
+### User Interaction Saved Across Browser Refreshes
 
 Isn't is annoying when something goes wrong and you loose all your data on the page by accidently refreshing the browser or navigating away from the page by mistake?
 

@@ -13,9 +13,9 @@ The following lists technical debt and any potential actions to remediate it (in
 - Unit Tesing:
     - NpsWidget:
         - Need to implement a JavaScript IoC container to provide runtime support for Depnedency Injection and support for unit testing
-        - Extract logic in 'render()' method to a seperate class to enable proper unit testing
-        - Extract logic in 'constrcutor(config)' method to a seperate class to enable proper unit testing
-        - Extract logic in 'ready()' method to a seperate class to enable proper unit testing
+        - Extract logic in `render()` method to a seperate class to enable proper unit testing
+        - Extract logic in `constrcutor(config)` method to a seperate class to enable proper unit testing
+        - Extract logic in `ready()` method to a seperate class to enable proper unit testing
         - Extract logic from widget event handlers to seperate classes to enable proper unit testing
     - Back-end API:
         - Interface and wrapper needed for Document DB to allow for any unit testing of value
